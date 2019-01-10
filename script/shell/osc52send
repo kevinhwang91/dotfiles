@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+buf=$(cat)
+
+# 7 bytes are occupied by a "\033]52;c;" header, 1 byte by a "\a" footer, and
+# 99992 bytes by the base64-encoded result of 74994 bytes of copyable text
+maxlen=74994
+if (( $(printf %s "$buf" | wc -c) > maxlen )); then
+    exit 1
+fi
+if [[ -n $TMUX ]]; then
+    tty=$(tmux list-panes -F '#{pane_active} #{pane_tty}' | awk '$1==1 { print $2 }')
+else
+    tty='/dev/tty'
+fi
+printf '\033]52;c;%s\a' "$(printf %s "$buf" | head -c $maxlen | base64)" >$tty

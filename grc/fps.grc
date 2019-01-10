@@ -1,0 +1,44 @@
+# PID, PPID, PGID
+regexp=\s+(\d+)\s+(\d+)\s+(\d+)
+colours=default,blue,cyan,green
+-
+# /full/path
+regexp=(\s|^)/[-\w\d.]+/[-\w\d./]+
+colours=bold white
+-
+# text:
+regexp=^([-a-z0-9]+):\s
+colours=unchanged,yellow
+-
+# -options
+regexp=(?<=\s)-[\w\d]+(?=\s|$)
+colours=yellow
+-
+# --long-option=
+# legacy: regexp=(?<=\s)--[-\w\d]+[\w\d](?==|\s|$)(=?)
+regexp=(?<=\s)--[-\w\d]+[\w\d](?==|\s|$)(=|\s)?(?!--)([^\s]*)
+colours=bright_magenta,white,underline green
+-
+# [text]
+regexp=\[[-\w\d:/]+\]
+colours=cyan
+-
+# root
+regexp=root|wheel(?=\s|$)
+colours=bold red
+-
+# pts
+regexp=(\s|^)pts/\d+(?=[^\w\d]|$)
+colours=bright_yellow
+-
+# tty
+regexp=(\s|^)tty\d+(?=[^\w\d]|$)
+colours=bright_cyan
+-
+# Process ZOMBIE
+regexp=\d\s+(Z)\s
+colours=unchanged,on_red bold white
+-
+# Process RS
+regexp=\d\s+([SR][<NLsl+]*)\s
+colours=unchanged,magenta

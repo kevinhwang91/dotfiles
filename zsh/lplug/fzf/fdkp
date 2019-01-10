@@ -1,0 +1,62 @@
+#!/usr/bin/env zsh
+
+_fdkp() {
+    local render
+    if (( $+commands[grcat] )); then
+        render='grcat fdockerps.grc'
+    else
+        render='cat'
+    fi
+    docker ps $@ --format="{{.ID}}@{{.Image}}@{{.Names}}@{{.Status}} \
+[{{.RunningFor}}]@{{.Ports}}@{{.Command}}" |
+    awk -F '@' '
+    BEGIN {
+        OFS = FS; print "ID@IMAGE@NAMES@STATUS@PORTS@COMMAND"
+    } {
+        $1 = substr($1, 1, 6);
+        $2 = gensub(/([^/.])[^/]*\//, "\\1/", "g", $2);
+        sub(/Up/, "U", $4);
+        sub(/Created/, "C", $4);
+        sub(/Dead/, "D", $4);
+        sub(/Exited/, "E", $4);
+        sub(/Running/, "RN", $4);
+        sub(/Removing/, "RM", $4);
+        sub(/Restarting/, "RS", $4);
+        sub(/Paused/, "P", $4);
+        gsub(/ ago/, "", $4);
+        gsub(/About a minute/, "1M", $4);
+        gsub(/About an hour/, "1H", $4);
+        gsub(/ seconds?/, "S", $4);
+        gsub(/ minutes?/, "M", $4);
+        gsub(/ hours?/, "H", $4);
+        gsub(/ days?/, "d", $4);
+        gsub(/ weeks?/, "w", $4);
+        gsub(/ months?/, "m", $4);
+        if (match($5, /[^:]*:([0-9]+)->[^:]*/)) {
+            $5 = gensub(/[^:]*:([0-9]+)->[^:]*/, "\\1,", "g", $5);
+            $5 = substr($5, 1, length($5) - 1);
+        } else {
+            $5 = ""
+        }
+        $6 = gensub(/"(.*)"/, "\\1", 1, $6);
+        print $0
+    } ' | column -t -s '@' | ${(z)render}
+}
+
+setopt localoptions pipefail
+
+local fzf_opts="--header-lines=1 -m \
+${commands[grcat]:+--ansi} --height=60% \
+--min-height=15 --tac --reverse -n2..3,.. \
+--preview-window=down:2 $EXTRA_OPTS"
+
+local fzf_preview_cmd="docker inspect --format='\
+{{with .State.Pid}}{{.}}{{end}}@{{.Config.Image}}\
+@{{range .NetworkSettings.Networks}}{{.IPAddress}} {{end}}\
+@{{range \$p, \$conf := .NetworkSettings.Ports}}\
+{{with \$conf}}{{(index . 0).HostPort}}->{{end}}{{\$p}} {{end}}' {1} |
+sed -E -e 's/ @/@/g' -e '1s/^/PID@IMAGE@IPADDRESS@PORTS\n/' |
+column -t -s'@'"
+
+_fdkp $@ | $FZF_CMD ${(z)fzf_opts} --preview=$fzf_preview_cmd |
+    awk '{printf "%s ", $3}' | sed -E '$s/ $//'

@@ -1,0 +1,11 @@
+[Unit]
+Description=Start tmux server, require to set server option exit-empty off
+
+[Service]
+Type=forking
+User=%I
+ExecStart=/usr/bin/zsh -i -c 'source ~/.zshrc; /usr/bin/tmux start-server'
+ExecStop=/usr/bin/tmux kill-server
+
+[Install]
+WantedBy=multi-user.target

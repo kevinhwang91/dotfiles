@@ -1,0 +1,28 @@
+[user]
+    email = USER_EMAIL
+    name = USER_NAME
+
+[core]
+    excludesfile = ~/.gitignore
+
+[blame]
+    date = short
+
+[pull]
+    rebase = true
+
+[diff]
+    tool = neovim
+    ignoreSubmodules = dirty
+
+[merge]
+    tool = neovim
+
+[mergetool]
+    keepBackup = false
+
+[difftool "neovim"]
+    cmd = nvim -d $LOCAL $REMOTE
+
+[mergetool "neovim"]
+    cmd = nvim -f -c \"Gvdiffsplit!\" \"$MERGED\"

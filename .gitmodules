@@ -1,0 +1,3 @@
+[submodule "script/shell/fzf-tmux"]
+	path = script/shell/fzf-tmux
+	url = https://github.com/kevinhwang91/fzf-tmux-script

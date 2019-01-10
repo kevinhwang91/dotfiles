@@ -1,0 +1,175 @@
+set number
+set relativenumber
+set clipboard=unnamedplus
+set ignorecase
+set smartcase
+set hlsearch
+set incsearch
+set visualbell
+set showcmd
+set showmode
+set timeout
+set timeoutlen=500
+
+let mapleader = ' '
+
+set multiple-cursors
+set highlightedyank
+let g:highlightedyank_highlight_color = 'rgba(209, 154, 102, 100)'
+let g:highlightedyank_highlight_duration = '800'
+
+" build ideavim by myself for remap surround
+set surround
+
+set argtextobj
+
+set ideajoin
+
+nnoremap s d
+xnoremap s d
+onoremap s d
+nnoremap d <C-d>
+xnoremap d <C-d>
+nnoremap u <C-u>
+xnoremap u <C-u>
+nnoremap <C-u> u
+
+nnoremap ' `
+xnoremap ' `
+onoremap ' `
+nnoremap ` '
+xnoremap ` '
+onoremap ` '
+nnoremap g' g`
+xnoremap g' g`
+onoremap g' g`
+nnoremap g` g'
+xnoremap g` g'
+onoremap g` g'
+nnoremap m' m`
+xnoremap m' m`
+nnoremap m` m'
+xnoremap m` m'
+
+nnoremap z[ [m
+xnoremap z[ [m
+onoremap z[ [m
+nnoremap z] ]m
+xnoremap z] ]m
+onoremap z] ]m
+
+nnoremap q <Nop>
+" nnoremap qq :q<CR>
+" It closes the current buffer instead of the current window.
+nnoremap qq <C-w>c
+nnoremap qa :qa<CR>
+
+nnoremap - "_
+xnoremap - "_
+nnoremap <leader>3 :edit #<CR>
+nnoremap <leader>l :nohlsearch<CR>
+nnoremap Y y$
+
+cnoremap <C-b> <Left>
+cnoremap <C-f> <Right>
+cnoremap <C-a> <Home>
+
+nnoremap <C-o> :action Back<CR>
+nnoremap <C-i> :action Forward<CR>
+nnoremap g, :action JumpToLastChange<CR>
+nnoremap g; :action JumpToNextChange<CR>
+nnoremap gd :action GotoDeclaration<CR>
+nnoremap gi :action GotoImplementation<CR>
+nnoremap gr :action ShowUsages<CR>
+nnoremap gs :action GotoSuperMethod<CR>
+nnoremap gy :action GotoTypeDeclaration<CR>
+
+noremap 'a 'A
+noremap 'b 'B
+noremap 'c 'C
+noremap 'd 'D
+noremap 'e 'E
+noremap 'f 'F
+noremap 'g 'G
+noremap 'h 'H
+noremap 'i 'I
+noremap 'j 'J
+noremap 'k 'K
+noremap 'l 'L
+noremap 'm 'M
+noremap 'n 'N
+noremap 'o 'O
+noremap 'p 'P
+noremap 'q 'Q
+noremap 'r 'R
+noremap 's 'S
+noremap 't 'T
+noremap 'u 'U
+noremap 'v 'V
+noremap 'w 'W
+noremap 'x 'X
+noremap 'y 'Y
+noremap 'z 'Z
+noremap ma mA
+noremap mb mB
+noremap mc mC
+noremap md mD
+noremap me mE
+noremap mf mF
+noremap mg mG
+noremap mh mH
+noremap mi mI
+noremap mj mJ
+noremap mk mK
+noremap ml mL
+noremap mm mM
+noremap mn mN
+noremap mo mO
+noremap mp mP
+noremap mq mQ
+noremap mr mR
+noremap ms mS
+noremap mt mT
+noremap mu mU
+noremap mv mV
+noremap mw mW
+noremap mx mX
+noremap my mY
+noremap mz mZ
+noremap m; :action ToggleBookmarkWithMnemonic<CR>
+noremap m<space> :delmarks A-Z0-9<CR>
+noremap <leader>fm :action ShowBookmarks<CR>
+
+nnoremap <leader>ic :action Generate<CR>
+
+nnoremap <leader>gb :action Annotate<CR>
+nnoremap <leader>gp :action Vcs.QuickListPopupAction<CR>
+nnoremap <leader>gm :action Vcs.ShowHistoryForBlock<CR>
+
+nnoremap <leader>rf :action RenameFile<CR>
+nnoremap <leader>rn :action RenameElement<CR>
+
+nnoremap <leader>fa :action GotoAction<CR>
+nnoremap <leader>fc :action GotoClass<CR>
+nnoremap <leader>ff :action GotoFile<CR>
+nnoremap <leader>fs :action GotoSymbol<CR>
+
+nnoremap <leader>ft :action FileStructurePopup<CR>
+nnoremap <leader>fu :action FindUsages<CR>
+
+nnoremap <leader>hc :action CallHierarchy<CR>
+nnoremap <leader>hm :action MethodHierarchy<CR>
+nnoremap <leader>ht :action TypeHierarchy<CR>
+
+nnoremap <leader>fp :action ViewBreakpoints<CR>
+nnoremap <leader>ba :action ToggleBreakpointAction<CR>
+nnoremap <leader>bb :action ToggleLineBreakpoint<CR>
+
+nnoremap <leader>hp :action VcsShowCurrentChangeMarker<CR>
+nnoremap <leader>hu :action Vcs.RollbackChangedLines<CR>
+nnoremap [c :action VcsShowPrevChangeMarker<CR>
+nnoremap ]c :action VcsShowNextChangeMarker<CR>
+
+nnoremap <leader>td :action ShowErrorDescription<CR>
+nnoremap [d :action GotoPreviousError<CR>
+nnoremap ]d :action GotoNextError<CR>

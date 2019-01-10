@@ -1,0 +1,14 @@
+#!/usr/bin/env zsh
+
+local matches
+matches=$(fps)
+
+local ret=$?
+if (( ret )); then
+    return $ret
+fi
+
+if [[ -o histignorespace && -n $matches ]]; then
+    LBUFFER=" $LBUFFER"
+fi
+LBUFFER="$LBUFFER$matches"

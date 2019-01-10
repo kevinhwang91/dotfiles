@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+ccls_bin=$(which -a ccls | grep -v "$(cd -P "$(dirname "$0")" && pwd -P)" | head -n 1)
+exec -- $ccls_bin --init="{\"clang\": {\"resourceDir\": \"$(clang -print-resource-dir)\"}}"

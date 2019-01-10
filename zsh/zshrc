@@ -1,0 +1,77 @@
+#!/usr/bin/env zsh
+
+# yarn
+[[ $PATH =~ $HOME/.yarn/bin ]] || PATH=$(yarn global bin):$PATH
+
+# golang
+export GOPATH=$HOME/WorkSpaces/go
+# [[ $PATH =~ $GOPATH/bin ]] || PATH=$(go env GOPATH)/bin:$PATH
+
+# path
+[[ $PATH =~ $HOME/.local/bin ]] || PATH=$HOME/.local/bin:$PATH
+export PATH
+
+export JDK_HOME=/usr/lib/jvm/default
+
+# emacs mode
+bindkey -e
+
+# tabs size
+tabs 4
+
+ZGEN_DIR=${XDG_CONFIG_HOME:-$HOME/.config}/zsh/zgen
+ZSH_LPLUG_DIR=${XDG_CONFIG_HOME:-$HOME/.config}/zsh/lplug
+source $ZGEN_DIR/zgen.zsh
+zgen load 'zsh-users/zsh-completions'
+export ZSH_AUTOSUGGEST_USE_ASYNC=1
+export ZSH_AUTOSUGGEST_MANUAL_REBIND=1
+zgen load 'zsh-users/zsh-autosuggestions'
+zgen load 'zdharma/fast-syntax-highlighting'
+zgen load 'hlissner/zsh-autopair'
+zgen load 'skywind3000/z.lua'
+zgen load 'mafredri/zsh-async'
+zgen load 'kevinhwang91/tmux-capture'
+zgen load $ZSH_LPLUG_DIR/completion.zsh
+zgen load $ZSH_LPLUG_DIR/misc.zsh
+zgen load $ZSH_LPLUG_DIR/color.zsh
+zgen load $ZSH_LPLUG_DIR/history.zsh
+zgen load $ZSH_LPLUG_DIR/alias-function.zsh
+zgen load $ZSH_LPLUG_DIR/theme.zsh
+zgen load $ZSH_LPLUG_DIR/git-prompt.zsh
+zgen load $ZSH_LPLUG_DIR/tmux.zsh
+zgen load $ZSH_LPLUG_DIR/fzf-plugin.zsh
+
+# python prompt toolkit color depth
+export PROMPT_TOOLKIT_COLOR_DEPTH=DEPTH_24_BIT
+
+# less
+export LESS=FRX
+
+# ranger
+if (( $+commands[ranger] )); then
+    export RANGER_LOAD_DEFAULT_RC=FALSE
+    export RANGER_ZLUA=$ZLUA_SCRIPT
+fi
+
+# neovim
+if (( $+commands[nvim] )); then
+    export EDITOR=nvim
+    export MANPAGER='nvim +Man!'
+fi
+
+# bat
+if (( $+commands[bat] )); then
+    export BAT_THEME=TwoDark
+    export BAT_STYLE=plain
+fi
+
+# git pager
+if (( $+commands[delta] )); then
+    export GIT_PAGER=$(printf '%s ' delta -n --syntax-theme=TwoDark -w 1 \
+        --minus-style=\"syntax #450a15\" --minus-emph-style=\"syntax #600818\" \
+        --plus-style=\"syntax #0b4820\" --plus-emph-style=\"syntax #175c2e\" \
+        --hunk-header-style=\"syntax bold\" --hunk-header-decoration-style=\"black box\" \
+        --file-style=\"yellow italic\" --file-decoration-style=\"yellow ul\" \
+        --line-numbers-zero-style=\"#4b5263\" \
+        --line-numbers-left-format=\"{nm:^4} \" --line-numbers-right-format=\"{np:^4}  \")
+fi

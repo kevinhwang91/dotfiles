@@ -1,0 +1,14 @@
+#!/usr/bin/env zsh
+
+setopt localoptions pipefail
+
+if [[ -n $(command -v z) ]]; then
+    local fzf_bind_opts
+    if (( $+commands[xsel] )); then
+        fzf_bind_opts='--bind=ctrl-y:execute-silent(echo -n {2} | xsel -i -b)'
+    elif (( $+commands[xclip] )); then
+        fzf_bind_opts='--bind=ctrl-y:execute-silent(echo -n {2} | xclip -i -selection clipboard)'
+    fi
+    local fzf_opts="--height=60% -n2..,.. --tac --tiebreak=index $fzf_bind_opts"
+    print $(z | $FZF_CMD ${(z)fzf_opts}| sed -E 's/^\s*[0-9,.]* *//')
+fi

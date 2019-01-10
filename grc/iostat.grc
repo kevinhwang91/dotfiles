@@ -1,0 +1,31 @@
+# Averages Title
+regexp=\s+(%user)\s+(%nice)\s+(%system)\s+(%iowait)\s+(%steal)\s+(%idle)
+colours=default,blue,cyan,magenta,green,red,yellow
+-
+# Averages Numbers
+regexp=\s+(\d+\.?\d{0,2}%?)\s+(\d+\.?\d{0,2}%?)\s+(\d+\.?\d{0,2}%?)\s+(\d+\.?\d{0,2}%?)\s+(\d+\.?\d{0,2}%?)\s+(\d+\.?\d{0,2}%?)
+colours=default,blue,cyan,magenta,green,red,yellow
+-
+# Averages last line
+regexp=^Average:.*$
+colours=reverse
+-
+# Devices Title
+regexp=\s+(tps)\s+([kM]B_read\/s)\s+([kM]B_wrtn\/s)\s+([kM]B_dscd\/s)\s+([kM]B_read)\s+([kM]B_wrtn)\s+([kM]B_dscd)
+colours=default,blue,cyan,magenta,yellow,bright_cyan,bright_magenta,bright_yellow
+-
+# Devices Numbers
+regexp=\s+(\d+\.?\d{0,2}[kMG]?)\s+(\d+\.?\d{0,2}[kMG]?)\s+(\d+\.?\d{0,2}[kMG]?)\s+(\d+\.?\d{0,2}[kMG]?)\s+(\d+\.?\d{0,2}k?M?G?)\s+(\d+\.?\d{0,2}[kMG]?)\s+(\d+\.?\d{0,2}[kMG]?)
+colours=default,blue,cyan,magenta,yellow,bright_cyan,bright_magenta,bright_yellow
+-
+# Disable colors in extent mode
+regexp=(\s+(\d+\.?\d{0,2}[kMG]?)){20}
+colours=default
+-
+# High rates (4 digits)
+regexp=\s\d{4}\.\d+
+colours=red
+-
+# High rates (5+ digits)
+regexp=\s\d{5,}\.\d+
+colours=bold red

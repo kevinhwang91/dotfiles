@@ -1,0 +1,15 @@
+#!/usr/bin/env zsh
+
+# http://blog.pkh.me/p/21-high-quality-gif-with-ffmpeg.html
+
+width=960
+algo=lanczos
+dithermode=none
+
+filters="fps=6,scale=$width:-1:flags=$algo"
+palette="/tmp/palette.png"
+input=$1
+output=${1:r}-$algo.gif
+
+ffmpeg -v warning -i $input -vf "$filters,palettegen" -y $palette
+ffmpeg -v warning -i $input -i $palette -lavfi "$filters [x]; [x][1:v] paletteuse=dither=$dithermode" -y $output

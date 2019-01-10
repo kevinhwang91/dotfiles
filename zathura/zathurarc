@@ -1,0 +1,39 @@
+set recolor true
+set recolor-darkcolor '#d3dae3'
+set recolor-lightcolor '#202326'
+set statusbar-bg '#313640'
+set statusbar-fg '#d3dae3'
+set inputbar-bg '#202326'
+set inputbar-fg '#d3dae3'
+set notification-bg '#383c4a'
+set notification-fg '#d3dae3'
+set notification-error-bg '#202326'
+set notification-error-fg '#e06c75'
+set notification-warning-bg '#202326'
+set notification-warning-fg '#d19a66'
+set highlight-color '#e5c07b'
+set highlight-active-color '#61afef'
+set completion-fg '#d3dae3'
+set completion-bg '#333841'
+set completion-highlight-fg '#d3dae3'
+set completion-highlight-bg '#4b5263'
+set completion-group-fg '#d3dae3'
+set completion-group-bg '#5c6370'
+set selection-clipboard 'clipboard'
+set default-bg '#202326'
+set default-fg '#d3dae3'
+set guioptions 'hv'
+set font 'Hack Nerd Font Regular 13'
+
+unmap q
+map qq quit
+map u scroll half-up
+map e scroll half-up
+map d scroll half-down
+map <C-p> toggle_page_mode
+map <C-0> zoom default
+map <C--> zoom out
+map <C-=> zoom in
+map <C-l> nohlsearch
+
+# vim: ft=conf

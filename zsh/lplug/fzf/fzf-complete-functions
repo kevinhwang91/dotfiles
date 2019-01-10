@@ -1,0 +1,16 @@
+#!/usr/bin/env zsh
+
+local matches
+if [[ ! $2 == +* ]]; then
+    matches=$(ffunctions)
+    local ret=$?
+    if (( ret )); then
+        return $ret
+    fi
+fi
+
+if [[ -n $matches ]]; then
+    LBUFFER="$LBUFFER$matches"
+else
+    return 99
+fi

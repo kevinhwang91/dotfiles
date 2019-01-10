@@ -1,0 +1,48 @@
+#!/usr/bin/env zsh
+
+local matches
+case $2 in
+    attach | cp | diff | exec | export | \
+        stats | top)
+        matches=$(EXTRA_OPTS=+m fdkp)
+        ;;
+    kill | pause | restart | stop)
+        matches=$(fdkp)
+        ;;
+    unpause)
+        matches=$(fdkp -f=status=paused)
+        ;;
+    rm)
+        if [[ $3 == -f ]]; then
+            matches=$(fdkp -a)
+        else
+            matches=$(fdkp -f=status=exited)
+        fi
+        ;;
+    start | update)
+        matches=$(fdkp -a)
+        ;;
+    logs | rename)
+        matches=$(EXTRA_OPTS=+m fdkp -a)
+        ;;
+    rmi)
+        matches=$(fdki)
+        ;;
+    create | history | run)
+        matches=$(EXTRA_OPTS=+m fdki)
+        ;;
+    *)
+        return 99
+        ;;
+esac
+
+local ret=$?
+if (( ret )); then
+    return $ret
+fi
+
+if [[ -n $matches ]]; then
+    LBUFFER="$LBUFFER$matches"
+else
+    return 99
+fi

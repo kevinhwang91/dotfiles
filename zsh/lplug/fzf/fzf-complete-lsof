@@ -1,0 +1,18 @@
+#!/usr/bin/env zsh
+
+local matches
+if [[ ${@: -1} == -p ]]; then
+    matches=$(FZF_MUL_DELIM="," fps)
+    local ret=$?
+    if (( ret )); then
+        return $ret
+    fi
+
+    if [[ -o histignorespace ]]; then
+        LBUFFER=" $LBUFFER"
+    fi
+
+    LBUFFER="$LBUFFER$matches"
+else
+    return 99
+fi

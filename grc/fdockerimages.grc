@@ -1,0 +1,15 @@
+# Image name
+regexp=\s{2,}((?:[a-z\-_0-9]+/)*)([a-z\-_0-9]+)(:\S+)?\s{2,}
+colours=default,bright_white,bright_yellow,cyan
+-
+# Images without tag
+regexp=\s+(<none>)\s+
+colours=unchanged,bold red
+-
+# Created
+regexp=\s{2,}(\d{,2}[HMSdwm])\s{2,}
+colours=default,blue
+-
+# Size
+regexp=\s{2,}\d+[.,]?\d*\s?(B|KB|MB|GB)?$
+colours=bright_magenta

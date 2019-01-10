@@ -1,0 +1,27 @@
+#!/usr/bin/env zsh
+
+setopt localoptions pipefail
+
+local context=${GREP_CONTEXT:-5}
+local reverse="\x1b[7m"
+local reset="\x1b[m"
+local histsize=${HISTSIZE:-30}
+
+local fzf_preview_cmd="
+    HISTSIZE=$histsize
+    context=$context
+    fc -R ~/.zsh_history
+    hist_context=\$(fc -rl 1 | \
+        grep --color=always -m 1 -C \$context -E '^\s*[0-9]+\*?\s+{1}(\s+|$|\|)')
+    cnt=\$(wc -l <<<\$hist_context)
+    if (( cnt == 2 * context + 1  )); then
+        target=\$(( context + 1 ))
+    else
+        target=\$(( cnt - context ))
+    fi
+    awk -v t=\$target '{ if (NR == t) {
+        gsub(/\x1b[[0-9;]*m/, \"&$reverse\");
+        printf(\"%s\n$reset\", \$0);
+    } else printf(\"%s\n\", \$0);}' <<<\$hist_context"
+
+alias | $FZF_CMD -d '=' --height=60% --preview=$fzf_preview_cmd | sed -E -n 's/^([^=]*)=.*/\1/p'

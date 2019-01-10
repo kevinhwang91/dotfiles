@@ -1,0 +1,9 @@
+#!/usr/bin/env zsh
+
+local matches
+matches=$(GREP_CONTEXT=10 faa)
+local ret=$?
+if (( ret )); then
+    return $ret
+fi
+LBUFFER="$LBUFFER$matches "

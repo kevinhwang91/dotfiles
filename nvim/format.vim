@@ -1,0 +1,39 @@
+Plug 'sbdchd/neoformat', {'on': 'Neoformat'}
+noremap <M-C-l> :Neoformat<CR>
+let g:neoformat_only_msg_on_error = 1
+let g:neoformat_basic_format_align = 1
+let g:neoformat_basic_format_retab = 1
+let g:neoformat_basic_format_trim = 1
+
+" python
+let g:neoformat_enabled_python = ['autopep8']
+let g:neoformat_python_autopep8 = {'exe': 'autopep8', 'args': ['--max-line-length=100']}
+
+" javascript
+let g:neoformat_enabled_javascript = ['prettier']
+
+" typescript
+let g:neoformat_enabled_typescript = ['prettier']
+
+" json
+let g:neoformat_enabled_json = ['prettier']
+
+" yaml
+let g:neoformat_enabled_yaml = ['prettier']
+let g:neoformat_yaml_prettier = {'exe': 'prettier',
+            \ 'args': ['--stdin-filepath', '"%:p"', '--tab-width=2'], 'stdin': 1}
+
+" editorconfig
+Plug 'editorconfig/editorconfig-vim'
+let g:EditorConfig_exclude_patterns = ['fugitive://.*']
+let g:EditorConfig_preserve_formatoptions = 1
+
+augroup GoFormat
+    autocmd!
+    autocmd FileType go setlocal noexpandtab
+augroup end
+
+augroup JavascriptTypescriptFormat
+    autocmd!
+    autocmd FileType javascript,typescript setlocal noexpandtab
+augroup end

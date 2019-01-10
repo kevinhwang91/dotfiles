@@ -1,0 +1,22 @@
+#!/usr/bin/env zsh
+
+setopt localoptions pipefail
+
+local selected
+
+fc -rl 1 | python -c '
+import sys
+cmds = set()
+for line in sys.stdin:
+    cmd = str(line.split()[1:])
+    if cmd not in cmds:
+        cmds.add(cmd)
+        sys.stdout.write(line)
+' | $FZF_CMD --height=60% -n2..,.. --tiebreak=index --bind=ctrl-s:toggle-sort --query=$1 +m |
+    read selected
+
+local ret=$?
+if [[ -n $selected ]]; then
+    awk '{print $1}' <<< $selected
+fi
+return $ret

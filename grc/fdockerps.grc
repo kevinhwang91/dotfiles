@@ -1,0 +1,32 @@
+# Image name
+regexp=\s{2,}((?:[a-z\-_0-9]+/)*)([a-z\-_0-9]+)(:\S+)?\s{2,}
+colours=default,bright_white,bright_yellow,cyan
+-
+# Name
+regexp=\s{2,}([a-z\-_0-9]+)\s{2,}(?=[CURE])
+colours=default,blue
+-
+# Status
+# Up, Paused
+regexp=\s{2,}U\s[\w]+(\s\(P\))?(?=\s\[)
+colours=green,yellow
+-
+# Created
+regexp=\s{2,}C(?=\s+\[)
+colours=bright_blue
+-
+# Restarting
+regexp=\s{2,}RS\s.(\d{1,3}).+(?=\s\[)
+colours=magenta
+-
+# Exited
+regexp=\s{2,}E\s.(\d{1,3}).+(?=\s\[)
+colours=red
+-
+# Created time
+regexp=\s\[\w+\]\s{2,}
+colours=bright_cyan
+-
+# Ports, Command
+regexp=(?<=\])\s{2,}((?:\d{,5},?)+)\s{2,}(.*)$
+colours=default,bright_magenta,bright_black

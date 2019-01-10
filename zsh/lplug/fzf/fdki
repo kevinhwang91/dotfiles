@@ -1,0 +1,43 @@
+#!/usr/bin/env zsh
+
+_fdki() {
+    local render
+    if (( $+commands[grcat] )); then
+        render='grcat fdockerps.grc'
+    else
+        render='cat'
+    fi
+
+    docker images $@ |
+    awk -F '( ){2,}' '
+    BEGIN {
+        print "ID@IMAGE@CREATED@SIZE"
+    } NR>1 {
+        $3 = substr($3, 1, 6);
+        gsub(/ ago/, "", $4);
+        gsub(/About a minute/, "1M", $4);
+        gsub(/About an hour/, "1H", $4);
+        gsub(/ seconds?/, "S", $4);
+        gsub(/ minutes?/, "M", $4);
+        gsub(/ hours?/, "H", $4);
+        gsub(/ days?/, "d", $4);
+        gsub(/ weeks?/, "w", $4);
+        gsub(/ months?/, "m", $4);
+        print $3"@"$1":"$2"@"$4"@"$5
+    } ' | column -t -s '@' | ${(z)render}
+}
+
+setopt localoptions pipefail
+
+local fzf_opts="--header-lines=1 -m \
+${commands[grcat]:+--ansi} --height=60% \
+--min-height=15 --tac --reverse \
+--preview-window=down:2 $EXTRA_OPTS"
+
+local fzf_preview_cmd="docker inspect --format='\
+{{printf \"Entrypoint: %s\n\" (join .Config.Entrypoint \" \")}}\
+{{printf \"Cmd: %s\" (join .Config.Cmd \" \")}}' {1} |
+awk -v OFS=' ' '{ \$1=\$1;print \$0 }'"
+
+_fdki $@ | $FZF_CMD ${(z)fzf_opts} --preview=$fzf_preview_cmd |
+    awk '{printf "%s ", $2}' | sed -E '$s/ $//'
