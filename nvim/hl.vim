@@ -42,31 +42,29 @@ if has('nvim-0.5')
         endfor
     endfunction
 
+    function s:refresh_ts() abort
+        if exists('b:ts_last_changedtick') &&
+                    \ (b:ts_last_changedtick < 0 || b:ts_last_changedtick == b:changedtick)
+            return
+        endif
+        let ft = &filetype
+        if index(s:ts_ft_set, ft) >= 0
+            execute 'silent! TSBufDisable highlight'
+            execute 'TSBufEnable highlight'
+        else
+            let b:ts_last_changedtick = -1
+            return
+        endif
+        let b:ts_last_changedtick = b:changedtick
+    endfunction
+
     augroup TSHighlight
         autocmd!
+        autocmd CursorHold,CursorHoldI * call <SID>refresh_ts()
         execute 'autocmd FileType ' . join(s:ts_ft_set, ',') .
                     \ ' call timer_start(0, "LazyLoadTreeSitter")'
     augroup END
 endif
-
-Plug 'sheerun/vim-polyglot'
-let g:polyglot_disabled = ['markdown', 'python', 'typescript', 'c/c++', 'c++11']
-
-let g:go_highlight_extra_types = 1
-let g:go_highlight_operators = 1
-let g:go_highlight_functions = 1
-let g:go_highlight_function_parameters = 1
-let g:go_highlight_function_calls = 1
-let g:go_highlight_types = 1
-let g:go_highlight_fields = 1
-let g:go_highlight_generate_tags = 1
-let g:go_highlight_format_strings = 1
-highlight default link goParamName Parameter
-highlight default link goParamType Type
-highlight default link goFunctionCall Function
-highlight default link goTypeDecl Statement
-highlight default link goVar Statement
-highlight default link goPredefinedIdentifiers cSpecial
 
 " lazy load for python file type
 Plug 'numirias/semshi', {'do': ':UpdateAllRemotePlugins', 'on': []}
