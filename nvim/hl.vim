@@ -30,6 +30,7 @@ if has('nvim-0.5')
 
         augroup TSHighlight
             autocmd!
+            autocmd CursorHold,CursorHoldI * call <SID>refresh_ts()
             execute 'autocmd FileType ' . join(s:ts_ft_set, ',') .
                         \ ' execute("TSBufEnable highlight")'
         augroup END
@@ -60,7 +61,6 @@ if has('nvim-0.5')
 
     augroup TSHighlight
         autocmd!
-        autocmd CursorHold,CursorHoldI * call <SID>refresh_ts()
         execute 'autocmd FileType ' . join(s:ts_ft_set, ',') .
                     \ ' call timer_start(0, "LazyLoadTreeSitter")'
     augroup END
