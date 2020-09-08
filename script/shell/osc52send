@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+
+# This script is deprecated in tmux 3.3 version
+# use tmux load-buffer -w -
+
 buf=$(cat)
 
 # 7 bytes are occupied by a "\033]52;c;" header, 1 byte by a "\a" footer, and

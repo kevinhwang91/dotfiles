@@ -619,7 +619,7 @@ key_bindings:
   - { key: Key0,      mods: Control,       chars: "\x1b\x5b\x32\x31\x3b\x35\x7e" }
   - { key: Semicolon, mods: Control,       chars: "\x1b\x5b\x32\x33\x3b\x35\x7e" }
   - { key: Apostrophe,mods: Control,       chars: "\x1b\x5b\x32\x34\x3b\x35\x7e" }
-  # Map Control-Alt-([1-9]) and Control-[,.] to Control-shift-[F1-F12] (F37-F48)
+  # Map Control-Alt-([1-9]) and Control-[,.] to Control-Shift-[F1-F12] (F37-F48)
   - { key: Key1,      mods: Control|Alt,   chars: "\x1b\x5b\x31\x3b\x36\x50"     }
   - { key: Key2,      mods: Control|Alt,   chars: "\x1b\x5b\x31\x3b\x36\x51"     }
   - { key: Key3,      mods: Control|Alt,   chars: "\x1b\x5b\x31\x3b\x36\x52"     }
@@ -632,6 +632,9 @@ key_bindings:
   - { key: Key0,      mods: Control|Alt,   chars: "\x1b\x5b\x32\x31\x3b\x36\x7e" }
   - { key: Comma,     mods: Control,       chars: "\x1b\x5b\x32\x33\x3b\x36\x7e" }
   - { key: Period,    mods: Control,       chars: "\x1b\x5b\x32\x34\x3b\x36\x7e" }
+  # Map Control-[ and Control-m to Alt-Shift-[F1-F2] (F61-F62)
+  - { key: LBracket,  mods: Control,       chars: "\x1b\x5b\x31\x3b\x34\x50"     }
+  - { key: M,         mods: Control,       chars: "\x1b\x5b\x31\x3b\x34\x51"     }
   #- { key: Paste,                                action: Paste          }
   #- { key: Copy,                                 action: Copy           }
   #- { key: L,         mods: Control,             action: ClearLogNotice }
