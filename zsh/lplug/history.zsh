@@ -1,3 +1,7 @@
+if [[ ! $- =~ i ]]; then
+    return
+fi
+
 # history
 if [ -z $HISTFILE ]; then
     HISTFILE=$HOME/.zsh_history

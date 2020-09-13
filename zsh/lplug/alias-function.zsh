@@ -1,3 +1,7 @@
+if [[ ! $- =~ i ]]; then
+    return
+fi
+
 if (( $+commands[exa] )); then
     alias ls='exa -gH --time-style=iso '
     alias la='ls -a -a'
@@ -27,6 +31,8 @@ alias grt='cd "$(git rev-parse --show-toplevel || echo .)"'
 alias grmv='git remote -v'
 alias grms='git remote set-url'
 
+alias grmsu='_grmsu'
+compdef __grmsu_compdef _grmsu
 _grmsu() {
     local o_url
     local n_url
@@ -45,7 +51,10 @@ _grmsu() {
         git remote set-url $remote $n_url
     fi
 }
-alias grmsu='_grmsu'
+__grmsu_compdef() {
+    (( $+functions[__git_remotes] )) || _git
+    _arguments '1: :__git_remotes'
+}
 
 alias gf='git fetch'
 alias gfa='git fetch --all --prune'
@@ -142,8 +151,10 @@ alias py='python'
 alias ipy='ipython'
 alias pluo='pip list --user --outdated --format=freeze'
 
-alias mux='tmux attach 2>/dev/null || tmux'
-
+alias mux='_mux'
+_mux() {
+    tmux attach $@ 2>/dev/null || tmux
+}
 alias rr='ranger'
 
 alias qc='qalc'
@@ -151,6 +162,36 @@ alias qc='qalc'
 alias jq='jq --indent 4'
 
 alias yg='yarn global'
+
+alias zz='z -'
+
+alias clocf='cloc --by-file --vcs=git .'
+
+if (( $+commands[htop] )); then
+    alias top='htop'
+fi
+
+alias topp='top -p'
+
+alias lsf='lsof -w'
+alias lsfp='lsof -w -p'
+
+if (( $+commands[nvim] )); then
+    alias ng='_ng'
+    _ng() {
+        git status >/dev/null && nvim +Git +'wincmd o' +'bwipeout #'
+    }
+
+    alias ngl='_ngl'
+    compdef __ngl_compdef _ngl
+    _ngl() {
+        git status >/dev/null && nvim +"Flog -raw-args=$*" +1tabclose
+    }
+    __ngl_compdef() {
+        (( $+functions[_git-log] )) || _git
+        _git-log
+    }
+fi
 
 alias Sudo='command sudo '
 
@@ -161,24 +202,24 @@ _sudo() {
 
     if [[ $type == function ]]; then
         shift
-        command sudo -E zsh -c "$(declare -f $cmd);$cmd $*"
+        # TODO issue with calling nested function
+        command sudo -E zsh -c "$(typeset -f $cmd);$cmd $*"
     elif [[ $type == alias ]]; then
-        alias _sudo='command sudo -E '
-        eval "_sudo $@"
-        unalias _sudo
+        functions[_t_expand_alias]=$@ 2>/dev/null
+        if (( $+functions[_t_expand_alias] )); then
+            set -- ${(z)functions[_t_expand_alias]#$'\t'}
+            unset -f _t_expand_alias
+
+            local cmd=$1
+            type=$(which -w $1 | cut -d\  -f2)
+            if [[ $type == function ]]; then
+                shift
+                command sudo -E zsh -c "$(typeset -f $cmd);$cmd $*"
+            else
+                eval "command sudo -E $@"
+            fi
+        fi
     else
         command sudo -E $@
     fi
 }
-
-if (( $+commands[nvim] )); then
-    alias ng='_ng'
-    _ng() {
-        git status >/dev/null && nvim +Git +'wincmd o' +'bwipeout #'
-    }
-
-    alias ngl='_ngl'
-    _ngl() {
-        git status >/dev/null && nvim +"Flog -raw-args=$*" +1tabclose
-    }
-fi

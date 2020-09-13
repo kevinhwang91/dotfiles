@@ -30,7 +30,7 @@ zgen load 'zdharma/fast-syntax-highlighting'
 zgen load 'hlissner/zsh-autopair'
 zgen load 'skywind3000/z.lua'
 zgen load 'mafredri/zsh-async'
-zgen load 'kevinhwang91/tmux-capture'
+zgen load 'kevinhwang91/zsh-tmux-capture'
 zgen load $ZSH_LPLUG_DIR/completion.zsh
 zgen load $ZSH_LPLUG_DIR/misc.zsh
 zgen load $ZSH_LPLUG_DIR/color.zsh
@@ -45,7 +45,7 @@ zgen load $ZSH_LPLUG_DIR/fzf-plugin.zsh
 export PROMPT_TOOLKIT_COLOR_DEPTH=DEPTH_24_BIT
 
 # less
-export LESS=FRX
+export LESS=FKMRX
 
 # ranger
 if (( $+commands[ranger] )); then

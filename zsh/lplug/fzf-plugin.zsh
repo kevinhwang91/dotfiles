@@ -14,7 +14,7 @@ fi
 
 export FZF_DEFAULT_OPTS
 
-if [[ -n $TMUX ]] && (( $+commands[tmux] )) && (( $+commands[fzfp] )); then
+if [[ -n $TMUX_PANE ]] && (( $+commands[tmux] )) && (( $+commands[fzfp] )); then
     FZF_CMD=$commands[fzfp]
 else
     FZF_CMD=$commands[fzf]

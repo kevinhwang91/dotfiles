@@ -1,3 +1,6 @@
+if [[ ! $- =~ i ]]; then
+    return
+fi
 # grc wrapper
 if (( $+commands[grc] )); then
     cmds=(
@@ -56,4 +59,3 @@ if [[ -z $LS_COLORS ]]; then
     eval "$(dircolors -b)"
 fi
 zstyle ':completion:*' list-colors ${(s/:/)LS_COLORS}
-unset LS_COLORS

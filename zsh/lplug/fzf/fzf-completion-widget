@@ -5,17 +5,17 @@ if (( $#LBUFFER > 0)) && [[ $LBUFFER[-1] != ' ' ]]; then
     return
 fi
 
-_expand_alias() {
-    functions[_expand-aliases]=$@ 2>/dev/null
-    if declare -f _expand-aliases >/dev/null; then
-        print ${functions[_expand-aliases]#$'\t'}
-        unset -f _expand-aliases
+_expand_alias_f() {
+    functions[_t_expand_alias]=$@ 2>/dev/null
+    if (( $+functions[_t_expand_alias] )); then
+        print ${functions[_t_expand_alias]#$'\t'}
+        unset -f _t_expand_alias
     else
         print $@
     fi
 }
 
-local tokens=(${(z)$(_expand_alias $LBUFFER)})
+local tokens=(${(z)$(_expand_alias_f $LBUFFER)})
 if (( $#tokens < 1 )); then
     eval 'fzf-complete-alias'
     local ret=$?
@@ -46,7 +46,7 @@ while (( $#tokens > 0 )); do
 done
 
 if [[ -n $pre_cmd_flag ]]; then
-    tokens=(${(z)$(_expand_alias $tokens[1])} $tokens[2,-1])
+    tokens=(${(z)$(_expand_alias_f $tokens[1])} $tokens[2,-1])
 fi
 
 local cmd=$tokens[1]

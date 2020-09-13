@@ -1,4 +1,8 @@
-prompt_preexec() {
+if (( ! $+commands[git] )) || [[ ! $- =~ i ]]; then
+    return
+fi
+
+_git_prompt_preexec() {
     typeset -gA git_info
     if [[ -n $git_info[top] ]]; then
         if [[ $2 =~ git\ (.*\ )?(pull|fetch)(\ .*)?$ ]]; then
@@ -14,7 +18,7 @@ prompt_preexec() {
     fi
 }
 
-prompt_render() {
+_git_prompt_render() {
     local branch_color
     local dirty_color
     typeset -gA git_info
@@ -53,15 +57,15 @@ prompt_render() {
     typeset -g last_prompt=$expanded_prompt
 }
 
-prompt_precmd() {
-    prompt_async_git_tasks
+_git_prompt_precmd() {
+    _git_prompt_tasks
 }
 
-git_stash_count() {
+_git_stash_count() {
     command git stash list | wc -l
 }
 
-git_simple_info_task() {
+_git_simple_info_task() {
     zstyle ':vcs_info:*' enable git
     zstyle ':vcs_info:*' use-simple true
     zstyle ':vcs_info:*' max-exports 3
@@ -79,7 +83,7 @@ git_simple_info_task() {
     print -r - ${(@kvq)info}
 }
 
-git_dirty_task() {
+_git_dirty_task() {
     local -i fast_check=$1
     if (( fast_check == 1 )); then
         test -z $(git status --porcelain --ignore-submodules -uno)
@@ -89,21 +93,21 @@ git_dirty_task() {
     return $?
 }
 
-git_fetch_task() {
+_git_fetch_task() {
     export GIT_TERMINAL_PROMPT=0
     command git -c gc.auto=0 fetch >/dev/null || return 99
-    git_arrows_task
+    _git_arrows_task
 }
 
-git_arrows_task() {
+_git_arrows_task() {
     command git rev-list --left-right --count HEAD...@'{u}'
 }
 
-prompt_async_git_tasks() {
+_git_prompt_tasks() {
     if (( ! ${prompt_async_init:-0} )); then
         RPROMPT=
         async_start_worker 'git_prompt' -u -n
-        async_register_callback 'git_prompt' prompt_async_callback
+        async_register_callback 'git_prompt' _git_prompt_async_callback
         typeset -g prompt_async_init=1
     fi
 
@@ -115,28 +119,28 @@ prompt_async_git_tasks() {
         git_info=
     fi
 
-    async_job 'git_prompt' git_simple_info_task
+    async_job 'git_prompt' _git_simple_info_task
     if [[ -n $git_info[top] ]]; then
-        git_refresh
+        _git_refresh
     fi
 }
 
-git_refresh() {
+_git_refresh() {
     if [[ $git_info[top] != $HOME ]]; then
-        async_job 'git_prompt' git_fetch_task
+        async_job 'git_prompt' _git_fetch_task
     fi
 
     local -i last_dirty_check=$(( EPOCHSECONDS - ${git_info[last_dirty_check_timestamp]:-0} ))
     if (( last_dirty_check > ${GIT_DIRTY_TIMEOUT:-60} )); then
         git_info[last_dirty_check_timestamp]=
-        async_job 'git_prompt' git_dirty_task ${git_info[fast_check]:-0}
+        async_job 'git_prompt' _git_dirty_task ${git_info[fast_check]:-0}
     fi
 
-    async_job 'git_prompt' git_stash_count
-    async_job 'git_prompt' git_arrows_task
+    async_job 'git_prompt' _git_stash_count
+    async_job 'git_prompt' _git_arrows_task
 }
 
-check_git_arrows() {
+_check_git_arrows() {
     local arrows left=${1:-0} right=${2:-0}
     typeset -gA git_symbols
 
@@ -155,7 +159,7 @@ check_git_arrows() {
     fi
 }
 
-prompt_async_callback() {
+_git_prompt_async_callback() {
     local job=$1 code=$2 output=$3 exec_time=$4 next_pending=$6
     local do_render=0
 
@@ -167,7 +171,7 @@ prompt_async_callback() {
                 typeset -g prompt_async_init=0
             fi
             ;;
-        git_simple_info_task)
+        _git_simple_info_task)
             local -A info
             info=("${(Q@)${(z)output}}")
             if [[ $info[pwd] != $PWD ]]; then
@@ -175,7 +179,7 @@ prompt_async_callback() {
             fi
             if [[ $info[top] != $git_info[top] ]]; then
                 async_flush_jobs 'git_prompt'
-                git_refresh
+                _git_refresh
             fi
 
             git_info[branch]=$info[branch]
@@ -183,7 +187,7 @@ prompt_async_callback() {
             git_info[action]=$info[action]
             do_render=1
             ;;
-        git_stash_count)
+        _git_stash_count)
             local stash_status
             local -i count=$output
             if (( count > 0 )); then
@@ -194,7 +198,7 @@ prompt_async_callback() {
                 do_render=1
             fi
             ;;
-        git_dirty_task)
+        _git_dirty_task)
             local prev_dirty=$git_info[dirty]
             if (( code == 0 )); then
                 git_info[dirty]=
@@ -216,10 +220,10 @@ prompt_async_callback() {
                 git_info[cached]=
             fi
             ;;
-        git_fetch_task|git_arrows_task)
+        _git_fetch_task|_git_arrows_task)
             case $code in
                 0)
-                    local arrows_status=$(check_git_arrows ${(ps:\t:)output})
+                    local arrows_status=$(_check_git_arrows ${(ps:\t:)output})
                     if [[ $git_info[arrow] != $arrows_status ]]; then
                         git_info[arrow]=$arrows_status
                         do_render=1
@@ -245,18 +249,18 @@ prompt_async_callback() {
     fi
 
     if (( ${render_requested:-$do_render} == 1 )); then
-        prompt_render
+        _git_prompt_render
     fi
     unset render_requested
 }
 
-prompt_setup() {
+_git_prompt_setup() {
     autoload -Uz add-zsh-hook
     autoload -Uz vcs_info
     autoload -Uz async && async
 
-    add-zsh-hook precmd prompt_precmd
-    add-zsh-hook preexec prompt_preexec
+    add-zsh-hook precmd _git_prompt_precmd
+    add-zsh-hook preexec _git_prompt_preexec
 }
 
 typeset -gA git_colors
@@ -279,4 +283,4 @@ git_symbols=(
 )
 
 # GIT_DIRTY_TIMEOUT=60
-prompt_setup
+_git_prompt_setup

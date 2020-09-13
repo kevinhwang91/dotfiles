@@ -1,3 +1,7 @@
+if [[ ! $- =~ i ]]; then
+    return
+fi
+
 setopt prompt_subst
 
 _fishy_path() {

@@ -10,12 +10,11 @@ PATH_LUA = os.environ.get('RANGER_LUA')
 PATH_ZLUA = os.environ.get('RANGER_ZLUA')
 
 if not PATH_LUA:
-    for path in os.environ.get('PATH', '').split(os.path.pathsep):
+    for p in os.environ.get('PATH', '').split(os.path.pathsep):
         for name in ('lua', 'luajit', 'lua5.3', 'lua5.2', 'lua5.1'):
-            test = os.path.join(path, name)
-            test = test + (sys.platform[:3] == 'win' and ".exe" or "")
-            if os.path.exists(test):
-                PATH_LUA = test
+            exe = os.path.join(p, name)
+            if os.path.exists(exe):
+                PATH_LUA = exe
                 break
 
 
@@ -23,8 +22,7 @@ def hook_init(fm):
 
     def update_zlua(signal):
         os.environ['_ZL_RANDOM'] = str(random.randint(0, 0x7fffffff))
-        z_p = subprocess.Popen([PATH_LUA, PATH_ZLUA, "--add", signal.new.path])
-        z_p.wait()
+        subprocess.Popen([PATH_LUA, PATH_ZLUA, '--add', signal.new.path], close_fds=True)
     if PATH_ZLUA and PATH_LUA and os.path.exists(PATH_ZLUA):
         fm.signal_bind('cd', update_zlua)
     return OLD_HOOK_INIT(fm)
@@ -61,14 +59,15 @@ class Z(ranger.api.commands.Command):
                 if mode in ('-e', '-x'):
                     path = subprocess.check_output(
                         [PATH_LUA, PATH_ZLUA, '--cd'] + args)
-                    path = path.decode("utf-8", "ignore")
+                    path = path.decode('utf-8', 'ignore')
                     path = path.rstrip('\n')
                     self.fm.notify(path)
                 elif mode in ('-h', '-l', '--help'):
                     pro = self.fm.execute_command(
-                        cmd + '| less +G', universal_newlines=True)
+                        cmd + '| less -+FX +G', universal_newlines=True)
                     stdout = pro.communicate()[0]
                 elif mode in ('-s', '-g'):
+                    path = None
                     if mode == '-g':
                         pro = self.fm.execute_command(
                             cmd +
@@ -90,11 +89,11 @@ class Z(ranger.api.commands.Command):
                         os.environ['_ZL_FZF_HEIGHT'] = '0'
                         path = subprocess.check_output(
                             [PATH_LUA, PATH_ZLUA, '--cd'] + args)
-                        path = path.decode("utf-8", "ignore")
+                        path = path.decode('utf-8', 'ignore')
                         self.fm.execute_console('redraw_window')
                     elif mode == '--':
                         pro = self.fm.execute_command(
-                            cmd + " 2>&1 | fzf | awk '{print $2}'",
+                            cmd + ' 2>&1 | fzf | awk "{print $2}"',
                             universal_newlines=True, stdout=subprocess.PIPE)
                         stdout = pro.communicate()[0]
                         path = stdout.rstrip('\n')
@@ -108,7 +107,7 @@ class Z(ranger.api.commands.Command):
             else:
                 path = subprocess.check_output(
                     [PATH_LUA, PATH_ZLUA, '--cd'] + args)
-                path = path.decode("utf-8", "ignore")
+                path = path.decode('utf-8', 'ignore')
                 path = path.rstrip('\n')
                 if path and os.path.exists(path):
                     self.fm.cd(path)

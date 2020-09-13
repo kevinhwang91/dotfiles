@@ -1,3 +1,7 @@
+if [[ ! $- =~ i ]]; then
+    return
+fi
+
 autoload -U compinit && compinit
 
 # complete menu
