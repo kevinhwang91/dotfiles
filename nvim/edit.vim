@@ -25,7 +25,7 @@ let g:targets_nl = 'nl'
 
 Plug 'Krasjet/auto-pairs'
 
-Plug 'mg979/vim-visual-multi', {'on': ['VMFromSearch', '<Plug>(VM-Find-Under)',
+Plug 'mg979/vim-visual-multi', {'on': ['VMSearch', '<Plug>(VM-Find-Under)',
             \'<Plug>(VM-Visual-Cursors)','<Plug>(VM-Add-Cursor-At-Pos)',
             \'<Plug>(VM-Select-All)', '<Plug>(VM-Visual-All)',
             \'<Plug>(VM-Select-Cursor-Up)','<Plug>(VM-Select-Cursor-Down)',

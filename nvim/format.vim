@@ -33,7 +33,8 @@ augroup GoFormat
     autocmd FileType go setlocal noexpandtab
 augroup end
 
-augroup JavascriptTypescriptFormat
+augroup PrettierFormat
     autocmd!
-    autocmd FileType javascript,typescript setlocal noexpandtab
+    autocmd FileType javascript,typescript,json setlocal noexpandtab
+    autocmd FileType yaml setlocal tabstop=2 shiftwidth=2
 augroup end

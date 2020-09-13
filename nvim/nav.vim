@@ -66,7 +66,7 @@ cabbrev rgt CtrlSF -T
 cabbrev rgr CtrlSF -R
 
 function! CtrlSFAfterMainWindowInit()
-    set wrap
+    setlocal wrap
     autocmd BufWinEnter <buffer> call s:ctrlsf_enter()
     autocmd BufWinLeave <buffer> call s:ctrlsf_leave()
     doautocmd BufWinEnter <buffer>
@@ -94,11 +94,6 @@ endfunction
 
 function! Wrap_VM_Exit() abort
     let g:VM_set_statusline = b:vm_set_statusline
-    if exists('b:backup_search')
-        let @/ = b:backup_search
-        unlet b:backup_search
-    endif
-
     for key in keys(b:visual_multi_map)
         execute 'nunmap <buffer> ' . key
     endfor
@@ -139,11 +134,8 @@ function s:vm_match_pat()
     if !exists('ctrlsf_pat')
         return
     endif
-    let b:backup_search = @/
-    let @/ = ctrlsf_pat
-    nohlsearch
     noautocmd normal! gE
-    execute 'VMFromSearch'
+    execute 'VMSearch ' . ctrlsf_pat
     execute "normal \<Plug>(VM-Show-Infoline)"
 endfunction
 

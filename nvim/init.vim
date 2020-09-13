@@ -1,4 +1,5 @@
-syntax on
+" comment syntax on to reduce startup time because vim-plug will invoke it
+" syntax on
 set number
 set relativenumber
 set tabstop=4
@@ -12,7 +13,7 @@ set timeout
 set timeoutlen=500
 set ignorecase
 set smartcase
-set updatetime=150
+set updatetime=200
 set hidden
 set cursorline
 set fileencodings=utf-8,gb2312,gb18030,gbk,ucs-bom,cp936,latin1
@@ -48,30 +49,31 @@ if (has('termguicolors'))
 endif
 
 " harcode for reducing startup time
-let g:python3_host_prog='/usr/bin/python3'
+let g:python3_host_prog = '/usr/bin/python3'
 if exists('$DISPLAY') && executable('xsel')
     let g:clipboard = {
                 \ 'name': 'xsel',
                 \ 'copy': {
-                \   '+': 'xsel --nodetach -i -b',
-                \   '*': 'xsel --nodetach -i -p',
+                \   '+': ['xsel', '--nodetach', '-i', '-b'],
+                \   '*': ['xsel', '--nodetach', '-i', '-b'],
                 \ },
                 \ 'paste': {
-                \   '+': 'xsel -o -b',
-                \   '*': 'xsel -o -p',
+                \   '+': ['xsel', '-o', '-b'],
+                \   '*': ['xsel', '-o', '-b'],
                 \ },
                 \ 'cache_enabled': 1
                 \ }
 elseif exists('$TMUX')
+    " load-buffer support -w in 3.3 version
     let g:clipboard = {
                 \ 'name': 'tmux',
                 \ 'copy': {
-                \   '+': 'tmux load-buffer -',
-                \   '*': 'tmux load-buffer -',
+                \   '+': ['tmux', 'load-buffer', '-w', '-'],
+                \   '*': ['tmux', 'load-buffer', '-w', '-'],
                 \  },
                 \ 'paste': {
-                \   '+': 'tmux save-buffer -',
-                \   '*': 'tmux save-buffer -',
+                \   '+': ['tmux', 'save-buffer', '-'],
+                \   '*': ['tmux', 'save-buffer', '-'],
                 \ },
                 \ 'cache_enabled': 1,
                 \ }
@@ -151,6 +153,7 @@ nnoremap <silent><leader>i :silent! normal! `^<CR>
 
 xnoremap <silent> <M-j> :move '>+1<CR>gv=gv
 xnoremap <silent> <M-k> :move '<-2<CR>gv=gv
+nnoremap <silent> yd :call setreg(v:register, expand('%:p:h'))<CR>:echo expand('%:p:h')<CR>
 nnoremap <silent> yn :call setreg(v:register, expand('%:t'))<CR>:echo expand('%:t')<CR>
 nnoremap <silent> yp :call setreg(v:register, expand('%:p'))<CR>:echo expand('%:p')<CR>
 nnoremap Y y$

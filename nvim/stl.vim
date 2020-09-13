@@ -14,6 +14,7 @@ augroup LightlineExtend
 augroup END
 
 function! LazyLoadLightline(timer) abort
+    let g:webdevicons_enable_nerdtree = 0
     call plug#load('vim-devicons')
     call plug#load('lightline.vim')
     call lightline#init()

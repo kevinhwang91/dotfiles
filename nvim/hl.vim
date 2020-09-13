@@ -10,8 +10,7 @@ endif
 
 " experiment
 if has('nvim-0.5')
-    Plug 'nvim-treesitter/nvim-treesitter', {'on': ['TSBufEnable', 'TSEnableAll',
-                \ 'TSInstall', 'TSInstallInfo', 'TSInstallSync', 'TSModuleInfo', 'TSUpdate']}
+    Plug 'nvim-treesitter/nvim-treesitter'
     highlight default link TSPunctBracket NONE
     highlight default link TSVariable NONE
     highlight default link TSConstant NONE
@@ -20,28 +19,13 @@ if has('nvim-0.5')
     highlight default link TSConstBuiltin cSpecial
     highlight default link TSParameter Parameter
 
-    " lazy load for file type
-    let s:ts_ft_set = ['go', 'java', 'rust', 'javascript', 'typescript']
+    let g:ts_ft_set = ['go', 'java', 'rust', 'javascript', 'typescript', 'lua']
 
-    function LazyLoadTreeSitter(timer) abort
-        if !get(g:, 'loaded_nvim_treesitter', 0)
-            call plug#load('nvim-treesitter')
-        endif
-
-        augroup TSHighlight
-            autocmd!
-            autocmd CursorHold,CursorHoldI * call <SID>refresh_ts()
-            execute 'autocmd FileType ' . join(s:ts_ft_set, ',') .
-                        \ ' execute("TSBufEnable highlight")'
-        augroup END
-
-        for buf_nr in filter(range(1, bufnr('$')), 'bufexists(v:val) && bufloaded(v:val)')
-            let ft = getbufvar(buf_nr, '&filetype')
-            if index(s:ts_ft_set, ft) > -1
-                execute 'TSBufEnable highlight'
-            endif
-        endfor
-    endfunction
+    augroup TSHighlight
+        autocmd!
+        autocmd CursorHold,CursorHoldI * call <SID>refresh_ts()
+        autocmd VimEnter * call <SID>enable_ts_hl()
+    augroup END
 
     function s:refresh_ts() abort
         if exists('b:ts_last_changedtick') &&
@@ -49,7 +33,7 @@ if has('nvim-0.5')
             return
         endif
         let ft = &filetype
-        if index(s:ts_ft_set, ft) >= 0
+        if index(g:ts_ft_set, ft) >= 0
             execute 'silent! TSBufDisable highlight'
             execute 'TSBufEnable highlight'
         else
@@ -59,11 +43,15 @@ if has('nvim-0.5')
         let b:ts_last_changedtick = b:changedtick
     endfunction
 
-    augroup TSHighlight
-        autocmd!
-        execute 'autocmd FileType ' . join(s:ts_ft_set, ',') .
-                    \ ' call timer_start(0, "LazyLoadTreeSitter")'
-    augroup END
+    function s:enable_ts_hl() abort
+        lua require'nvim-treesitter.configs'.setup {
+                    \   ensure_installed = vim.g.ts_ft_set,
+                    \   highlight = {
+                    \       enable = true,
+                    \       disable = {'c'},
+                    \   },
+                    \ }
+    endfunction
 endif
 
 " lazy load for python file type
@@ -122,7 +110,7 @@ let g:vimade = {
             \ 'enablesigns': 1,
             \ 'fadelevel': 0.6,
             \ 'fadepriority': 0,
-            \ 'checkinterval': 200,
+            \ 'checkinterval': 220,
             \ 'basegroups': ['Folded', 'Search', 'SignColumn', 'LineNr',
             \       'CursorLineNr', 'DiffAdd', 'DiffChange', 'DiffDelete',
             \       'DiffText', 'FoldColumn', 'Whitespace']
