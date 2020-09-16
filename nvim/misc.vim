@@ -41,29 +41,3 @@ let g:SignatureMap = {
             \ 'ListBufferMarkers'  :  "m?"
             \ }
 nnoremap <silent> <leader>tm :SignatureToggleSigns<CR>
-
-" wip
-Plug 'puremourning/vimspector'
-let g:vimspector_install_gadgets = ['vscode-cpptools', 'debugpy', 'vscode-go',
-            \ 'vscode-bash-debug', 'debugger-for-chrome', 'CodeLLDB']
-nmap <F1> <Plug>VimspectorRestart
-nmap <F2> <Plug>VimspectorContinue
-nmap <F3> <Plug>VimspectorPause
-nmap <F4> <Plug>VimspectorStop
-nmap <F5> <Plug>VimspectorToggleConditionalBreakpoint
-nmap <F6> <Plug>VimspectorStepOut
-nmap <F7> <Plug>VimspectorStepInto
-nmap <F8> <Plug>VimspectorStepOver
-nmap <F9> <Plug>VimspectorAddFunctionBreakpoint
-nmap <F10> <Plug>VimspectorToggleBreakpoint
-" alacritty has remaped Control-([1-9]|[0;']) to Control-[F1-F12] (F25-F36)
-nmap <F25> <Plug>VimspectorRestart
-nmap <F26> <Plug>VimspectorContinue
-nmap <F27> <Plug>VimspectorPause
-nmap <F28> <Plug>VimspectorStop
-nmap <F29> <Plug>VimspectorToggleConditionalBreakpoint
-nmap <F30> <Plug>VimspectorStepOut
-nmap <F31> <Plug>VimspectorStepInto
-nmap <F32> <Plug>VimspectorStepOver
-nmap <F33> <Plug>VimspectorAddFunctionBreakpoint
-nmap <F34> <Plug>VimspectorToggleBreakpoint

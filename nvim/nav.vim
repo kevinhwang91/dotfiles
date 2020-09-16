@@ -23,7 +23,6 @@ if executable('fzf')
     nnoremap <silent> <leader>fb :Buffers<CR>
 
     let $FZF_DEFAULT_OPTS .= ' --reverse --info=inline'
-    let $FZF_PREVIEW_COMMAND = 'bat --color=always --style=plain --theme=TwoDark -n -- {} || cat {}'
     let g:fzf_layout = { 'window': { 'width': 0.8, 'height': 0.8 } }
 endif
 
@@ -59,7 +58,7 @@ let g:ctrlsf_mapping = {
             \ }
 highlight default link ctrlsfFilename Underlined
 
-nmap <leader>rg <Plug>CtrlSFCwordExec
+nmap <leader>rg <Plug>CtrlSFCCwordExec
 xmap <leader>rg <Plug>CtrlSFVwordExec
 cabbrev rg CtrlSF
 cabbrev rgt CtrlSF -T
@@ -150,3 +149,36 @@ function s:wrap_vm_map(action) abort
     endif
     execute "normal \<Plug>(VM-Show-Infoline)"
 endfunction
+
+Plug 'andymass/vim-matchup'
+let loaded_matchit = 1
+let loaded_matchparen = 1
+
+let g:matchup_matchparen_timeout = 100
+let g:matchup_matchparen_deferred = 1
+let g:matchup_matchparen_deferred_show_delay = 150
+let g:matchup_matchparen_deferred_hide_delay = 700
+let g:matchup_matchparen_hi_surround_always = 1
+let g:matchup_motion_override_Npercent = 0
+let g:matchup_motion_cursor_end = 0
+let g:matchup_mappings_enabled = 0
+
+nmap % <Plug>(matchup-%)
+omap % <Plug>(matchup-%)
+xmap % <Plug>(matchup-%)
+nmap g5 <Plug>(matchup-g%)
+omap g5 <Plug>(matchup-g%)
+xmap g5 <Plug>(matchup-g%)
+nmap [5 <Plug>(matchup-[%)
+omap [5 <Plug>(matchup-[%)
+xmap [5 <Plug>(matchup-[%)
+nmap ]5 <Plug>(matchup-]%)
+omap ]5 <Plug>(matchup-]%)
+xmap ]5 <Plug>(matchup-]%)
+nmap z5 <Plug>(matchup-z%)
+omap z5 <Plug>(matchup-z%)
+xmap z5 <Plug>(matchup-z%)
+omap a5 <Plug>(matchup-a%)
+xmap a5 <Plug>(matchup-a%)
+omap i5 <Plug>(matchup-i%)
+xmap i5 <Plug>(matchup-i%)

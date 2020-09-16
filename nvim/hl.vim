@@ -18,6 +18,7 @@ if has('nvim-0.5')
     highlight default link TSInclude Statement
     highlight default link TSConstBuiltin cSpecial
     highlight default link TSParameter Parameter
+    highlight default link TSVariableBuiltin cSpecial
 
     let g:ts_ft_set = ['go', 'java', 'rust', 'javascript', 'typescript', 'lua']
 
@@ -54,35 +55,22 @@ if has('nvim-0.5')
     endfunction
 endif
 
-" lazy load for python file type
-Plug 'numirias/semshi', {'do': ':UpdateAllRemotePlugins', 'on': []}
-function LazyLoadSemshi(timer) abort
-    let g:semshi#mark_selected_nodes = 0
-    let g:semshi#error_sign = 0
-    highlight default link semshiSelf cSpecial
-    highlight default link semshiBuiltin Structure
-    highlight default link semshiAttribute Keyword
-    highlight default link semshiGlobal Bold
-    highlight default link semshiUnresolved Underlined
-    highlight default link semshiFree NONE
-    highlight default link semshiParameter Parameter
-    highlight semshiParameterUnused cterm=underline ctermfg=71 gui=underline guifg=#50a14f
-    highlight semshiImported cterm=italic ctermfg=173 gui=italic guifg=#d19a66
-    highlight semshiFree cterm=italic gui=italic
+Plug 'numirias/semshi', {'do': 'UpdateRemotePlugins'}
+let g:semshi#mark_selected_nodes = 0
+let g:semshi#error_sign = 0
 
-    autocmd FileType python syntax match pythonOperator '\V=\|-\|+\|*\|@\|/\|%\|&\||\|^\|~\|<\|>\|!=' |
-                \ syntax match pythonFunctionCall
-                \ '\%([^[:cntrl:][:space:][:punct:][:digit:]]\|_\)\%([^[:cntrl:][:punct:][:space:]]\|_\)*\ze\%(\s*(\)'
-    highlight default link pythonFunctionCall Function
+highlight default link semshiFree Italic
+highlight default link semshiSelf cSpecial
+highlight default link semshiBuiltin Structure
+highlight default link semshiAttribute Keyword
+highlight default link semshiGlobal Bold
+highlight default link semshiUnresolved Underlined
+highlight default link semshiParameter Parameter
 
-    call plug#load('semshi')
-    for buf_nr in filter(range(1, bufnr('$')), 'bufexists(v:val) && bufloaded(v:val)')
-        if getbufvar(buf_nr, '&filetype') == 'python'
-            execute 'Semshi enable'
-        endif
-    endfor
-endfunction
-autocmd FileType python ++once call timer_start(0, 'LazyLoadSemshi')
+highlight default link pythonFunctionCall Function
+autocmd FileType python syntax match pythonOperator '\V=\|-\|+\|*\|@\|/\|%\|&\||\|^\|~\|<\|>\|!='
+autocmd FileType python syntax match pythonFunctionCall
+            \ '\%([^[:cntrl:][:space:][:punct:][:digit:]]\|_\)\%([^[:cntrl:][:punct:][:space:]]\|_\)*\ze\%(\s*(\)'
 
 Plug 'rrethy/vim-hexokinase', {'do': 'make hexokinase'}
 let s:all_hexokinase_pat = ['full_hex', 'triple_hex', 'rgb', 'rgba', 'hsl', 'hsla', 'colour_names']

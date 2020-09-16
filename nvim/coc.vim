@@ -1,5 +1,5 @@
-Plug 'neoclide/coc.nvim', {'do': 'yarn install --frozen-lockfile'}
-" Plug 'neoclide/coc.nvim', {'branch': 'release'}
+" Plug 'neoclide/coc.nvim', {'do': 'yarn install --frozen-lockfile'}
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
 let g:coc_global_extensions = [
             \ 'coc-go',
@@ -102,7 +102,7 @@ function s:get_cur_word()
 endf
 
 function s:highlight_fallback(err, res)
-    if index(s:fb_ft_black_list, &filetype) > -1
+    if &buftype == 'terminal' || index(s:fb_ft_black_list, &filetype) > -1
         return
     endif
 

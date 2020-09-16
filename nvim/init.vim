@@ -1,5 +1,4 @@
-" comment syntax on to reduce startup time because vim-plug will invoke it
-" syntax on
+syntax on
 set number
 set relativenumber
 set tabstop=4
@@ -223,14 +222,6 @@ endfunction
 nnoremap <silent> z[ :<C-u>call <SID>nav_fold(0, v:count1)<CR>
 nnoremap <silent> z] :<C-u>call <SID>nav_fold(1, v:count1)<CR>
 
-" matchit
-nmap <silent> [5 <Plug>(MatchitNormalMultiBackward)
-xmap <silent> [5 <Plug>(MatchitVisualMultiBackward)
-omap <silent> [5 <Plug>(MatchitOperationMultiBackward)
-nmap <silent> ]5 <Plug>(MatchitNormalMultiForward)
-xmap <silent> ]5 <Plug>(MatchitVisualMultiForward)
-omap <silent> ]5 <Plug>(MatchitOperationMultiForward)
-
 if empty($XDG_CONFIG_HOME)
     call plug#begin('~/.config/nvim/plugged')
 else
@@ -269,6 +260,9 @@ call s:source('mdk.vim')
 
 " language server client
 call s:source('coc.vim')
+
+" debug
+call s:source('debug.vim')
 
 " rarely used
 call s:source('misc.vim')

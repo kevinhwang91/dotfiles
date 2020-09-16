@@ -191,6 +191,13 @@ if (( $+commands[nvim] )); then
         (( $+functions[_git-log] )) || _git
         _git-log
     }
+
+    if (( $+commands[gdb] )); then
+        alias ngdb='_ngdb'
+        _ngdb() {
+            nvim +"GdbStart gdb $*" +1tabclose
+        }
+    fi
 fi
 
 alias Sudo='command sudo '
