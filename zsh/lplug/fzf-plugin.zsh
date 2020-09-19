@@ -15,7 +15,8 @@ fi
 export FZF_DEFAULT_OPTS
 
 if [[ -n $TMUX_PANE ]] && (( $+commands[tmux] )) && (( $+commands[fzfp] )); then
-    FZF_CMD=$commands[fzfp]
+    export TMUX_POPUP_NESTED_FB='test $(tmux display -pF "#{==:#S,floating}") == 1'
+    FZF_CMD="$commands[fzfp]"
 else
     FZF_CMD=$commands[fzf]
 fi
