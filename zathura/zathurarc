@@ -26,11 +26,13 @@ set guioptions 'hv'
 set font 'Hack Nerd Font Regular 13'
 
 unmap q
+unmap <C-n>
 map qq quit
 map u scroll half-up
 map e scroll half-up
 map d scroll half-down
 map <C-p> toggle_page_mode
+map <C-g> toggle_statusbar
 map <C-0> zoom default
 map <C--> zoom out
 map <C-=> zoom in
