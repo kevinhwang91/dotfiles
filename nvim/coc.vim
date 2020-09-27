@@ -1,5 +1,5 @@
-" Plug 'neoclide/coc.nvim', {'do': 'yarn install --frozen-lockfile'}
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'neoclide/coc.nvim', {'do': 'yarn install --frozen-lockfile'}
+" Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
 let g:coc_global_extensions = [
             \ 'coc-go',
@@ -88,7 +88,7 @@ highlight default link CocHighlightText CurrentWord
  " CocHasProvider('documentHighlight') has probability of RPC failure
  " Write the hardcode of filetype for fallback highlight
 let s:fb_ft_black_list = [
-            \ 'fzf', 'vim', 'sh', 'python', 'go', 'c', 'cpp', 'rust', 'java',
+            \ 'qf', 'fzf', 'vim', 'sh', 'python', 'go', 'c', 'cpp', 'rust', 'java',
             \ 'typescript', 'javascript', 'css', 'html', 'xml'
             \ ]
 

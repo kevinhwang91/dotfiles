@@ -3,11 +3,16 @@ let g:rnvimr_enable_ex = 1
 let g:rnvimr_enable_bw = 1
 let g:rnvimr_hide_gitignore = 1
 let g:rnvimr_border_attr = {'fg': 3}
-let g:rnvimr_ranger_cmd = 'ranger --cmd="set column_ratios 1,1"'
+let g:rnvimr_ranger_cmd = 'ranger'
 highlight default link RnvimrNormal CursorLine
 tnoremap <silent> <M-i> <C-\><C-n>:RnvimrResize<CR>
 nnoremap <silent> <M-o> :RnvimrToggle<CR>
 tnoremap <silent> <M-o> <C-\><C-n>:RnvimrToggle<CR>
+let g:rnvimr_ranger_views = [
+            \ {'minwidth': 90, 'ratio': []},
+            \ {'minwidth': 50, 'maxwidth': 89, 'ratio': [1,1]},
+            \ {'maxwidth': 49, 'ratio': [1]}
+            \ ]
 
 if executable('fzf')
     Plug 'junegunn/fzf.vim'
@@ -66,9 +71,12 @@ cabbrev rgr CtrlSF -R
 
 function! CtrlSFAfterMainWindowInit()
     setlocal wrap
-    autocmd BufWinEnter <buffer> call s:ctrlsf_enter()
-    autocmd BufWinLeave <buffer> call s:ctrlsf_leave()
-    doautocmd BufWinEnter <buffer>
+    augroup CtrlSFMainWindow
+        autocmd!
+        autocmd BufWinEnter <buffer> call s:ctrlsf_enter()
+        autocmd BufWinLeave <buffer> call s:ctrlsf_leave()
+        doautocmd BufWinEnter <buffer>
+    augroup end
 
     let b:visual_multi_map = {'n': 'VM-Find-Next', 'N': 'VM-Find-Prev',
                 \'q': 'VM-Skip-Region', 'Q': 'VM-Remove-Region',
@@ -175,9 +183,9 @@ xmap [5 <Plug>(matchup-[%)
 nmap ]5 <Plug>(matchup-]%)
 omap ]5 <Plug>(matchup-]%)
 xmap ]5 <Plug>(matchup-]%)
-nmap z5 <Plug>(matchup-z%)
-omap z5 <Plug>(matchup-z%)
-xmap z5 <Plug>(matchup-z%)
+nmap z' <Plug>(matchup-z%)
+omap z' <Plug>(matchup-z%)
+xmap z' <Plug>(matchup-z%)
 omap a5 <Plug>(matchup-a%)
 xmap a5 <Plug>(matchup-a%)
 omap i5 <Plug>(matchup-i%)

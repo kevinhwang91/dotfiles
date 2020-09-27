@@ -48,13 +48,17 @@ endfunction
 command! -nargs=? -complete=buffer FollowSymlink call <SID>follow_symlink(<f-args>)
 
 function s:clean_empty_buf()
-    let buf = filter(range(1, bufnr('$')), 'empty(bufname(v:val))')
-    if !empty(buf)
-        execute 'bw ' . join(buf, ' ')
-    endif
+    let bufnr_list = []
+    for buf in getbufinfo({'buflisted': 1})
+        if !buf.changed && empty(buf.name)
+            call add(bufnr_list, buf.bufnr)
+        endif
+    endfor
+    execute 'bw ' . join(bufnr_list)
 endfunction
 
 command! -nargs=0 CleanEmptyBuf call <SID>clean_empty_buf()
+nnoremap <silent> qe :CleanEmptyBuf<CR>
 
 " function WIP() abort
     " if v:hlsearch

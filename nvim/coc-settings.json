@@ -1,4 +1,6 @@
 {
+	"list.maxPreviewHeight": 20,
+	"coc.preferences.useQuickfixForLocations": false,
 	"languageserver": {
 		"ccls": {
 			"command": "ccls",
@@ -35,10 +37,12 @@
 	"html.trace.server": "off",
 	"yaml.trace.server": "off",
 	"css.trace.server": "off",
-	"jedi.enable": false,
+	"jedi.enable": true,
 	"jedi.startupMessage": false,
 	"jedi.jediSettings.autoImportModules": [],
 	"jedi.executable.command": "jedi-language-server",
+	"pyright.disableLanguageServices": true,
+	"pyright.disableCompletion": true,
 	"java.enabled": true,
 	"java.codeGeneration.useBlocks": true,
 	"java.import.maven.enabled": true,

@@ -63,12 +63,11 @@ if exists('$DISPLAY') && executable('xsel')
                 \ 'cache_enabled': 1
                 \ }
 elseif exists('$TMUX')
-    " load-buffer support -w in 3.3 version
     let g:clipboard = {
                 \ 'name': 'tmux',
                 \ 'copy': {
-                \   '+': ['tmux', 'load-buffer', '-w', '-'],
-                \   '*': ['tmux', 'load-buffer', '-w', '-'],
+                \   '+': ['tmux', 'load-buffer', '-'],
+                \   '*': ['tmux', 'load-buffer', '-'],
                 \  },
                 \ 'paste': {
                 \   '+': ['tmux', 'save-buffer', '-'],
@@ -76,6 +75,11 @@ elseif exists('$TMUX')
                 \ },
                 \ 'cache_enabled': 1,
                 \ }
+    " load-buffer support -w in 3.3 version
+    if str2float(matchstr(system('tmux -V')[0:-2], '\d\+\.\d\+')) >= 3.3
+        let g:clipboard['copy']['+'] = ['tmux', 'load-buffer', '-w', '-']
+        let g:clipboard['copy']['*'] = ['tmux', 'load-buffer', '-w', '-']
+    endif
 endif
 
 " source config file function
@@ -284,8 +288,13 @@ let g:doge_mapping_comment_jump_forward = '<C-j>'
 let g:doge_mapping_comment_jump_backward = '<C-k>'
 
 " comment
-Plug 'preservim/nerdcommenter', {'on': '<Plug>NERDCommenterToggle'}
+Plug 'preservim/nerdcommenter', {'on': ['<Plug>NERDCommenterToggle']}
+let g:NERDCreateDefaultMappings = 0
 let g:NERDSpaceDelims = 1
+let g:NERDCompactSexyComs = 1
+let g:NERDDefaultAlign = 'left'
+let g:NERDToggleCheckAllLines = 1
+let g:NERDTrimTrailingWhitespace = 1
 map <C-_> <Plug>NERDCommenterToggle
 
 call plug#end()

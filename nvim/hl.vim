@@ -72,6 +72,11 @@ autocmd FileType python syntax match pythonOperator '\V=\|-\|+\|*\|@\|/\|%\|&\||
 autocmd FileType python syntax match pythonFunctionCall
             \ '\%([^[:cntrl:][:space:][:punct:][:digit:]]\|_\)\%([^[:cntrl:][:punct:][:space:]]\|_\)*\ze\%(\s*(\)'
 
+augroup SemshiHighlight
+    autocmd!
+    autocmd BufWritePost *.py execute('Semshi highlight')
+augroup END
+
 Plug 'rrethy/vim-hexokinase', {'do': 'make hexokinase'}
 let s:all_hexokinase_pat = ['full_hex', 'triple_hex', 'rgb', 'rgba', 'hsl', 'hsla', 'colour_names']
 let g:Hexokinase_highlighters = ['backgroundfull']
