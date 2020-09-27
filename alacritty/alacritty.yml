@@ -65,6 +65,9 @@ window:
   # Window title
   #title: Alacritty
 
+  # Allow terminal applications to change Alacritty's window title.
+  #dynamic_title: true
+
   # Window class (Linux/BSD only):
   #class:
     # Application instance name
@@ -76,15 +79,14 @@ window:
   #
   # Override the variant of the GTK theme. Commonly supported values are `dark` and `light`.
   # Set this to `None` to use the default theme variant.
-  gtk_theme_variant: dark
+  #gtk_theme_variant: None
 
 #scrolling:
   # Maximum number of lines in the scrollback buffer.
   # Specifying '0' will disable scrolling.
   #history: 10000
 
-  # Number of lines the viewport will move for every line scrolled when
-  # scrollback is enabled (history > 0).
+  # Scrolling distance multiplier.
   #multiplier: 3
 
 # Font configuration
@@ -100,40 +102,40 @@ font:
     family: Hack Nerd Font
 
     # The `style` can be specified to pick a specific face.
-    style: Regular
+    #style: Regular
 
   # Bold font face
-  bold:
+  #bold:
     # Font family
     #
     # If the bold family is not specified, it will fall back to the
     # value specified for the normal font.
-    family: Hack Nerd Font
+    #family: monospace
 
     # The `style` can be specified to pick a specific face.
-    style: Bold
+    #style: Bold
 
   # Italic font face
-  italic:
+  #italic:
     # Font family
     #
     # If the italic family is not specified, it will fall back to the
     # value specified for the normal font.
-    family: Hack Nerd Font
+    #family: monospace
 
     # The `style` can be specified to pick a specific face.
-    style: Italic
+    #style: Italic
 
   # Bold italic font face
-  bold_italic:
+  #bold_italic:
     # Font family
     #
     # If the bold italic family is not specified, it will fall back to the
     # value specified for the normal font.
-    family: Hack Nerd Font
+    #family: monospace
 
     # The `style` can be specified to pick a specific face.
-    style: Bold Italic
+    #style: Bold Italic
 
   # Point size
   size: 11.5
@@ -208,17 +210,16 @@ colors:
   # Search colors
   #
   # Colors used for the search bar and match highlighting.
-  #
-  # Allowed values are CellForeground and CellBackground, which reference the
-  # affected cell, or hexadecimal colors like #ff00ff.
   #search:
-  #  matches:
-  #    foreground: '#000000'
-  #    background: '#ffffff'
-  #
-  #  bar:
-  #    background: CellForeground
-  #    foreground: CellBackground
+    # Allowed values are CellForeground and CellBackground, which reference the
+    # affected cell, or hexadecimal colors like #ff00ff.
+    #matches:
+    #  foreground: '#000000'
+    #  background: '#ffffff'
+
+    #bar:
+    #  background: '#c5c8c6'
+    #  foreground: '#1d1f21'
 
   # Normal colors
   normal:
@@ -335,13 +336,11 @@ colors:
 #background_opacity: 1.0
 
 #selection:
+  # This string contains all characters that are used as separators for "semantic words" in Alacritty.
   #semantic_escape_chars: ",│`|:\"' ()[]{}<>\t"
 
   # When set to `true`, selected text will be copied to the primary clipboard.
   #save_to_clipboard: false
-
-# Allow terminal applications to change Alacritty's window title.
-#dynamic_title: true
 
 #cursor:
   # Cursor style
@@ -503,10 +502,11 @@ colors:
 #
 #   - ToggleViMode
 #   - SearchForward
+#       Start searching toward the right of the search origin.
 #   - SearchBackward
+#       Start searching toward the left of the search origin.
 #   - Copy
 #   - Paste
-#   - PasteSelection
 #   - IncreaseFontSize
 #   - DecreaseFontSize
 #   - ResetFontSize
@@ -519,51 +519,88 @@ colors:
 #   - ScrollToTop
 #   - ScrollToBottom
 #   - ClearHistory
+#       Remove the terminal's scrollback history.
 #   - Hide
+#       Hide the Alacritty window.
 #   - Minimize
+#       Minimize the Alacritty window.
 #   - Quit
+#       Quit Alacritty.
 #   - ToggleFullscreen
 #   - SpawnNewInstance
+#       Spawn a new instance of Alacritty.
 #   - ClearLogNotice
+#       Clear Alacritty's UI warning and error notice.
 #   - ClearSelection
+#       Remove the active selection.
 #   - ReceiveChar
 #   - None
 #
 #   (`mode: Vi` only):
 #   - Open
+#       Open URLs at the cursor location with the launcher configured in `url.launcher`.
 #   - Up
+#       Move the vi mode cursor up by one line.
 #   - Down
+#       Move the vi mode cursor down by one line.
 #   - Left
+#       Move the vi mode cursor left by one character.
 #   - Right
+#       Move the vi mode cursor right by one character.
 #   - First
+#       Move the vi mode cursor to the start of the line, searching across newlines if it is already at the beginning.
 #   - Last
+#       Move the vi mode cursor to the end of the line, searching across newlines if it is already at the end.
 #   - FirstOccupied
+#       Move the vi mode cursor to the first non-empty cell in this line, searching across newlines if it is already at the first one.
 #   - High
+#       Move the vi mode cursor to the top of the screen.
 #   - Middle
+#       Move the vi mode cursor to the middle of the screen.
 #   - Low
+#       Move the vi mode cursor to the bottom of the screen.
 #   - SemanticLeft
+#       Move the vi mode cursor to the start of the previous semantically separated word.
 #   - SemanticRight
+#       Move the vi mode cursor to the start of the next semantically separated word.
 #   - SemanticLeftEnd
+#       Move the vi mode cursor to the end of the previous semantically separated word.
 #   - SemanticRightEnd
-#   - WordRight
+#       Move the vi mode cursor to the end of the next semantically separated word.
 #   - WordLeft
-#   - WordRightEnd
+#       Move the vi mode cursor to the start of the previous whitespace separated word.
+#   - WordRight
+#       Move the vi mode cursor to the start of the next whitespace separated word.
 #   - WordLeftEnd
+#       Move the vi mode cursor to the end of the previous whitespace separated word.
+#   - WordRightEnd
+#       Move the vi mode cursor to the end of the next whitespace separated word.
 #   - Bracket
+#       Move the vi mode cursor to the next character that matches the bracket at the cursor's
+#       current location.
 #   - ToggleNormalSelection
 #   - ToggleLineSelection
 #   - ToggleBlockSelection
 #   - ToggleSemanticSelection
+#       Toggle semantic selection based on `selection.semantic_escape_chars`.
 #   - SearchNext
+#       Jump to the beginning of the next match.
 #   - SearchPrevious
+#       Jump to the beginning of the previous match.
 #   - SearchStart
+#       Jump to the next start of a match to the left of the vi mode cursor.
 #   - SearchEnd
+#       Jump to the next end of a match to the left of the vi mode cursor.
 #
 #   (macOS only):
-#   - ToggleSimpleFullscreen: Enters fullscreen without occupying another space
+#   - ToggleSimpleFullscreen
+#       Enter fullscreen without occupying another space.
 #
 #   (Linux/BSD only):
-#   - CopySelection: Copies into selection buffer
+#   - CopySelection
+#       Copy from the selection buffer.
+#   - PasteSelection
+#       Paste from the selection buffer.
 #
 # - `command`: Fork and execute a specified command plus arguments
 #
@@ -594,6 +631,7 @@ colors:
 #    - AppCursor
 #    - AppKeypad
 #    - Alt
+#    - Vi
 #
 #    A `~` operator can be used before a mode to apply the binding whenever
 #    the mode is *not* active, e.g. `~Alt`.
@@ -650,6 +688,7 @@ key_bindings:
   #- { key: Escape,                      mode: Vi, action: ClearSelection          }
   #- { key: I,                           mode: Vi, action: ScrollToBottom          }
   #- { key: I,                           mode: Vi, action: ToggleViMode            }
+  #- { key: C,      mods: Control,       mode: Vi, action: ToggleViMode            }
   #- { key: Y,      mods: Control,       mode: Vi, action: ScrollLineUp            }
   #- { key: E,      mods: Control,       mode: Vi, action: ScrollLineDown          }
   #- { key: G,                           mode: Vi, action: ScrollToTop             }
@@ -706,7 +745,7 @@ key_bindings:
   #- { key: Minus,    mods: Control,                 action: DecreaseFontSize }
 
   # (Windows only)
-  - { key: F11,              action: ToggleFullscreen }
+  - { key: F11,      mods: Shift,                   action: ToggleFullscreen }
 
   # (macOS only)
   #- { key: K,      mods: Command, mode: ~Vi, chars: "\x0c"            }
