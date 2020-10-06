@@ -19,27 +19,43 @@ bindkey -e
 # tabs size
 tabs 4
 
-ZGEN_DIR=${XDG_CONFIG_HOME:-$HOME/.config}/zsh/zgen
+if [[ ! -f $HOME/.zinit/bin/zinit.zsh ]]; then
+    print -P "%F{33}▓▒░ %F{220}Installing %F{33}DHARMA%F{220} Initiative Plugin Manager \
+        (%F{33}zdharma/zinit%F{220})…%f"
+    command mkdir -p "$HOME/.zinit" && command chmod g-rwX "$HOME/.zinit"
+    command git clone https://github.com/zdharma/zinit "$HOME/.zinit/bin" && \
+        print -P "%F{33}▓▒░ %F{34}Installation successful.%f%b" || \
+        print -P "%F{160}▓▒░ The clone has failed.%f%b"
+fi
+
 ZSH_LPLUG_DIR=${XDG_CONFIG_HOME:-$HOME/.config}/zsh/lplug
-source $ZGEN_DIR/zgen.zsh
-zgen load 'zsh-users/zsh-completions'
-export ZSH_AUTOSUGGEST_USE_ASYNC=1
-export ZSH_AUTOSUGGEST_MANUAL_REBIND=1
-zgen load 'zsh-users/zsh-autosuggestions'
-zgen load 'zdharma/fast-syntax-highlighting'
-zgen load 'hlissner/zsh-autopair'
-zgen load 'skywind3000/z.lua'
-zgen load 'mafredri/zsh-async'
-zgen load 'kevinhwang91/zsh-tmux-capture'
-zgen load $ZSH_LPLUG_DIR/completion.zsh
-zgen load $ZSH_LPLUG_DIR/misc.zsh
-zgen load $ZSH_LPLUG_DIR/color.zsh
-zgen load $ZSH_LPLUG_DIR/history.zsh
-zgen load $ZSH_LPLUG_DIR/alias-function.zsh
-zgen load $ZSH_LPLUG_DIR/theme.zsh
-zgen load $ZSH_LPLUG_DIR/git-prompt.zsh
-zgen load $ZSH_LPLUG_DIR/tmux.zsh
-zgen load $ZSH_LPLUG_DIR/fzf-plugin.zsh
+source ~/.zinit/bin/zinit.zsh
+
+ZSH_AUTOSUGGEST_USE_ASYNC=1
+ZSH_AUTOSUGGEST_MANUAL_REBIND=1
+zinit wait lucid for \
+    zdharma/fast-syntax-highlighting \
+    atload='!_zsh_autosuggest_start' zsh-users/zsh-autosuggestions \
+    blockf zsh-users/zsh-completions
+
+_ZL_NO_ALIASES=1
+zinit lucid wait for \
+    as='program' src='z.lua.plugin.zsh' skywind3000/z.lua \
+    hlissner/zsh-autopair
+
+zinit light-mode for \
+    mafredri/zsh-async \
+    kevinhwang91/zsh-tmux-capture
+
+source $ZSH_LPLUG_DIR/completion.zsh
+source $ZSH_LPLUG_DIR/misc.zsh
+source $ZSH_LPLUG_DIR/color.zsh
+source $ZSH_LPLUG_DIR/history.zsh
+source $ZSH_LPLUG_DIR/alias-function.zsh
+source $ZSH_LPLUG_DIR/theme.zsh
+source $ZSH_LPLUG_DIR/git-prompt.zsh
+source $ZSH_LPLUG_DIR/tmux.zsh
+source $ZSH_LPLUG_DIR/fzf-plugin.zsh
 
 # python prompt toolkit color depth
 export PROMPT_TOOLKIT_COLOR_DEPTH=DEPTH_24_BIT
@@ -50,7 +66,6 @@ export LESS=FKMRX
 # ranger
 if (( $+commands[ranger] )); then
     export RANGER_LOAD_DEFAULT_RC=FALSE
-    export RANGER_ZLUA=$ZLUA_SCRIPT
 fi
 
 # neovim
