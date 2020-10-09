@@ -13,22 +13,23 @@ class FzfSelect(Command):
     """
 
     def execute(self):
+        fzf_cmd ='fzf +m --height=100% --layout=default --info=default'
         if self.quantifier:
             # match only directories
             if shutil.which('fd'):
-                command = r"fd -L . --type d | fzf +m"
+                command = r"fd -L . --type d | " + fzf_cmd
             else:
                 command = r"find -L . -mindepth 1 \( -path '*/\.*' \
                 -o -fstype 'dev' -o -fstype 'proc' \) -prune \
-                -o -type d -print 2> /dev/null | cut -b3- | fzf +m"
+                -o -type d -print 2> /dev/null | cut -b3- | " + fzf_cmd
         else:
             # match files and directories
             if shutil.which('fd'):
-                command = r"fd -L . | fzf +m"
+                command = r"fd -L . | " + fzf_cmd
             else:
                 command = r"find -L . -mindepth 1 \( -path '*/\.*' \
                 -o -fstype 'dev' -o -fstype 'proc' \) -prune \
-                -o -print 2> /dev/null | cut -b3- | fzf +m"
+                -o -print 2> /dev/null | cut -b3- | " + fzf_cmd
         fzf = self.fm.execute_command(
             command, universal_newlines=True, stdout=subprocess.PIPE)
         stdout = fzf.communicate()[0]

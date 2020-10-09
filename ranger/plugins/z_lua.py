@@ -1,116 +1,68 @@
-import sys
 import os
-import random
-import subprocess
 import ranger.api
+from shutil import which
 
-OLD_HOOK_INIT = ranger.api.hook_init
+if which('z.lua'):
+    OLD_HOOK_READY = ranger.api.hook_ready
 
-PATH_LUA = os.environ.get('RANGER_LUA')
-PATH_ZLUA = os.environ.get('RANGER_ZLUA')
+    def hook_ready(fm):
 
-if not PATH_LUA:
-    for p in os.environ.get('PATH', '').split(os.path.pathsep):
-        for name in ('lua', 'luajit', 'lua5.3', 'lua5.2', 'lua5.1'):
-            exe = os.path.join(p, name)
-            if os.path.exists(exe):
-                PATH_LUA = exe
-                break
-
-
-def hook_init(fm):
-
-    def update_zlua(signal):
-        os.environ['_ZL_RANDOM'] = str(random.randint(0, 0x7fffffff))
-        subprocess.Popen([PATH_LUA, PATH_ZLUA, '--add', signal.new.path], close_fds=True)
-    if PATH_ZLUA and PATH_LUA and os.path.exists(PATH_ZLUA):
+        def update_zlua(signal):
+            fm.execute_command(['z.lua', '--add', signal.new.path], flags='s', wait=False)
         fm.signal_bind('cd', update_zlua)
-    return OLD_HOOK_INIT(fm)
+        fm.execute_command(['z.lua', '--add', fm.thisdir.path], flags='s', wait=False)
+        return OLD_HOOK_READY(fm)
 
-
-ranger.api.hook_init = hook_init
+    ranger.api.hook_ready = hook_ready
 
 
 class Z(ranger.api.commands.Command):
 
     def execute(self):
-        if (not PATH_ZLUA) or (not os.path.exists(PATH_ZLUA)):
-            self.fm.notify(
-                'Not find z.lua, please set $RANGER_ZLUA to absolute path of z.lua.\n')
+        if not which('z.lua'):
+            self.fm.notify('z.lua is not found.', bad=True)
             return
-        args = self.args[1:]
-        if args:
-            mode = ''
-            for arg in args:
-                if arg in ('-l', '-e', '-x', '-h', '--help', '--', '-s', '-g'):
-                    mode = arg
-                    break
-                if arg in ('-I', '-i'):
-                    mode = arg
-                elif arg[:1] != '-':
-                    break
-            if mode:
-                cmd = '"%s" "%s" ' % (PATH_LUA, PATH_ZLUA)
-                if mode in ('-I', '-i', '--'):
-                    cmd += ' --cd'
-                if mode not in ('-s', '-g'):
-                    for arg in args:
-                        cmd += ' "%s"' % arg
-                if mode in ('-e', '-x'):
-                    path = subprocess.check_output(
-                        [PATH_LUA, PATH_ZLUA, '--cd'] + args)
-                    path = path.decode('utf-8', 'ignore')
-                    path = path.rstrip('\n')
-                    self.fm.notify(path)
-                elif mode in ('-h', '-l', '--help'):
-                    pro = self.fm.execute_command(
-                        cmd + '| less -+FX +G', universal_newlines=True)
-                    stdout = pro.communicate()[0]
-                elif mode in ('-s', '-g'):
-                    path = None
-                    if mode == '-g':
-                        pro = self.fm.execute_command(
-                            cmd +
-                            r' -l 2>&1 | fzf -n2..,.. --tac +s -e | sed "s/^\s*[0-9,.]* *//"',
-                            universal_newlines=True, stdout=subprocess.PIPE)
-                        stdout = pro.communicate()[0]
-                        path = stdout.rstrip('\n')
-                    elif mode == '-s':
-                        pro = self.fm.execute_command(
-                            cmd +
-                            r' --cd -- 2>&1 | fzf | sed "s/^\s*[0-9,.]* *//"',
-                            universal_newlines=True, stdout=subprocess.PIPE)
-                        stdout = pro.communicate()[0]
-                        path = stdout.rstrip('\n')
-                    if path and os.path.exists(path):
-                        self.fm.cd(path)
-                else:
-                    if mode == '-I':
-                        os.environ['_ZL_FZF_HEIGHT'] = '0'
-                        path = subprocess.check_output(
-                            [PATH_LUA, PATH_ZLUA, '--cd'] + args)
-                        path = path.decode('utf-8', 'ignore')
-                        self.fm.execute_console('redraw_window')
-                    elif mode == '--':
-                        pro = self.fm.execute_command(
-                            cmd + ' 2>&1 | fzf | awk "{print $2}"',
-                            universal_newlines=True, stdout=subprocess.PIPE)
-                        stdout = pro.communicate()[0]
-                        path = stdout.rstrip('\n')
-                    else:
-                        pro = self.fm.execute_command(
-                            cmd, universal_newlines=True, stdout=subprocess.PIPE)
-                        stdout = pro.communicate()[0]
-                        path = stdout.rstrip('\n')
-                    if path and os.path.exists(path):
-                        self.fm.cd(path)
+        arg1 = self.arg(1)
+        if not arg1:
+            return
+        mode = None
+        fzf_enable = False
+        fzf_cmd = ['fzf', '--height=100%', '--layout=default', '--info=default']
+        if arg1 == '-s':
+            mode = '--'
+            fzf_enable = True
+        elif arg1 == '-g':
+            mode = '-l'
+            fzf_cmd += ['-n2..,..', '--tac', '+s', '-e']
+            fzf_enable = True
+        elif arg1 in ('--', '-l'):
+            mode = arg1
+        cmd = ['z.lua']
+        import subprocess
+        if mode:
+            cmd += [mode]
+            if mode == '--':
+                cmd += ['-e']
             else:
-                path = subprocess.check_output(
-                    [PATH_LUA, PATH_ZLUA, '--cd'] + args)
-                path = path.decode('utf-8', 'ignore')
-                path = path.rstrip('\n')
-                if path and os.path.exists(path):
-                    self.fm.cd(path)
+                cmd += self.args[2:]
+            with subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT) as src_pro:
+                if fzf_enable:
+                    sink_pro = self.fm.execute_command(
+                        fzf_cmd,
+                        universal_newlines=True, stdin=src_pro.stdout, stdout=subprocess.PIPE)
+                    stdout = sink_pro.communicate()[0]
+                    import re
+                    path = re.sub(r'^\s*[0-9,.]*\s*', '', stdout).rstrip('\n')
+                    if path and os.path.exists(path):
+                        self.fm.cd(path)
                 else:
-                    self.fm.notify('No matching found', bad=True)
-        return True
+                    self.fm.execute_command(['less', '-+FX', '+G'], stdin=src_pro.stdout)
+        else:
+            path = subprocess.check_output(
+                cmd + ['-e'] + self.args[1:],
+                env=dict(os.environ, PWD=self.fm.thisdir.path))
+            path = path.decode('utf-8', 'ignore').rstrip('\n')
+            if path and os.path.exists(path):
+                self.fm.cd(path)
+            else:
+                self.fm.notify('No matching found', bad=True)
