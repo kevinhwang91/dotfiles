@@ -38,7 +38,7 @@ if (( $+commands[grc] )); then
 
     for cmd in $cmds; do
         if (( $+commands[$cmd] )) ; then
-            eval "function $cmd() {grc --colour=auto $cmd \$@}"
+            eval "function $cmd() {stdbuf -oL grc --colour=auto $cmd \$@}"
         fi
     done
     unset cmds cmd
@@ -55,7 +55,7 @@ export COLORTERM=truecolor
 
 autoload -U colors && colors
 
-if [[ -z $LS_COLORS ]]; then
+if [[ -z $LS_COLORS ]] && (( $+commands[dircolors] )); then
     eval "$(dircolors -b)"
 fi
 zstyle ':completion:*' list-colors ${(s/:/)LS_COLORS}

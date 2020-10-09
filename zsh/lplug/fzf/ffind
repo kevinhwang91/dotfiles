@@ -1,6 +1,4 @@
-#!/usr/bin/env zsh
-
-setopt localoptions
+emulate -L zsh
 
 local s_path level
 local only_dir

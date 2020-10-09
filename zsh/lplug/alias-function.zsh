@@ -146,8 +146,13 @@ alias dkis='docker inspect'
 alias gor='go run'
 alias gob='go build'
 
+alias cco='gcc -o'
+
+alias curljs='curl -X POST -H "Content-Type: application/json" -d @-'
+
 alias -s py='py'
 alias py='python'
+alias pyhp='python -m http.server'
 alias ipy='ipython'
 alias pluo='pip list --user --outdated --format=freeze'
 
@@ -156,6 +161,11 @@ _mux() {
     tmux attach $@ 2>/dev/null || tmux
 }
 alias rr='ranger'
+
+alias rsync-cp='rsync -avz --progress -h'
+alias rsync-mv='rsync -avz --progress -h --remove-source-files'
+alias rsync-update='rsync -avzu --progress -h'
+alias rsync-sync='rsync -avzu --delete --progress -h'
 
 alias qc='qalc'
 

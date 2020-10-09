@@ -1,6 +1,6 @@
-#!/usr/bin/env zsh
+emulate -L zsh
 
-setopt localoptions pipefail
+setopt pipefail
 
 local selected
 

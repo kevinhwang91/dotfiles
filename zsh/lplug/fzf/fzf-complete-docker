@@ -1,4 +1,4 @@
-#!/usr/bin/env zsh
+emulate -L zsh
 
 local matches
 case $2 in

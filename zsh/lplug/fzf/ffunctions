@@ -1,5 +1,5 @@
-#!/usr/bin/env zsh
+emulate -L zsh
 
-setopt localoptions pipefail
+setopt pipefail
 
 print -l ${(k)functions} | $FZF_CMD  --height=60%

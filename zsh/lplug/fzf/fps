@@ -1,4 +1,6 @@
-#!/usr/bin/env zsh
+emulate -L zsh
+
+setopt pipefail
 
 _fps() {
     local render
@@ -14,8 +16,6 @@ _fps() {
             print
     }' | ${(z)render}
 }
-
-setopt localoptions pipefail
 
 local fzf_opts="--header-lines=1 -m \
 ${commands[grcat]:+--ansi} --height=60% \

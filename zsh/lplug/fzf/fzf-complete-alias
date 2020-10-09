@@ -1,4 +1,4 @@
-#!/usr/bin/env zsh
+emulate -L zsh
 
 local matches
 matches=$(GREP_CONTEXT=10 faa)

@@ -1,6 +1,6 @@
-#!/usr/bin/env zsh
+emulate -L zsh
 
-setopt localoptions pipefail
+setopt pipefail
 
 local context=${GREP_CONTEXT:-5}
 local reverse="\x1b[7m"

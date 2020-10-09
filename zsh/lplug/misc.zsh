@@ -5,6 +5,7 @@ fi
 # misc
 setopt auto_cd
 setopt multios
+setopt long_list_jobs
 unsetopt nomatch
 
 # edit command using EDITOR
