@@ -281,7 +281,7 @@ augroup ManInitPost
 augroup END
 
 " document
-Plug 'kkoomen/vim-doge', {'on': ['DogeGenerate', 'DogeCreateDocStandard']}
+Plug 'kkoomen/vim-doge', {'do': {-> doge#install()}}
 let g:doge_enable_mappings = 0
 nnoremap <leader>dg :DogeGenerate<CR>
 let g:doge_mapping_comment_jump_forward = '<C-j>'

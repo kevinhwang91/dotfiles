@@ -128,13 +128,3 @@ function s:clean_undo_file()
         end
     endfor
 endfunction
-
-function s:v_set_search(cmdtype)
-    let temp = @s
-    norm! gv"sy
-    let @/ = substitute(escape(@s, a:cmdtype.'\'), '\n', '\\n', 'g')
-    let @s = temp
-endfunction
-
-xnoremap * :<C-u>call <SID>v_set_search('/')<CR>/<C-r>=@/<CR><CR>
-xnoremap # :<C-u>call <SID>v_set_search('?')<CR>?<C-r>=@/<CR><CR>

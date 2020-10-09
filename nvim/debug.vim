@@ -32,7 +32,6 @@ function s:nvim_gdb_init() abort
         call sign_define('GdbBreakpoint' . i, {'texthl': 'WarningMsg'})
     endfor
     setlocal foldcolumn=0 signcolumn=no nonumber norelativenumber
-    let b:matchup_matchparen_enabled = 0
 endfunction
 
 function! GdbTKeymaps()

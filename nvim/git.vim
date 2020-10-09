@@ -11,7 +11,7 @@ nnoremap <leader>ge :Gedit<CR>
 nnoremap <silent> <leader>gb :Git blame -w <bar> setlocal nocursorline nocursorbind <bar>
             \ wincmd p<CR>
 nnoremap <leader>gw :execute 'FollowSymlink' <bar> Gwrite<CR>
-nnoremap <leader>gr :execute 'FollowSymlink' <bar> Gread <bar> w!<CR>
+nnoremap <leader>gr :execute 'FollowSymlink' <bar> keepalt Gread <bar> w!<CR>
 nnoremap <silent> <leader>gd :Gdiffsplit<CR>
 nnoremap <silent> <leader>gD :Gdiffsplit HEAD<CR>
 nnoremap <silent> qd :call fugitive#DiffClose()<CR>

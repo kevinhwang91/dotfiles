@@ -7,7 +7,7 @@ do_install() {
 
     if [[ ! -f "$dst_conf/autoload/plug.vim" ]]; then
         curl -fLo "$dst_conf/autoload/plug.vim" --create-dirs \
-            'https://raw.githubusercontent.com/junegunn/vim-plug/main/plug.vim'
+            'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
     fi
 
     find "$src_conf" -iname '*.vim' -type f | {

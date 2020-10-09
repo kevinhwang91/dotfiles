@@ -21,10 +21,6 @@ function s:set_fold_opt() abort
 endfunction
 
 function s:load_anyfold(afile, bufnr) abort
-    if !buflisted(a:bufnr)
-        return
-    endif
-
     let fsize = getfsize(a:afile)
     if fsize < 524288 && fsize > 0
         let b:lazy_load_fold = a:bufnr
@@ -48,10 +44,6 @@ function LazyLoadAnyFold(timer) abort
 endfunction
 
 function s:load_lspfold(bufnr) abort
-    if !buflisted(a:bufnr)
-        return
-    endif
-
     let b:lazy_load_fold = a:bufnr
     augroup FoldLazyLoad
         execute 'autocmd! BufEnter <buffer=' . a:bufnr . '>'

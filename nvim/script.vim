@@ -60,6 +60,16 @@ endfunction
 command! -nargs=0 CleanEmptyBuf call <SID>clean_empty_buf()
 nnoremap <silent> qe :CleanEmptyBuf<CR>
 
+function s:v_set_search(cmdtype)
+    let temp = @s
+    norm! gv"sy
+    let @/ = substitute(escape(@s, a:cmdtype.'\'), '\n', '\\n', 'g')
+    let @s = temp
+endfunction
+
+xnoremap * :<C-u>call <SID>v_set_search('/')<CR>/<C-r>=@/<CR><CR>
+xnoremap # :<C-u>call <SID>v_set_search('?')<CR>?<C-r>=@/<CR><CR>
+
 " function WIP() abort
     " if v:hlsearch
         " set nolazyredraw

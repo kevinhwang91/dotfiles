@@ -1,6 +1,5 @@
 {
-	"list.maxPreviewHeight": 20,
-	"coc.preferences.useQuickfixForLocations": false,
+	"coc.preferences.useQuickfixForLocations": true,
 	"languageserver": {
 		"ccls": {
 			"command": "ccls",

@@ -142,7 +142,7 @@ function s:vm_match_pat()
         return
     endif
     noautocmd normal! gE
-    execute 'VMSearch ' . ctrlsf_pat
+    execute 'VMSearch! ' . ctrlsf_pat
     execute "normal \<Plug>(VM-Show-Infoline)"
 endfunction
 
@@ -159,8 +159,8 @@ function s:wrap_vm_map(action) abort
 endfunction
 
 Plug 'andymass/vim-matchup'
-let loaded_matchit = 1
-let loaded_matchparen = 1
+let g:loaded_matchit = 1
+let g:loaded_matchparen = 1
 
 let g:matchup_matchparen_timeout = 100
 let g:matchup_matchparen_deferred = 1
@@ -170,6 +170,12 @@ let g:matchup_matchparen_hi_surround_always = 1
 let g:matchup_motion_override_Npercent = 0
 let g:matchup_motion_cursor_end = 0
 let g:matchup_mappings_enabled = 0
+
+augroup MatchupMatch
+    autocmd!
+    autocmd TermOpen * let b:matchup_matchparen_enabled = 0
+    autocmd TermEnter * ++once let b:matchup_matchparen_enabled = 0
+augroup END
 
 nmap % <Plug>(matchup-%)
 omap % <Plug>(matchup-%)
@@ -190,3 +196,6 @@ omap a5 <Plug>(matchup-a%)
 xmap a5 <Plug>(matchup-a%)
 omap i5 <Plug>(matchup-i%)
 xmap i5 <Plug>(matchup-i%)
+
+Plug 'kevinhwang91/nvim-bqf'
+let g:bqf_auto_enable = 1
