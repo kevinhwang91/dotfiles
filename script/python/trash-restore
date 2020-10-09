@@ -2,9 +2,7 @@
 
 import os
 import sys
-import errno
 import shutil
-import subprocess
 
 from trashcli.restore import RestoreCmd
 
@@ -43,6 +41,7 @@ class FrestoreCmd(RestoreCmd):
                     self.exit(1)
 
     def restore_by_fzf(self, trashed_files):
+        import subprocess
         encoding = sys.getdefaultencoding()
         fzf_preview_cmd = """
             t=${$(readlink {2}):-{2}}
@@ -59,8 +58,7 @@ class FrestoreCmd(RestoreCmd):
                     cat $t) 2>/dev/null
             fi
         """
-        fzf_cmd = 'fzfp' if os.getenv(
-            'TMUX') and shutil.which('fzfp') else 'fzf'
+        fzf_cmd = 'fzfp' if os.getenv('TMUX') and shutil.which('fzfp') else 'fzf'
         fzf_pro = subprocess.Popen(
             [fzf_cmd, '--header=  Which files to restore?', '-d', '\t', '--with-nth=1',
              '--height=60%', '--reverse', '-m', '--ansi', '--preview-window', ':hidden',
@@ -90,6 +88,7 @@ class FrestoreCmd(RestoreCmd):
                 pin.flush()
             pin.close()
         except OSError as err:
+            import errno
             if err.errno != errno.EPIPE:
                 raise
 
@@ -115,6 +114,7 @@ class FrestoreCmd(RestoreCmd):
                 self.exit(1)
 
     def handle_trashed_files(self, trashed_files):
+        trashed_files = sorted(trashed_files, key=lambda f: f.deletion_date, reverse=True)
         if not trashed_files:
             self.report_no_files_found()
         elif shutil.which('fzf') is None:
