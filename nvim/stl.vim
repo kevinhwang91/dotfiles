@@ -190,12 +190,7 @@ function! LightlineQuickfix() abort
     if &buftype != 'quickfix'
         return ''
     endif
-    let dict = getwininfo(win_getid())
-    if len(dict) > 0 && get(dict[0], 'quickfix', 0) && !get(dict[0], 'loclist', 0)
-        return ' Quickfix '
-    elseif len(dict) > 0 && get(dict[0], 'quickfix', 0) && get(dict[0], 'loclist', 0)
-        return ' Location '
-    endif
+    return getwininfo(win_getid())[0].loclist ? ' Location ' : ' Quickfix '
 endfunction
 
 function! LightlineCocStatus() abort

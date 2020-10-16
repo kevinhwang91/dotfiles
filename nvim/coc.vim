@@ -115,6 +115,10 @@ endfunction
 
 " Remap for rename current word
 nmap <leader>rn <Plug>(coc-refactor)
+" Remap keys for applying codeAction to the current buffer.
+nmap <leader>ac  <Plug>(coc-codeaction)
+" Apply AutoFix to problem on the current line.
+nmap <leader>qf  <Plug>(coc-fix-current)
 
 " Map function and class text objects
 " NOTE: Requires 'textDocument.documentSymbol' support from the language server.
@@ -129,5 +133,6 @@ omap ak <Plug>(coc-classobj-a)
 
 " Add `:OR` command for organize imports of the current buffer.
 command! -nargs=0 OR :call CocAction('runCommand', 'editor.action.organizeImport')
+nnoremap <silent> <leader>qi :OR<CR>
 
 nnoremap <silent> <M-q> :echo CocAction('getCurrentFunctionSymbol')<CR>

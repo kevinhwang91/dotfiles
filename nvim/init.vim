@@ -23,6 +23,7 @@ set listchars=tab:\│\ ,trail:•
 set showbreak=╰─➤
 set nofoldenable
 set foldcolumn=1
+set foldlevelstart=99
 set title
 set titlestring=%(%m%)%(%{expand(\"%:~\")}%)
 set history=10000

@@ -16,7 +16,7 @@ augroup FoldLazyLoad
 augroup END
 
 function s:set_fold_opt() abort
-    setlocal foldenable foldlevel=99 foldlevelstart=99
+    setlocal foldenable
     setlocal foldtext=FoldText()
 endfunction
 

@@ -75,6 +75,7 @@ let g:cycle_default_groups = [
             \ [['left', 'right']],
             \ [['top', 'bottom']],
             \ [['before', 'after']],
+            \ [['width', 'height']],
             \ [['push', 'pull']],
             \ [['&&', '||']],
             \ [['++', '--']],

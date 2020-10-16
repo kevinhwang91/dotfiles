@@ -22,27 +22,7 @@ if has('nvim-0.5')
 
     let g:ts_ft_set = ['go', 'java', 'rust', 'javascript', 'typescript', 'lua']
 
-    augroup TSHighlight
-        autocmd!
-        autocmd CursorHold,CursorHoldI * call <SID>refresh_ts()
-        autocmd VimEnter * call <SID>enable_ts_hl()
-    augroup END
-
-    function s:refresh_ts() abort
-        if exists('b:ts_last_changedtick') &&
-                    \ (b:ts_last_changedtick < 0 || b:ts_last_changedtick == b:changedtick)
-            return
-        endif
-        let ft = &filetype
-        if index(g:ts_ft_set, ft) >= 0
-            execute 'silent! TSBufDisable highlight'
-            execute 'TSBufEnable highlight'
-        else
-            let b:ts_last_changedtick = -1
-            return
-        endif
-        let b:ts_last_changedtick = b:changedtick
-    endfunction
+    autocmd VimEnter * ++once call <SID>enable_ts_hl()
 
     function s:enable_ts_hl() abort
         lua require'nvim-treesitter.configs'.setup {
@@ -111,7 +91,7 @@ let g:vimade = {
 
 augroup FadeExceptFloating
     autocmd!
-    autocmd WinEnter,BufWinEnter * call <SID>fade_except_floating()
+    autocmd WinEnter * call <SID>fade_except_floating()
 augroup END
 
 function s:toggle_vimade(enable) abort
