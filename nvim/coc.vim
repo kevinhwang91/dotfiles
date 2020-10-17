@@ -77,16 +77,18 @@ function s:show_documentation()
     endif
 endfunction
 
+let g:coc_enable_locationlist = 0
 augroup Coc
     autocmd!
+    autocmd User CocLocationsChange call setloclist(0, g:coc_jump_locations) | lwindow
     autocmd CursorHold * silent call CocActionAsync('highlight',
                 \ '', function('s:highlight_fallback'))
     autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
 augroup END
 highlight default link CocHighlightText CurrentWord
 
- " CocHasProvider('documentHighlight') has probability of RPC failure
- " Write the hardcode of filetype for fallback highlight
+" CocHasProvider('documentHighlight') has probability of RPC failure
+" Write the hardcode of filetype for fallback highlight
 let s:fb_ft_black_list = [
             \ 'qf', 'fzf', 'vim', 'sh', 'python', 'go', 'c', 'cpp', 'rust', 'java',
             \ 'typescript', 'javascript', 'css', 'html', 'xml'
