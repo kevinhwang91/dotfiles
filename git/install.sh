@@ -21,7 +21,11 @@ do_install() {
         read -r -e git_name
 
         mkdir "$(dirname $dst)" 2>/dev/null
-        sed -e "s/USER_NAME/$git_name/g" -e "s/USER_EMAIL/$git_email/g" "$src_conf/gitconfig" > $dst
+        sed -e "s/USER_NAME/$git_name/" -e "s/USER_EMAIL/$git_email/" "$src_conf/gitconfig" > $dst
+        if [[ -z $(command -v delta) ]]; then
+            info 'comment delta in .gitconfig.'
+            sed -E -e 's/ (pager)/;\1/' -E 's/ (diffFilter)/;\1/' -i $dst
+        fi
 
     else
         info 'skip to set up git config.'
