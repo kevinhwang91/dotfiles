@@ -84,6 +84,7 @@ alias gce='git commit'
 alias gca='git commit --amend'
 
 alias gcp='git cherry-pick'
+alias gcpn='git cherry-pick --no-commit'
 alias gcpa='git cherry-pick --abort'
 alias gcpc='git cherry-pick --continue'
 
@@ -176,6 +177,7 @@ alias yg='yarn global'
 alias zz='z -'
 
 alias clocf='cloc --by-file --vcs=git .'
+alias clocl='cloc --by-file-by-lang --vcs=git .'
 
 if (( $+commands[htop] )); then
     alias top='htop'

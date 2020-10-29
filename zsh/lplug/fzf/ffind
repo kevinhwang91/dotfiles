@@ -19,11 +19,16 @@ while getopts ':dl:s:' opt; do
     esac
 done
 
+local fzf_opts="--height=60% --reverse -m --tiebreak=end \
+--preview-window=right:60% \
+--bind=alt-k:preview-up,alt-j:preview-down"
+
 if (( $+commands[fd] )); then
-    local cmd="command fd -L . $s_path --min-depth 1 ${level:+--max-depth $level}"    
+    local cmd="command fd -L . $s_path --min-depth 1 ${level:+--max-depth $level} -H -E '.git*'"
     if [[ $only_dir ]]; then
         cmd="$cmd --type d"
     fi
+    local fzf_opts="$fzf_opts --bind=alt-i:reload($cmd),alt-o:reload($cmd -I)"
 else
     local cmd="command find -L ${s_path:-.} -mindepth 1 ${level:+-maxdepth $level} \
     \\( -path '*/\\.git' \
@@ -43,10 +48,6 @@ else
         cmd="$cmd | cut -b3-"
     fi
 fi
-
-local fzf_opts="--height=60% --reverse -m --tiebreak=end \
---preview-window=right:60% \
---bind=alt-k:preview-up,alt-j:preview-down"
 
 local fzf_preview_cmd='
     t=${$(readlink {}):-{}}

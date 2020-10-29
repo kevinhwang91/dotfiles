@@ -126,6 +126,7 @@ _git_prompt_tasks() {
 }
 
 _git_refresh() {
+    typeset -gA git_info
     if [[ $git_info[top] != $HOME ]]; then
         async_job 'git_prompt' _git_fetch_task
     fi
@@ -282,5 +283,6 @@ git_symbols=(
     stash           
 )
 
-# GIT_DIRTY_TIMEOUT=60
+ZLE_RPROMPT_INDENT=0
+GIT_DIRTY_TIMEOUT=60
 _git_prompt_setup
