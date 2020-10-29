@@ -1,5 +1,5 @@
 Plug 'sbdchd/neoformat', {'on': 'Neoformat'}
-noremap <M-C-l> :Neoformat<CR>
+noremap <M-C-l> <Cmd>Neoformat<CR>
 let g:neoformat_only_msg_on_error = 1
 let g:neoformat_basic_format_align = 1
 let g:neoformat_basic_format_retab = 1

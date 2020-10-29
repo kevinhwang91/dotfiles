@@ -19,12 +19,16 @@ function s:set_win_rnu(val) abort
         return
     endif
 
-    for win_hd in nvim_tabpage_list_wins(0)
-        if nvim_get_current_win() == win_hd && nvim_win_get_option(win_hd, 'number')
-            call nvim_win_set_option(win_hd, 'relativenumber', a:val)
-        elseif empty(nvim_win_get_config(win_hd)['relative']) &&
-                    \ nvim_win_get_option(win_hd, 'number')
-            call nvim_win_set_option(win_hd, 'relativenumber', v:false)
+    let cur_winid = nvim_get_current_win()
+    for winid in nvim_tabpage_list_wins(0)
+        if cur_winid == winid && nvim_win_get_option(cur_winid, 'number')
+            if &buftype == 'quickfix'
+                continue
+            endif
+            call nvim_win_set_option(cur_winid, 'relativenumber', a:val)
+        elseif empty(nvim_win_get_config(winid)['relative']) &&
+                    \ nvim_win_get_option(winid, 'number')
+            call nvim_win_set_option(winid, 'relativenumber', v:false)
         endif
     endfor
 endfunction
@@ -58,7 +62,7 @@ function s:clean_empty_buf()
 endfunction
 
 command! -nargs=0 CleanEmptyBuf call <SID>clean_empty_buf()
-nnoremap <silent> qe :CleanEmptyBuf<CR>
+nnoremap <silent> qe <Cmd>CleanEmptyBuf<CR>
 
 function s:v_set_search(cmdtype)
     let temp = @s
@@ -67,40 +71,64 @@ function s:v_set_search(cmdtype)
     let @s = temp
 endfunction
 
-xnoremap * :<C-u>call <SID>v_set_search('/')<CR>/<C-r>=@/<CR><CR>
-xnoremap # :<C-u>call <SID>v_set_search('?')<CR>?<C-r>=@/<CR><CR>
+xnoremap * :call <SID>v_set_search('/')<CR>/<C-r>=@/<CR><CR>
+xnoremap # :call <SID>v_set_search('?')<CR>?<C-r>=@/<CR><CR>
 
-" function WIP() abort
-    " if v:hlsearch
-        " set nolazyredraw
-        " normal! n
-        " set lazyredraw
-        " return
-    " endif
-    " let hl_groups = ['CocHighlightText', 'CocHighlightRead', 'CocHighlightWrite']
-    " let pos = []
-    " let groups = getmatches()
-    " for group in filter(groups, 'index(hl_groups, v:val.group) > -1')
-        " for [key, val] in items(group)
-            " if key =~ '^pos' && index(pos, val) < 0
-                " call add(pos, val)
-            " endif
-        " endfor
-    " endfor
-    " call sort(pos, {p1, p2 -> p1[0] == p2[0] ? p1[1] - p2[1] : p1[0] - p2[0]})
-    " let [_, p1, p2, _] = getpos('.')
-    " let i = 0
-    " let len = len(pos)
-    " while i < len
-        " let p = pos[i]
-        " if p1 == p[0] && p2 >= p[1] && p2 < p[1] + p[2]
-            " if i + 1 == len
-                " let i = -1
-            " endif
-            " echo pos[i+1][0] pos[i+1][1]
-            " call cursor(pos[i+1][0], pos[i+1][1])
-            " return
-        " endif
-        " let i += 1
-    " endwhile
-" endfunction
+" augroup ShadowWindow
+"     autocmd!
+"     autocmd WinEnter * call timer_start(50, {-> call(function('s:toggle_shadow'), [])})
+" augroup END
+
+function s:shadow_existed() abort
+    return exists('s:shadow_winid') && nvim_win_is_valid(s:shadow_winid)
+endfunction
+
+function s:create_shadow() abort
+    if s:shadow_existed()
+        return
+    endif
+
+    let opts = {
+                \ 'relative': 'editor',
+                \ 'focusable': 0,
+                \ 'width': &columns,
+                \ 'height': &lines,
+                \ 'row': 0,
+                \ 'col': 0,
+                \ 'style': 'minimal',
+                \ }
+
+    let shadow_bufnr = nvim_create_buf(0, 1)
+    call nvim_buf_set_option(shadow_bufnr, 'bufhidden', 'wipe')
+    let s:shadow_winid = nvim_open_win(shadow_bufnr, 0, opts)
+    call nvim_win_set_option(s:shadow_winid, 'winhighlight', 'Normal:Normal')
+    call nvim_win_set_option(s:shadow_winid, 'winblend', 70)
+    autocmd ShadowWindow VimResized * call <SID>reszie_shadow()
+endfunction
+
+function s:close_shadow() abort
+    if !s:shadow_existed()
+        return
+    endif
+    autocmd! ShadowWindow VimResized
+    call nvim_win_close(s:shadow_winid, 0)
+endfunction
+
+function s:reszie_shadow() abort
+    if !s:shadow_existed()
+        return
+    endif
+    call nvim_win_set_config(s:shadow_winid, {'width': &columns, 'height': &lines})
+endfunction
+
+function! s:toggle_shadow() abort
+    if s:shadow_existed() && s:shadow_winid == win_getid()
+        close
+        return
+    endif
+    if empty(nvim_win_get_config(0)['relative'])
+        call s:close_shadow()
+    else
+        call s:create_shadow()
+    endif
+endfunction

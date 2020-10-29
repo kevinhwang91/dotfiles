@@ -16,7 +16,7 @@ augroup FoldLazyLoad
 augroup END
 
 function s:set_fold_opt() abort
-    setlocal foldenable
+    setlocal foldenable foldlevel=99
     setlocal foldtext=FoldText()
 endfunction
 
@@ -29,12 +29,12 @@ function s:load_anyfold(afile, bufnr) abort
             execute 'autocmd BufEnter <buffer=' . a:bufnr .
                         \ '> call timer_start(2000, "LazyLoadAnyFold")'
         augroup END
-        call s:set_fold_opt()
     endif
 endfunction
 
 function LazyLoadAnyFold(timer) abort
     if exists('b:lazy_load_fold') && b:lazy_load_fold
+        call s:set_fold_opt()
         execute 'AnyFoldActivate'
         augroup FoldLazyLoad
             execute 'autocmd! BufEnter <buffer=' . b:lazy_load_fold . '>'

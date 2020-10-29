@@ -9,11 +9,11 @@ let g:eregex_default_enable = 0
 Plug 'KabbAmine/vCoolor.vim', {'on': ['VCoolor', 'VCoolIns']}
 let g:vcoolor_disable_mappings = 1
 let g:vcoolor_lowercase = 1
-nnoremap <silent> <leader>pc :VCoolor<CR>
+nnoremap <silent> <leader>pc <Cmd>VCoolor<CR>
 
 " suda, fix neovim ':w !sudo tee %' bug
 Plug 'kevinhwang91/suda.vim'
-nnoremap <leader>:w :w suda://%<CR>
+nnoremap <leader>:w <Cmd>w suda://%<CR>
 
 " marks display
 " hide at startup https://github.com/neovim/neovim/issues/4295
@@ -40,4 +40,4 @@ let g:SignatureMap = {
             \ 'ListBufferMarks'    :  "m/",
             \ 'ListBufferMarkers'  :  "m?"
             \ }
-nnoremap <silent> <leader>tm :SignatureToggleSigns<CR>
+nnoremap <silent> <leader>tm <Cmd>SignatureToggleSigns<CR>

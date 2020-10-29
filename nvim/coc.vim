@@ -33,7 +33,7 @@ nmap <silent> [d <Plug>(coc-diagnostic-prev)
 nmap <silent> ]d <Plug>(coc-diagnostic-next)
 
 " Remap keys for gotos
-nmap <silent> gd :call <SID>go_to_definition()<CR>
+nmap <silent> gd <Cmd>call <SID>go_to_definition()<CR>
 nmap <silent> gy <Plug>(coc-type-definition)
 nmap <silent> gi <Plug>(coc-implementation)
 nmap <silent> gr <Plug>(coc-references)
@@ -49,15 +49,18 @@ function! s:go_to_definition()
     else
         let cword = expand('<cword>')
         try
-            let line = line('.')
-            execute('tjump ' . cword)
-            if line == line('.')
-                return
-            endif
+            execute('ltag ' . cword)
+            let def_size = getloclist(0, {'size': 0}).size
             let w:gtd = 'tag'
-            call search(cword, 'c')
-            if bufnr() != bufnr
-                normal zz
+            if def_size > 1
+                execute("normal! \<C-o>")
+                execute('lopen ' . def_size)
+            elseif def_size == 1
+                lclose
+                call search(cword, 'c')
+                if bufnr() != bufnr
+                    normal zz
+                endif
             endif
         catch /.*/
             let w:gtd = 'search'
@@ -67,7 +70,7 @@ function! s:go_to_definition()
 endfunction
 
 " Use K for show documentation in preview window
-nnoremap <silent> K :call <SID>show_documentation()<CR>
+nnoremap <silent> K <Cmd>call <SID>show_documentation()<CR>
 
 function s:show_documentation()
     if (index(['vim','help'], &filetype) >= 0)
@@ -80,12 +83,21 @@ endfunction
 let g:coc_enable_locationlist = 0
 augroup Coc
     autocmd!
-    autocmd User CocLocationsChange call setloclist(0, g:coc_jump_locations) | lwindow
+    autocmd User CocLocationsChange call <SID>jump_to_loc(g:coc_jump_locations)
     autocmd CursorHold * silent call CocActionAsync('highlight',
                 \ '', function('s:highlight_fallback'))
     autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
 augroup END
-highlight default link CocHighlightText CurrentWord
+
+function s:jump_to_loc(locs) abort
+    let loc = setloclist(0, [], ' ', {'title': 'CocLocationList', 'items': a:locs})
+    let winid = getloclist(0, {'winid': 0}).winid
+    if winid == 0
+        lwindow
+    else
+        call win_gotoid(winid)
+    endif
+endfunction
 
 " CocHasProvider('documentHighlight') has probability of RPC failure
 " Write the hardcode of filetype for fallback highlight
@@ -93,6 +105,8 @@ let s:fb_ft_black_list = [
             \ 'qf', 'fzf', 'vim', 'sh', 'python', 'go', 'c', 'cpp', 'rust', 'java',
             \ 'typescript', 'javascript', 'css', 'html', 'xml'
             \ ]
+
+highlight default link CocHighlightText CurrentWord
 
 function s:get_cur_word()
     let line = getline('.')
@@ -115,6 +129,13 @@ function s:highlight_fallback(err, res)
     let w:coc_matchids_fb = matchadd('CocHighlightText', s:get_cur_word(), -1)
 endfunction
 
+" Remap <C-f> and <C-b> for scroll float windows/popups.
+" Note coc#float#scroll works on neovim >= 0.4.3 or vim >= 8.2.0750
+nnoremap <nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
+nnoremap <nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
+inoremap <nowait><expr> <C-f> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(1)\<cr>" : "\<Right>"
+inoremap <nowait><expr> <C-b> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(0)\<cr>" : "\<Left>"
+
 " Remap for rename current word
 nmap <leader>rn <Plug>(coc-refactor)
 " Remap keys for applying codeAction to the current buffer.
@@ -134,7 +155,7 @@ xmap ak <Plug>(coc-classobj-a)
 omap ak <Plug>(coc-classobj-a)
 
 " Add `:OR` command for organize imports of the current buffer.
-command! -nargs=0 OR :call CocAction('runCommand', 'editor.action.organizeImport')
-nnoremap <silent> <leader>qi :OR<CR>
+command! -nargs=0 OR <Cmd>call CocAction('runCommand', 'editor.action.organizeImport')
+nnoremap <silent> <leader>qi <Cmd>OR<CR>
 
-nnoremap <silent> <M-q> :echo CocAction('getCurrentFunctionSymbol')<CR>
+nnoremap <silent> <M-q> <Cmd>echo CocAction('getCurrentFunctionSymbol')<CR>

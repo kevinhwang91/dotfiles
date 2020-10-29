@@ -5,41 +5,69 @@ let g:rnvimr_hide_gitignore = 1
 let g:rnvimr_border_attr = {'fg': 3}
 let g:rnvimr_ranger_cmd = 'ranger'
 highlight default link RnvimrNormal CursorLine
-tnoremap <silent> <M-i> <C-\><C-n>:RnvimrResize<CR>
-nnoremap <silent> <M-o> :RnvimrToggle<CR>
-tnoremap <silent> <M-o> <C-\><C-n>:RnvimrToggle<CR>
+tnoremap <silent> <M-i> <C-\><C-n><Cmd>RnvimrResize<CR>
+nnoremap <silent> <M-o> <Cmd>RnvimrToggle<CR>
+tnoremap <silent> <M-o> <C-\><C-n><Cmd>RnvimrToggle<CR>
 let g:rnvimr_ranger_views = [
             \ {'minwidth': 90, 'ratio': []},
             \ {'minwidth': 50, 'maxwidth': 89, 'ratio': [1,1]},
             \ {'maxwidth': 49, 'ratio': [1]}
             \ ]
 
+Plug 'kevinhwang91/nvim-bqf'
+let g:bqf_auto_enable = 1
+
 if executable('fzf')
     Plug 'junegunn/fzf.vim'
-    nnoremap <silent> <leader>ft :BTags<CR>
-    nnoremap <silent> <leader>fo :Tags<CR>
-    nnoremap <silent> <leader>fc :BCommits<CR>
-    nnoremap <silent> <leader>f/ :History/<CR>
-    nnoremap <silent> <leader>f; :History:<CR>
-    nnoremap <silent> <leader>fr :History<CR>
-    nnoremap <silent> <leader>fg :GFiles<CR>
-    nnoremap <silent> <leader>fm :Marks<CR>
-    nnoremap <silent> <leader>ff :FZF<CR>
-    nnoremap <silent> <leader>fb :Buffers<CR>
+    nnoremap <silent> <leader>ft <Cmd>BTags<CR>
+    nnoremap <silent> <leader>fo <Cmd>Tags<CR>
+    nnoremap <silent> <leader>fc <Cmd>BCommits<CR>
+    nnoremap <silent> <leader>f/ <Cmd>History/<CR>
+    nnoremap <silent> <leader>f; <Cmd>History:<CR>
+    nnoremap <silent> <leader>fr <Cmd>History<CR>
+    nnoremap <silent> <leader>fg <Cmd>GFiles<CR>
+    nnoremap <silent> <leader>fm <Cmd>Marks<CR>
+    nnoremap <silent> <leader>ff <Cmd>FZF<CR>
+    nnoremap <silent> <leader>fb <Cmd>Buffers<CR>
 
-    let $FZF_DEFAULT_OPTS .= ' --reverse --info=inline'
-    let g:fzf_layout = { 'window': { 'width': 0.8, 'height': 0.8 } }
+    let $FZF_DEFAULT_OPTS .= ' --reverse --info=inline --border'
+    let $BAT_STYLE='numbers'
+
+    let g:fzf_layout = {'window': {'width': 0.7, 'height': 0.7}}
+
+    augroup Fzf
+        autocmd VimResized * call <SID>resize_fzf_preview()
+    augroup END
+
+    function s:resize_fzf_preview() abort
+        try
+            let layout = g:fzf_layout.window
+            if &columns * layout.width - 2 > 100
+                let g:fzf_preview_window = 'right:50%'
+            else
+                if &lines * layout.height - 2 > 25
+                    let g:fzf_preview_window = 'down:50%'
+                else
+                    let g:fzf_preview_window = ''
+                endif
+            endif
+        catch /^Vim\%((\a\+)\)\=:E/
+        endtry
+    endfunction
+
+    call s:resize_fzf_preview()
 endif
 
 Plug 't9md/vim-choosewin', {'on': 'ChooseWin'}
-nnoremap <M-0> :ChooseWin<CR>
+nnoremap <M-0> <Cmd>ChooseWin<CR>
 let g:choosewin_blink_on_land = 0
-let g:choosewin_color_label = { 'gui': ['#98c379', '#202326', 'bold'] }
-let g:choosewin_color_label_current = { 'gui': ['#528bff', '#202326', 'bold'] }
-let g:choosewin_color_other = { 'gui': ['#2c323c'] }
+let g:choosewin_color_label = {'gui': ['#98c379', '#202326', 'bold']}
+let g:choosewin_color_label_current = {'gui': ['#528bff', '#202326', 'bold']}
+let g:choosewin_color_other = {'gui': ['#2c323c']}
 
 Plug 'dyng/ctrlsf.vim'
 let g:ctrlsf_ackprg = 'rg'
+let g:ctrlsf_populate_qflist = 1
 let g:ctrlsf_auto_focus = {'at': 'start'}
 let g:ctrlsf_auto_preview = 1
 let g:ctrlsf_default_root = 'project'
@@ -57,12 +85,11 @@ let g:ctrlsf_mapping = {
             \ 'next': '<C-j>',
             \ 'prev': '<C-k>',
             \ 'pquit': 'qq',
-            \ 'loclist': '',
+            \ 'loclist': '<C-s>',
             \ 'chgmode': 'M',
             \ 'stop': '<C-c>',
             \ }
 highlight default link ctrlsfFilename Underlined
-
 nmap <leader>rg <Plug>CtrlSFCCwordExec
 xmap <leader>rg <Plug>CtrlSFVwordExec
 cabbrev rg CtrlSF
@@ -83,10 +110,10 @@ function! CtrlSFAfterMainWindowInit()
                 \']': 'VM-Goto-Next', '[': 'VM-Goto-Prev'}
     nnoremap <buffer><expr><silent> <leader>1
                 \ execute('let g:ctrlsf_auto_preview = !g:ctrlsf_auto_preview')
-    nnoremap <buffer><silent> <C-n> :call <SID>vm_match_pat()<CR>
+    nnoremap <buffer><silent> <C-n> <Cmd>call <SID>vm_match_pat()<CR>
 
-    nnoremap <buffer><silent> [f :call <SID>nav_file(0)<CR>
-    nnoremap <buffer><silent> ]f :call <SID>nav_file(1)<CR>
+    nnoremap <buffer><silent> [f <Cmd>call <SID>nav_file(0)<CR>
+    nnoremap <buffer><silent> ]f <Cmd>call <SID>nav_file(1)<CR>
 endfunction
 
 function! Wrap_VM_Start() abort
@@ -94,7 +121,7 @@ function! Wrap_VM_Start() abort
     let g:VM_set_statusline = 0
     for [key, val] in items(b:visual_multi_map)
         execute 'nmap <buffer><nowait><silent> '. key .
-                    \' :call <SID>wrap_vm_map("'. val . '")<CR>'
+                    \' <Cmd>call <SID>wrap_vm_map("'. val . '")<CR>'
     endfor
     nmap <buffer><nowait><silent> <C-n> n
 endfunction
@@ -104,7 +131,7 @@ function! Wrap_VM_Exit() abort
     for key in keys(b:visual_multi_map)
         execute 'nunmap <buffer> ' . key
     endfor
-    nnoremap <buffer><silent> <C-n> :call <SID>vm_match_pat()<CR>
+    nnoremap <buffer><silent> <C-n> <Cmd>call <SID>vm_match_pat()<CR>
 endfunction
 
 function s:nav_file(forward) abort
@@ -173,8 +200,8 @@ let g:matchup_mappings_enabled = 0
 
 augroup MatchupMatch
     autocmd!
-    autocmd TermOpen * let b:matchup_matchparen_enabled = 0
-    autocmd TermEnter * ++once let b:matchup_matchparen_enabled = 0
+    autocmd TermEnter * call clearmatches()
+    autocmd TermOpen * let [b:matchup_matchparen_enabled, b:matchup_matchparen_fallback] = [0, 0]
 augroup END
 
 nmap % <Plug>(matchup-%)
@@ -196,6 +223,3 @@ omap a5 <Plug>(matchup-a%)
 xmap a5 <Plug>(matchup-a%)
 omap i5 <Plug>(matchup-i%)
 xmap i5 <Plug>(matchup-i%)
-
-Plug 'kevinhwang91/nvim-bqf'
-let g:bqf_auto_enable = 1

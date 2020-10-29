@@ -190,7 +190,11 @@ function! LightlineQuickfix() abort
     if &buftype != 'quickfix'
         return ''
     endif
-    return getwininfo(win_getid())[0].loclist ? ' Location ' : ' Quickfix '
+    let type = getwininfo(win_getid())[0].loclist ? 'loc' : 'qf'
+    return type == 'loc' ?
+                \ printf(' Location [%d/%d] ', getloclist(0, {'nr': 0}).nr,
+                \ getloclist(0, {'nr': '$'}).nr) :
+                \ printf(' Quickfix [%d/%d] ', getqflist({'nr': 0}).nr, getqflist({'nr': '$'}).nr)
 endfunction
 
 function! LightlineCocStatus() abort

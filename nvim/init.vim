@@ -21,7 +21,7 @@ set cedit=<C-x>
 set list
 set listchars=tab:\│\ ,trail:•
 set showbreak=╰─➤
-set nofoldenable
+set foldenable
 set foldcolumn=1
 set foldlevelstart=99
 set title
@@ -98,20 +98,20 @@ call s:source('script.vim')
 let mapleader = ' '
 nnoremap <Space> <Nop>
 xnoremap <Space> <Nop>
-nnoremap q <Nop>
-nnoremap Q <Nop>
+noremap q <Nop>
+noremap Q <Nop>
 nnoremap - "_
 xnoremap - "_
-nnoremap <silent> qq :confirm q<CR>
-nnoremap <silent> qa :confirm qa<CR>
-nnoremap <silent> qt :tabc<CR>
-nnoremap <silent> qc :ccl<CR>
-nnoremap <silent> qs :lcl<CR>
-nnoremap <leader>w :w<CR>
-nnoremap <leader>wq :wq<CR>
+nnoremap <silent> qq <Cmd>confirm q<CR>
+nnoremap <silent> qa <Cmd>confirm qa<CR>
+nnoremap <silent> qt <Cmd>tabc<CR>
+nnoremap <silent> qc <Cmd>ccl<CR>
+nnoremap <silent> qs <Cmd>lcl<CR>
+nnoremap <leader>w <Cmd>w<CR>
+nnoremap <leader>wq <Cmd>wq<CR>
 nnoremap <C-g> 1<C-g>
-nnoremap <silent> <leader>3 :buffer #<CR>
-nnoremap <silent> <leader>l :nohlsearch<CR>
+nnoremap <silent> <leader>3 <Cmd>buffer #<CR>
+nnoremap <silent> <leader>l <Cmd>nohlsearch<CR>
 cnoremap <C-b> <Left>
 cnoremap <C-f> <Right>
 cnoremap <C-a> <Home>
@@ -123,6 +123,7 @@ if has('nvim-0.5')
     cnoremap <expr><CR> pumvisible() ? "\<C-y>" : "\<CR>"
 endif
 tnoremap <M-\> <C-\><C-n>
+nnoremap <silent><C-w>O <Cmd>tabonly<CR>
 
 nnoremap s d
 xnoremap s d
@@ -151,15 +152,15 @@ nnoremap m' m`
 xnoremap m' m`
 nnoremap m` m'
 xnoremap m` m'
-nnoremap <silent> '0 :normal! `0<CR>:silent! CleanEmptyBuf<CR>
-xnoremap <silent> '0 :normal! `0<CR>:silent! CleanEmptyBuf<CR>
-nnoremap <silent><leader>i :silent! normal! `^<CR>
+nnoremap <silent> '0 <Cmd>normal! `0<CR>:silent! CleanEmptyBuf<CR>
+xnoremap <silent> '0 <Cmd>normal! `0<CR>:silent! CleanEmptyBuf<CR>
+nnoremap <silent><leader>i <Cmd>silent! normal! `^<CR>
 
 xnoremap <silent> <M-j> :move '>+1<CR>gv=gv
 xnoremap <silent> <M-k> :move '<-2<CR>gv=gv
-nnoremap <silent> yd :call setreg(v:register, expand('%:p:h'))<CR>:echo expand('%:p:h')<CR>
-nnoremap <silent> yn :call setreg(v:register, expand('%:t'))<CR>:echo expand('%:t')<CR>
-nnoremap <silent> yp :call setreg(v:register, expand('%:p'))<CR>:echo expand('%:p')<CR>
+nnoremap <silent> yd <Cmd>call setreg(v:register, expand('%:p:h'))<CR>:echo expand('%:p:h')<CR>
+nnoremap <silent> yn <Cmd>call setreg(v:register, expand('%:t'))<CR>:echo expand('%:t')<CR>
+nnoremap <silent> yp <Cmd>call setreg(v:register, expand('%:p'))<CR>:echo expand('%:p')<CR>
 nnoremap Y y$
 
 function s:prefix_timeout(prefix)
@@ -178,16 +179,16 @@ nnoremap <expr> [ <SID>prefix_timeout('[')
 xnoremap <expr> [ <SID>prefix_timeout('[')
 nnoremap <expr> ] <SID>prefix_timeout(']')
 xnoremap <expr> ] <SID>prefix_timeout(']')
-nnoremap <silent> [b :bprevious<CR>
-nnoremap <silent> ]b :bnext<CR>
-nnoremap [q :cprevious<CR>
-nnoremap ]q :cnext<CR>
-nnoremap [Q :cfirst<CR>
-nnoremap ]Q :clast<CR>
-nnoremap [s :lprevious<CR>
-nnoremap ]s :lnext<CR>
-nnoremap [S :lfirst<CR>
-nnoremap ]S :llast<CR>
+nnoremap <silent> [b <Cmd>bprevious<CR>
+nnoremap <silent> ]b <Cmd>bnext<CR>
+nnoremap <silent> [q <Cmd>execute(v:count1 . 'cprevious')<CR>
+nnoremap <silent> ]q <Cmd>execute(v:count1 . 'cnext')<CR>
+nnoremap [Q <Cmd>cfirst<CR>
+nnoremap ]Q <Cmd>clast<CR>
+nnoremap <silent> [s <Cmd>execute(v:count1 . 'lprevious')<CR>
+nnoremap <silent> ]s <Cmd>execute(v:count1 . 'lnext')<CR>
+nnoremap [S <Cmd>lfirst<CR>
+nnoremap ]S <Cmd>llast<CR>
 nnoremap [z [z_
 xnoremap [z [z_
 nnoremap ]z ]z_
@@ -224,8 +225,8 @@ function s:nav_fold(forward, count)
     endif
 endfunction
 
-nnoremap <silent> z[ :<C-u>call <SID>nav_fold(0, v:count1)<CR>
-nnoremap <silent> z] :<C-u>call <SID>nav_fold(1, v:count1)<CR>
+nnoremap <silent> z[ <Cmd>call <SID>nav_fold(0, v:count1)<CR>
+nnoremap <silent> z] <Cmd>call <SID>nav_fold(1, v:count1)<CR>
 
 if empty($XDG_CONFIG_HOME)
     call plug#begin('~/.config/nvim/plugged')
@@ -284,7 +285,7 @@ augroup END
 " document
 Plug 'kkoomen/vim-doge', {'do': {-> doge#install()}}
 let g:doge_enable_mappings = 0
-nnoremap <leader>dg :DogeGenerate<CR>
+nnoremap <leader>dg <Cmd>DogeGenerate<CR>
 let g:doge_mapping_comment_jump_forward = '<C-j>'
 let g:doge_mapping_comment_jump_backward = '<C-k>'
 

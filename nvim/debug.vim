@@ -4,21 +4,21 @@ Plug 'sakhnik/nvim-gdb', {'do': ':UpdateRemotePlugins'}
 let g:nvimgdb_disable_start_keymaps = 1
 
 function! GdbKeymaps()
-    nnoremap <silent><buffer> <F25> :GdbRun<CR>
-    nnoremap <silent><buffer> <F26> :GdbContinue<CR>
+    nnoremap <silent><buffer> <F25> <Cmd>GdbRun<CR>
+    nnoremap <silent><buffer> <F26> <Cmd>GdbContinue<CR>
     nnoremap <silent><buffer> <F27>
-                \ :echo substitute(GdbCustomCommand('info locals'), '\r\n', ' \| ', 'g')<CR>
-    nnoremap <silent><buffer> <F28> :GdbDebugStop<CR>
-    nnoremap <silent><buffer> <F29> :GdbEvalWord<CR>
-    xnoremap <silent><buffer> <F29> :GdbEvalRange<CR>
-    nnoremap <silent><buffer> <F30> :GdbFinish<CR>
-    nnoremap <silent><buffer> <F31> :GdbStep<CR>
-    nnoremap <silent><buffer> <F32> :GdbNext<CR>
-    nnoremap <silent><buffer> <F33> :GdbUntil<CR>
-    nnoremap <silent><buffer> <F34> :GdbBreakpointToggle<CR>
-    nnoremap <silent><buffer> <C-P> :GdbFrameUp<CR>
-    nnoremap <silent><buffer> <C-N> :GdbFrameDown<CR>
-    nnoremap <silent><buffer> <leader>wl :GdbCreateWatch info locals<CR>
+                \ <Cmd>echo substitute(GdbCustomCommand('info locals'), '\r\n', ' \| ', 'g')<CR>
+    nnoremap <silent><buffer> <F28> <Cmd>GdbDebugStop<CR>
+    nnoremap <silent><buffer> <F29> <Cmd>GdbEvalWord<CR>
+    xnoremap <silent><buffer> <F29> <Cmd>GdbEvalRange<CR>
+    nnoremap <silent><buffer> <F30> <Cmd>GdbFinish<CR>
+    nnoremap <silent><buffer> <F31> <Cmd>GdbStep<CR>
+    nnoremap <silent><buffer> <F32> <Cmd>GdbNext<CR>
+    nnoremap <silent><buffer> <F33> <Cmd>GdbUntil<CR>
+    nnoremap <silent><buffer> <F34> <Cmd>GdbBreakpointToggle<CR>
+    nnoremap <silent><buffer> <C-P> <Cmd>GdbFrameUp<CR>
+    nnoremap <silent><buffer> <C-N> <Cmd>GdbFrameDown<CR>
+    nnoremap <silent><buffer> <leader>wl <Cmd>GdbCreateWatch info locals<CR>
 endfunction
 
 augroup NvimGdb

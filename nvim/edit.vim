@@ -54,7 +54,7 @@ xmap <leader>A <Plug>(VM-Visual-All)
 xmap <leader>c <Plug>(VM-Visual-Cursors)
 nmap <M-C-k> <Plug>(VM-Select-Cursor-Up)
 nmap <M-C-j> <Plug>(VM-Select-Cursor-Down)
-nmap <silent> <leader>g/ :VMFromSearch<CR>
+nmap <silent> <leader>g/ <Cmd>VMSearch<CR>
 
 Plug 'bootleq/vim-cycle'
 let g:cycle_no_mappings = 1
@@ -110,7 +110,7 @@ function Undotree_CustomMap()
     nunmap <buffer> u
 endfunc
 
-nnoremap <silent> <M-u> :UndotreeToggle<CR>
+nnoremap <silent> <M-u> <Cmd>UndotreeToggle<CR>
 
 command! -nargs=0 UndotreeToggle call s:undo_toggle()
 function s:undo_toggle()

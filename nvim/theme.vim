@@ -11,6 +11,7 @@ function s:color_scheme() abort
     highlight! link TermCursor Cursor
     highlight MatchWord cterm=underline gui=underline
     if g:colors_name ==# 'one'
+        highlight BqfPreviewBorder guifg=#fbb829 ctermfg=214
         highlight semshiParameterUnused cterm=underline ctermfg=71 gui=underline guifg=#50a14f
         highlight semshiImported cterm=italic ctermfg=173 gui=italic guifg=#d19a66
         highlight CurrentWord cterm=bold ctermbg=238 gui=bold guibg=#314365
