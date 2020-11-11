@@ -33,12 +33,30 @@ function s:set_win_rnu(val) abort
     endfor
 endfunction
 
+let s:focus_lock = 1
+function s:signcolumn_lost(timer) abort
+    if s:focus_lock >= 0
+        call s:set_win_rnu(v:false)
+        highlight! link FoldColumn Ignore
+    endif
+    let s:focus_lock += 1
+endfunction
+
+function s:signcolumn_gained(timer) abort
+    if s:focus_lock >= 0
+        call s:set_win_rnu(v:true)
+        highlight! link FoldColumn NONE
+    endif
+    let s:focus_lock += 1
+endfunction
+
 augroup ToggleSigncolumn
     autocmd!
-    autocmd FocusLost * call s:set_win_rnu(v:false) |
-                \ highlight! link FoldColumn Ignore
-    autocmd WinEnter,FocusGained * call s:set_win_rnu(v:true) |
-                \ highlight! link FoldColumn NONE
+    autocmd FocusLost * let s:focus_lock -= 1 |
+                \ call timer_start(50, function('s:signcolumn_lost'))
+    autocmd FocusGained * let s:focus_lock -= 1 |
+                \ call timer_start(50, function('s:signcolumn_gained'))
+    autocmd WinEnter * call s:set_win_rnu(v:true) | highlight! link FoldColumn NONE
 augroup END
 
 function s:follow_symlink(...) abort
@@ -74,10 +92,26 @@ endfunction
 xnoremap * :call <SID>v_set_search('/')<CR>/<C-r>=@/<CR><CR>
 xnoremap # :call <SID>v_set_search('?')<CR>?<C-r>=@/<CR><CR>
 
-" augroup ShadowWindow
-"     autocmd!
-"     autocmd WinEnter * call timer_start(50, {-> call(function('s:toggle_shadow'), [])})
-" augroup END
+function s:zz() abort
+    if line('.') == line('$')
+        keepjumps execute 'normal! ' . line('.') . 'zb'
+        return
+    endif
+    normal! zz
+    normal! L
+    if line('.') == line('$')
+        keepjumps execute 'normal! ' . line('.') . 'zb'
+    endif
+    keepjumps normal! ``
+endfunction
+
+nnoremap zz <Cmd>call <SID>zz()<CR>
+xnoremap zz <Cmd>call <SID>zz()<CR>
+
+augroup ShadowWindow
+    autocmd!
+    autocmd WinEnter * call timer_start(50, {-> call(function('s:toggle_shadow'), [])})
+augroup END
 
 function s:shadow_existed() abort
     return exists('s:shadow_winid') && nvim_win_is_valid(s:shadow_winid)
@@ -121,14 +155,30 @@ function s:reszie_shadow() abort
     call nvim_win_set_config(s:shadow_winid, {'width': &columns, 'height': &lines})
 endfunction
 
-function! s:toggle_shadow() abort
-    if s:shadow_existed() && s:shadow_winid == win_getid()
+function s:detect_other_floatwins(cur_winid) abort
+    if getwinvar(a:cur_winid, '&buftype') == 'nofile'
+        return 1
+    endif
+    for winid in nvim_list_wins()
+        if winid == a:cur_winid
+            continue
+        endif
+        if !empty(nvim_win_get_config(winid).relative) && getwinvar(winid, '&buftype') != 'nofile'
+            return 1
+        endif
+    endfor
+    return 0
+endfunction
+
+function s:toggle_shadow() abort
+    let cur_winid = win_getid()
+    if s:shadow_existed() && s:shadow_winid == cur_winid
         close
         return
     endif
-    if empty(nvim_win_get_config(0)['relative'])
+    if empty(nvim_win_get_config(0).relative)
         call s:close_shadow()
-    else
+    elseif !s:detect_other_floatwins(cur_winid)
         call s:create_shadow()
     endif
 endfunction

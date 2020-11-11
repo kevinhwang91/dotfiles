@@ -31,8 +31,9 @@ set lazyredraw
 set inccommand=nosplit
 set shortmess+=aIc
 set signcolumn=yes:1
-set shada=!,'300,<50,s10,h
+set shada=!,'300,<50,s10,h,%
 set synmaxcol=300
+set textwidth=100
 
 " undo
 set undofile

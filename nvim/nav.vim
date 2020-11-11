@@ -14,6 +14,7 @@ let g:rnvimr_ranger_views = [
             \ {'maxwidth': 49, 'ratio': [1]}
             \ ]
 
+" WIP need neovim 0.5
 Plug 'kevinhwang91/nvim-bqf'
 let g:bqf_auto_enable = 1
 
@@ -65,6 +66,32 @@ let g:choosewin_color_label = {'gui': ['#98c379', '#202326', 'bold']}
 let g:choosewin_color_label_current = {'gui': ['#528bff', '#202326', 'bold']}
 let g:choosewin_color_other = {'gui': ['#2c323c']}
 
+" if executable('rg')
+"     set grepprg=rg\ --vimgrep\ --no-heading\ --smart-case
+"     set grepformat=%f:%l:%c:%m,%f:%l:%m
+" endif
+
+Plug 'mhinz/vim-grepper', {'on': ['Grepper', '<Plug>(GrepperOperator)']}
+nnoremap <leader>rg <Cmd>Grepper -tool rg<CR>
+
+nmap gs <Plug>(GrepperOperator)
+xmap gs <Plug>(GrepperOperator)
+
+let g:grepper = {
+            \ 'tools': ['rg', 'git'],
+            \ 'dir': 'repo,file',
+            \ 'open': 1,
+            \ 'switch': 1,
+            \ 'jump': 0,
+            \ 'simple_prompt': 1,
+            \ 'quickfix': 1,
+            \ 'highlight': 1,
+            \ 'rg': {
+            \   'grepprg': 'rg -H --no-heading --vimgrep --smart-case',
+            \   'grepformat': '%f:%l:%c:%m,%f:%l:%m',
+            \   }
+            \ }
+
 Plug 'dyng/ctrlsf.vim'
 let g:ctrlsf_ackprg = 'rg'
 let g:ctrlsf_populate_qflist = 1
@@ -90,11 +117,8 @@ let g:ctrlsf_mapping = {
             \ 'stop': '<C-c>',
             \ }
 highlight default link ctrlsfFilename Underlined
-nmap <leader>rg <Plug>CtrlSFCCwordExec
-xmap <leader>rg <Plug>CtrlSFVwordExec
-cabbrev rg CtrlSF
-cabbrev rgt CtrlSF -T
-cabbrev rgr CtrlSF -R
+nmap <leader>ct <Plug>CtrlSFCCwordExec
+xmap <leader>ct <Plug>CtrlSFVwordExec
 
 function! CtrlSFAfterMainWindowInit()
     setlocal wrap

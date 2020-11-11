@@ -6,14 +6,14 @@
 
 Plug 'itchyny/lightline.vim', {'on': []}
 Plug 'ryanoasis/vim-devicons', {'on': []}
-autocmd VimEnter * ++once call timer_start(0, 'LazyLoadLightline')
+autocmd VimEnter * ++once call timer_start(0, function('s:lazy_load_stl'))
 augroup LightlineExtend
     autocmd!
     autocmd User CocDiagnosticChange call lightline#update()
     autocmd CursorHold,BufWritePost * call s:whitespace_refresh()
 augroup END
 
-function! LazyLoadLightline(timer) abort
+function s:lazy_load_stl(timer) abort
     let g:webdevicons_enable_nerdtree = 0
     call plug#load('vim-devicons')
     call plug#load('lightline.vim')
@@ -191,10 +191,10 @@ function! LightlineQuickfix() abort
         return ''
     endif
     let type = getwininfo(win_getid())[0].loclist ? 'loc' : 'qf'
-    return type == 'loc' ?
-                \ printf(' Location [%d/%d] ', getloclist(0, {'nr': 0}).nr,
-                \ getloclist(0, {'nr': '$'}).nr) :
-                \ printf(' Quickfix [%d/%d] ', getqflist({'nr': 0}).nr, getqflist({'nr': '$'}).nr)
+    let what = {'nr': 0, 'size': 0}
+    let info = type == 'loc' ? getloclist(0, what) : getqflist(what)
+    let prefix = type == 'loc' ? 'Location' : ' Quickfix'
+    return printf(' %s nr:%d size:%d ', prefix, info.nr, info.size)
 endfunction
 
 function! LightlineCocStatus() abort

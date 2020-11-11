@@ -1,5 +1,5 @@
-Plug 'neoclide/coc.nvim', {'do': 'yarn install --frozen-lockfile'}
-" Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'neoclide/coc.nvim', {'branch': 'master', 'do': 'yarn install --frozen-lockfile'}
+" Plug 'neoclide/coc.nvim'
 
 let g:coc_global_extensions = [
             \ 'coc-go',
@@ -83,14 +83,18 @@ endfunction
 let g:coc_enable_locationlist = 0
 augroup Coc
     autocmd!
-    autocmd User CocLocationsChange call <SID>jump_to_loc(g:coc_jump_locations)
+    autocmd User CocLocationsChange ++nested call <SID>jump_to_loc(g:coc_jump_locations)
     autocmd CursorHold * silent call CocActionAsync('highlight',
                 \ '', function('s:highlight_fallback'))
     autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
+    autocmd VimLeavePre * if get(g:, 'coc_process_pid', 0) |
+                \ call system('kill -9 ' . g:coc_process_pid) | endif
 augroup END
 
 function s:jump_to_loc(locs) abort
-    let loc = setloclist(0, [], ' ', {'title': 'CocLocationList', 'items': a:locs})
+    let loc_range = map(deepcopy(a:locs), 'v:val.range')
+    let loc = setloclist(0, [], ' ', {'title': 'CocLocationList', 'items': a:locs,
+                \ 'context': {'bqf': {'lsp_range_hl': loc_range}}})
     let winid = getloclist(0, {'winid': 0}).winid
     if winid == 0
         lwindow
@@ -130,18 +134,18 @@ function s:highlight_fallback(err, res)
 endfunction
 
 " Remap <C-f> and <C-b> for scroll float windows/popups.
-" Note coc#float#scroll works on neovim >= 0.4.3 or vim >= 8.2.0750
 nnoremap <nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
 nnoremap <nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
+vnoremap <nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#nvim_scroll(1, 1) : "\<C-f>"
+vnoremap <nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#nvim_scroll(0, 1) : "\<C-b>"
 inoremap <nowait><expr> <C-f> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(1)\<cr>" : "\<Right>"
 inoremap <nowait><expr> <C-b> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(0)\<cr>" : "\<Left>"
-
 " Remap for rename current word
-nmap <leader>rn <Plug>(coc-refactor)
+nmap <silent> <leader>rn <Plug>(coc-refactor)
 " Remap keys for applying codeAction to the current buffer.
-nmap <leader>ac  <Plug>(coc-codeaction)
+nmap <silent> <leader>ac  <Plug>(coc-codeaction)
 " Apply AutoFix to problem on the current line.
-nmap <leader>qf  <Plug>(coc-fix-current)
+nmap <silent> <leader>qf  <Plug>(coc-fix-current)
 
 " Map function and class text objects
 " NOTE: Requires 'textDocument.documentSymbol' support from the language server.
@@ -153,6 +157,10 @@ xmap ik <Plug>(coc-classobj-i)
 omap ik <Plug>(coc-classobj-i)
 xmap ak <Plug>(coc-classobj-a)
 omap ak <Plug>(coc-classobj-a)
+
+" TODO
+map [f vafo<Esc>
+map ]f vaf<Esc>
 
 " Add `:OR` command for organize imports of the current buffer.
 command! -nargs=0 OR <Cmd>call CocAction('runCommand', 'editor.action.organizeImport')
