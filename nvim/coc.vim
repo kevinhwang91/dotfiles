@@ -5,7 +5,6 @@ let g:coc_global_extensions = [
             \ 'coc-go',
             \ 'coc-html',
             \ 'coc-json',
-            \ 'coc-jedi',
             \ 'coc-pyright',
             \ 'coc-java',
             \ 'coc-rust-analyzer',
@@ -97,7 +96,7 @@ function s:jump_to_loc(locs) abort
                 \ 'context': {'bqf': {'lsp_range_hl': loc_range}}})
     let winid = getloclist(0, {'winid': 0}).winid
     if winid == 0
-        lwindow
+        aboveleft lwindow
     else
         call win_gotoid(winid)
     endif
