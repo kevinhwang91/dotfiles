@@ -1,17 +1,19 @@
 #!/usr/bin/env zsh
 
-# yarn
-[[ $PATH =~ $HOME/.yarn/bin ]] || PATH=$(yarn global bin):$PATH
-
 # golang
 export GOPATH=$HOME/WorkSpaces/go
 # [[ $PATH =~ $GOPATH/bin ]] || PATH=$(go env GOPATH)/bin:$PATH
 
+export JDK_HOME=/usr/lib/jvm/default
+
+# yarn
+if (( $+commands[yarn] )); then
+    [[ $PATH =~ $HOME/.yarn/bin ]] || PATH=$(yarn global bin):$PATH
+fi
+
 # path
 [[ $PATH =~ $HOME/.local/bin ]] || PATH=$HOME/.local/bin:$PATH
 export PATH
-
-export JDK_HOME=/usr/lib/jvm/default
 
 # emacs mode
 bindkey -e

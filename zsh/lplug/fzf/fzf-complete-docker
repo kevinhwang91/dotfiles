@@ -2,7 +2,7 @@ emulate -L zsh
 
 local matches
 case $2 in
-    attach | cp | diff | exec | export | \
+    attach | diff | exec | export | \
         stats | top)
         matches=$(EXTRA_OPTS=+m fdkp)
         ;;

@@ -9,6 +9,6 @@ set print object on
 set print array-indexes on
 
 # set follow-fork-mode child
-# set follow-exec-mode same
+set follow-exec-mode same
 
 alias st=start

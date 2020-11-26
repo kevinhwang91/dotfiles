@@ -4,6 +4,7 @@ IndentWidth: 4
 ColumnLimit: 100
 AlignEscapedNewlines: DontAlign
 AlignAfterOpenBracket: DontAlign
+AllowShortFunctionsOnASingleLine: None
 ---
 
 # vim: ft=yaml
