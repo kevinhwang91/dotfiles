@@ -18,13 +18,13 @@ set highlightedyank
 let g:highlightedyank_highlight_color = 'rgba(209, 154, 102, 100)'
 let g:highlightedyank_highlight_duration = '800'
 
-" build ideavim by myself for remap surround
-set surround
-
 set argtextobj
 
 set ideajoin
 
+set surround
+unmap ds
+nmap sd <Plug>DSurround
 nnoremap s d
 xnoremap s d
 onoremap s d
@@ -51,13 +51,6 @@ xnoremap m' m`
 nnoremap m` m'
 xnoremap m` m'
 
-nnoremap z[ [m
-xnoremap z[ [m
-onoremap z[ [m
-nnoremap z] ]m
-xnoremap z] ]m
-onoremap z] ]m
-
 nnoremap q <Nop>
 " nnoremap qq :q<CR>
 " It closes the current buffer instead of the current window.
@@ -74,42 +67,42 @@ cnoremap <C-b> <Left>
 cnoremap <C-f> <Right>
 cnoremap <C-a> <Home>
 
-nnoremap <C-o> :action Back<CR>
-nnoremap <C-i> :action Forward<CR>
-nnoremap g, :action JumpToLastChange<CR>
-nnoremap g; :action JumpToNextChange<CR>
-nnoremap gd :action GotoDeclaration<CR>
-nnoremap gi :action GotoImplementation<CR>
-nnoremap gr :action ShowUsages<CR>
-nnoremap gs :action GotoSuperMethod<CR>
-nnoremap gy :action GotoTypeDeclaration<CR>
+nmap <C-o> <Action>(Back)
+nmap <C-i> <Action>(Forward)
+nmap g, <Action>(JumpToLastChange)
+nmap g; <Action>(JumpToNextChange)
+nmap gd <Action>(GotoDeclaration)
+nmap gi <Action>(GotoImplementation)
+nmap gr <Action>(ShowUsages)
+nmap gp <Action>(GotoSuperMethod)
+nmap gy <Action>(GotoTypeDeclaration)
 
-noremap 'a 'A
-noremap 'b 'B
-noremap 'c 'C
-noremap 'd 'D
-noremap 'e 'E
-noremap 'f 'F
-noremap 'g 'G
-noremap 'h 'H
-noremap 'i 'I
-noremap 'j 'J
-noremap 'k 'K
-noremap 'l 'L
-noremap 'm 'M
-noremap 'n 'N
-noremap 'o 'O
-noremap 'p 'P
-noremap 'q 'Q
-noremap 'r 'R
-noremap 's 'S
-noremap 't 'T
-noremap 'u 'U
-noremap 'v 'V
-noremap 'w 'W
-noremap 'x 'X
-noremap 'y 'Y
-noremap 'z 'Z
+noremap 'a `A
+noremap 'b `B
+noremap 'c `C
+noremap 'd `D
+noremap 'e `E
+noremap 'f `F
+noremap 'g `G
+noremap 'h `H
+noremap 'i `I
+noremap 'j `J
+noremap 'k `K
+noremap 'l `L
+noremap 'm `M
+noremap 'n `N
+noremap 'o `O
+noremap 'p `P
+noremap 'q `Q
+noremap 'r `R
+noremap 's `S
+noremap 't `T
+noremap 'u `U
+noremap 'v `V
+noremap 'w `W
+noremap 'x `X
+noremap 'y `Y
+noremap 'z `Z
 noremap ma mA
 noremap mb mB
 noremap mc mC
@@ -136,40 +129,40 @@ noremap mw mW
 noremap mx mX
 noremap my mY
 noremap mz mZ
-noremap m; :action ToggleBookmarkWithMnemonic<CR>
+nmap m; <Action>(ToggleBookmarkWithMnemonic)
 noremap m<space> :delmarks A-Z0-9<CR>
-noremap <leader>fm :action ShowBookmarks<CR>
+nmap <leader>fm <Action>(ShowBookmarks)
 
-nnoremap <leader>ic :action Generate<CR>
+nmap <leader>ic <Action>(Generate)
 
-nnoremap <leader>gb :action Annotate<CR>
-nnoremap <leader>gp :action Vcs.QuickListPopupAction<CR>
-nnoremap <leader>gm :action Vcs.ShowHistoryForBlock<CR>
+nmap <leader>gb <Action>(Annotate)
+nmap <leader>gp <Action>(Vcs.QuickListPopupAction)
+nmap <leader>gm <Action>(Vcs.ShowHistoryForBlock)
 
-nnoremap <leader>rf :action RenameFile<CR>
-nnoremap <leader>rn :action RenameElement<CR>
+nmap <leader>rf <Action>(RenameFile)
+nmap <leader>rn <Action>(RenameElement)
 
-nnoremap <leader>fa :action GotoAction<CR>
-nnoremap <leader>fc :action GotoClass<CR>
-nnoremap <leader>ff :action GotoFile<CR>
-nnoremap <leader>fs :action GotoSymbol<CR>
+nmap <leader>fa <Action>(GotoAction)
+nmap <leader>fc <Action>(GotoClass)
+nmap <leader>ff <Action>(GotoFile)
+nmap <leader>fs <Action>(GotoSymbol)
 
-nnoremap <leader>ft :action FileStructurePopup<CR>
-nnoremap <leader>fu :action FindUsages<CR>
+nmap <leader>ft <Action>(FileStructurePopup)
+nmap <leader>fu <Action>(FindUsages)
 
-nnoremap <leader>hc :action CallHierarchy<CR>
-nnoremap <leader>hm :action MethodHierarchy<CR>
-nnoremap <leader>ht :action TypeHierarchy<CR>
+nmap <leader>hc <Action>(CallHierarchy)
+nmap <leader>hm <Action>(MethodHierarchy)
+nmap <leader>ht <Action>(TypeHierarchy)
 
-nnoremap <leader>fp :action ViewBreakpoints<CR>
-nnoremap <leader>ba :action ToggleBreakpointAction<CR>
-nnoremap <leader>bb :action ToggleLineBreakpoint<CR>
+nmap <leader>fp <Action>(ViewBreakpoints)
+nmap <leader>ba <Action>(ToggleBreakpointAction)
+nmap <leader>bb <Action>(ToggleLineBreakpoint)
 
-nnoremap <leader>hp :action VcsShowCurrentChangeMarker<CR>
-nnoremap <leader>hu :action Vcs.RollbackChangedLines<CR>
-nnoremap [c :action VcsShowPrevChangeMarker<CR>
-nnoremap ]c :action VcsShowNextChangeMarker<CR>
+nmap <leader>hp <Action>(VcsShowCurrentChangeMarker)
+nmap <leader>hu <Action>(Vcs.RollbackChangedLines)
+nmap [c <Action>(VcsShowPrevChangeMarker)
+nmap ]c <Action>(VcsShowNextChangeMarker)
 
-nnoremap <leader>td :action ShowErrorDescription<CR>
-nnoremap [d :action GotoPreviousError<CR>
-nnoremap ]d :action GotoNextError<CR>
+nmap <leader>td <Action>(ShowErrorDescription)
+nmap [d <Action>(GotoPreviousError)
+nmap ]d <Action>(GotoNextError)
