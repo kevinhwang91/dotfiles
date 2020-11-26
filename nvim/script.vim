@@ -76,21 +76,13 @@ function s:clean_empty_buf()
             call add(bufnr_list, buf.bufnr)
         endif
     endfor
-    execute 'bw ' . join(bufnr_list)
+    if !empty(bufnr_list)
+        execute 'bwipeout ' . join(bufnr_list)
+    endif
 endfunction
 
 command! -nargs=0 CleanEmptyBuf call <SID>clean_empty_buf()
 nnoremap <silent> qe <Cmd>CleanEmptyBuf<CR>
-
-function s:v_set_search(cmdtype)
-    let temp = @s
-    norm! gv"sy
-    let @/ = substitute(escape(@s, a:cmdtype.'\'), '\n', '\\n', 'g')
-    let @s = temp
-endfunction
-
-xnoremap * :call <SID>v_set_search('/')<CR>/<C-r>=@/<CR><CR>
-xnoremap # :call <SID>v_set_search('?')<CR>?<C-r>=@/<CR><CR>
 
 function s:zz() abort
     if line('.') == line('$')
@@ -105,12 +97,13 @@ function s:zz() abort
     keepjumps normal! ``
 endfunction
 
-nnoremap zz <Cmd>call <SID>zz()<CR>
-xnoremap zz <Cmd>call <SID>zz()<CR>
+nnoremap zZ <Cmd>call <SID>zz()<CR>
+xnoremap zZ <Cmd>call <SID>zz()<CR>
 
+let s:shadow_winblend = 70
 augroup ShadowWindow
     autocmd!
-    autocmd WinEnter * call timer_start(50, {-> call(function('s:toggle_shadow'), [])})
+    autocmd WinEnter * call timer_start(50, function('s:toggle_shadow'))
 augroup END
 
 function s:shadow_existed() abort
@@ -136,7 +129,7 @@ function s:create_shadow() abort
     call nvim_buf_set_option(shadow_bufnr, 'bufhidden', 'wipe')
     let s:shadow_winid = nvim_open_win(shadow_bufnr, 0, opts)
     call nvim_win_set_option(s:shadow_winid, 'winhighlight', 'Normal:Normal')
-    call nvim_win_set_option(s:shadow_winid, 'winblend', 70)
+    call nvim_win_set_option(s:shadow_winid, 'winblend', s:shadow_winblend)
     autocmd ShadowWindow VimResized * call <SID>reszie_shadow()
 endfunction
 
@@ -170,7 +163,7 @@ function s:detect_other_floatwins(cur_winid) abort
     return 0
 endfunction
 
-function s:toggle_shadow() abort
+function s:toggle_shadow(timer) abort
     let cur_winid = win_getid()
     if s:shadow_existed() && s:shadow_winid == cur_winid
         close

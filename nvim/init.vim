@@ -1,4 +1,4 @@
-syntax on
+syntax enable
 set number
 set relativenumber
 set tabstop=4
@@ -48,6 +48,10 @@ if (has('termguicolors'))
     set termguicolors
     set guicursor=n-v-c-sm:block-Cursor,i-ci-ve:ver25-Cursor,r-cr-o:hor20
 endif
+
+let g:loaded_netrwPlugin = 1
+let g:loaded_matchparen = 1
+let g:loaded_matchit = 1
 
 " harcode for reducing startup time
 let g:python3_host_prog = '/usr/bin/python3'
@@ -112,7 +116,7 @@ nnoremap <leader>w <Cmd>w<CR>
 nnoremap <leader>wq <Cmd>wq<CR>
 nnoremap <C-g> 1<C-g>
 nnoremap <silent> <leader>3 <Cmd>buffer #<CR>
-nnoremap <silent> <leader>l <Cmd>nohlsearch<CR>
+nnoremap <silent> <leader>l :nohlsearch<CR>
 cnoremap <C-b> <Left>
 cnoremap <C-f> <Right>
 cnoremap <C-a> <Home>
@@ -121,7 +125,7 @@ cnoremap <C-k> <C-\>egetcmdline()[:getcmdpos() - 2]<CR>
 cnoremap <M-b> <C-Left>
 cnoremap <M-f> <C-Right>
 if has('nvim-0.5')
-    cnoremap <expr><CR> pumvisible() ? "\<C-y>" : "\<CR>"
+    cnoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<CR>"
 endif
 tnoremap <M-\> <C-\><C-n>
 nnoremap <silent><C-w>O <Cmd>tabonly<CR>
@@ -153,8 +157,8 @@ nnoremap m' m`
 xnoremap m' m`
 nnoremap m` m'
 xnoremap m` m'
-nnoremap <silent> '0 <Cmd>normal! `0<CR>:silent! CleanEmptyBuf<CR>
-xnoremap <silent> '0 <Cmd>normal! `0<CR>:silent! CleanEmptyBuf<CR>
+nnoremap <silent> '0 <Cmd>normal! `0<CR><Cmd>silent! CleanEmptyBuf<CR>
+xnoremap <silent> '0 <Cmd>normal! `0<CR><Cmd>silent! CleanEmptyBuf<CR>
 nnoremap <silent><leader>i <Cmd>silent! normal! `^<CR>
 
 xnoremap <silent> <M-j> :move '>+1<CR>gv=gv
@@ -300,7 +304,24 @@ let g:NERDToggleCheckAllLines = 1
 let g:NERDTrimTrailingWhitespace = 1
 map <C-_> <Plug>NERDCommenterToggle
 
+if has('nvim-0.5')
+    Plug 'nvim-treesitter/nvim-treesitter'
+    Plug 'nvim-treesitter/nvim-treesitter-textobjects'
+    highlight default link TSPunctBracket NONE
+    highlight default link TSVariable NONE
+    highlight default link TSConstant NONE
+    highlight default link TSKeyword Statement
+    highlight default link TSInclude Statement
+    highlight default link TSConstBuiltin SpecialChar
+    highlight default link TSParameter Parameter
+    highlight default link TSVariableBuiltin SpecialChar
+endif
+
 call plug#end()
+
+if has('nvim-0.5')
+    lua require('treesitter')
+endif
 
 " color scheme
 try

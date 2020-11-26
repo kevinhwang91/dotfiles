@@ -193,8 +193,9 @@ function! LightlineQuickfix() abort
     let type = getwininfo(win_getid())[0].loclist ? 'loc' : 'qf'
     let what = {'nr': 0, 'size': 0}
     let info = type == 'loc' ? getloclist(0, what) : getqflist(what)
+    let nr = type == 'loc' ? getloclist(0, {'nr': '$'}).nr : getqflist({'nr': '$'}).nr
     let prefix = type == 'loc' ? 'Location' : ' Quickfix'
-    return printf(' %s nr:%d size:%d ', prefix, info.nr, info.size)
+    return printf(' %s (%d/%d) [%d] ', prefix, info.nr, nr, info.size)
 endfunction
 
 function! LightlineCocStatus() abort

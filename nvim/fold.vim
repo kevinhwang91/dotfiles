@@ -5,14 +5,11 @@ let g:anyfold_motion = 0
 
 augroup FoldLazyLoad
     autocmd!
-    " autocmd FileType vim,sh,zsh,python,c,cpp,css,yaml,java,xml,html,go,json,lua,make,sql,tmux,
-    " \javascript,typescript
-    " \ call <SID>load_anyfold(expand('<afile>'), expand('<abuf>'))
-
-    autocmd FileType vim,sh,zsh,python,c,cpp,yaml,xml,html,json,lua,make,sql,tmux,rust
-                \ call <SID>load_anyfold(expand('<afile>'), str2nr(expand('<abuf>')))
-    autocmd FileType go,rust,java,javascript,typescript,css
-                \ call <SID>load_lspfold(str2nr(expand('<abuf>')))
+    autocmd FileType vim,sh,zsh,python,yaml,xml,html,json,make,sql,tmux call <SID>load_anyfold()
+    autocmd FileType javascript,typescript,css call <SID>load_lspfold()
+    if has('nvim-0.5')
+        autocmd FileType c,cpp,go,rust,java,lua call <SID>load_treesitter()
+    endif
 augroup END
 
 function s:set_fold_opt() abort
@@ -20,19 +17,38 @@ function s:set_fold_opt() abort
     setlocal foldtext=FoldText()
 endfunction
 
-function s:load_anyfold(afile, bufnr) abort
-    let fsize = getfsize(a:afile)
-    if fsize < 524288 && fsize > 0
-        let b:lazy_load_fold = a:bufnr
+function s:load_treesitter() abort
+    let b:lazy_load_fold = str2nr(expand('<abuf>'))
+    augroup FoldLazyLoad
+        autocmd! BufEnter <buffer=abuf>
+        autocmd BufEnter <buffer=abuf> call timer_start(2000, function('s:lazy_load_treesitter'))
+    augroup END
+endfunction
+
+function s:lazy_load_treesitter(timer) abort
+    if exists('b:lazy_load_fold') && b:lazy_load_fold
+        call s:set_fold_opt()
+        setlocal foldmethod=expr
+        setlocal foldexpr=nvim_treesitter#foldexpr()
         augroup FoldLazyLoad
-            execute 'autocmd! BufEnter <buffer=' . a:bufnr . '>'
-            execute 'autocmd BufEnter <buffer=' . a:bufnr .
-                        \ '> call timer_start(2000, "LazyLoadAnyFold")'
+            execute 'autocmd! BufEnter <buffer=' . b:lazy_load_fold . '>'
+        augroup END
+        unlet b:lazy_load_fold
+    endif
+endfunction
+
+function s:load_anyfold() abort
+    let fsize = getfsize(expand('<afile>'))
+    if fsize < 524288 && fsize > 0
+        let b:lazy_load_fold = str2nr(expand('<abuf>'))
+        augroup FoldLazyLoad
+            autocmd! BufEnter <buffer=abuf>
+            autocmd BufEnter <buffer=abuf> call timer_start(2000, function('s:lazy_load_anyfold'))
         augroup END
     endif
 endfunction
 
-function LazyLoadAnyFold(timer) abort
+function s:lazy_load_anyfold(timer) abort
     if exists('b:lazy_load_fold') && b:lazy_load_fold
         call s:set_fold_opt()
         execute 'AnyFoldActivate'
@@ -43,12 +59,12 @@ function LazyLoadAnyFold(timer) abort
     endif
 endfunction
 
-function s:load_lspfold(bufnr) abort
-    let b:lazy_load_fold = a:bufnr
+function s:load_lspfold() abort
+    let b:lazy_load_fold = str2nr(expand('<abuf>'))
     augroup FoldLazyLoad
-        execute 'autocmd! BufEnter <buffer=' . a:bufnr . '>'
-        execute 'autocmd BufEnter <buffer=' . a:bufnr .
-                    \ '> call timer_start(2000, "LazyLoadLspFold", {"repeat": 10})'
+        autocmd! BufEnter <buffer=abuf>
+        autocmd BufEnter <buffer=abuf> call timer_start(2000,
+                    \ function('s:lazy_load_lsp'), {'repeat': 10})
     augroup END
 endfunction
 
@@ -62,7 +78,7 @@ function s:handle_callback(err, res) abort
     endif
 endfunction
 
-function LazyLoadLspFold(timer) abort
+function s:lazy_load_lsp(timer) abort
     if exists('b:lazy_load_fold') && b:lazy_load_fold
         silent! let has_folding_range = CocHasProvider('foldingRange')
         if exists('has_folding_range') && has_folding_range
@@ -74,6 +90,8 @@ function LazyLoadLspFold(timer) abort
 endfunction
 
 command! -nargs=0 AnyFold call <SID>set_fold_opt() | AnyFoldActivate
+command! -nargs=0 TreesitterFold call <SID>set_fold_opt() |
+            \ setlocal foldmethod=expr foldexpr=nvim_treesitter#foldexpr()
 command! -nargs=0 LspFold execute 'setlocal foldmethod=manual | normal! zE' |
             \ call CocActionAsync('fold', '', function('s:handle_callback'))
 

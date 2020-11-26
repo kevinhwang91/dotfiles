@@ -18,6 +18,34 @@ let g:rnvimr_ranger_views = [
 Plug 'kevinhwang91/nvim-bqf'
 let g:bqf_auto_enable = 1
 
+" WIP
+Plug 'kevinhwang91/nvim-hlslens'
+let g:hlslens_auto_enable = 1
+noremap <silent> n <Cmd>execute('normal! ' . v:count1 . 'n')<CR><Cmd>call hlslens#start()<CR>
+noremap <silent> N <Cmd>execute('normal! ' . v:count1 . 'N')<CR><Cmd>call hlslens#start()<CR>
+
+augroup VMlens
+    autocmd!
+    autocmd User visual_multi_start call VMlensStart()
+    autocmd User visual_multi_exit call VMlensExit()
+augroup END
+
+function! VMlensStart() abort
+    if v:hlsearch && get(g:, 'hlslens_enabled', 0)
+        let b:hlslens_existed = 1
+    endif
+    execute 'autocmd HlSearchLens CursorMoved * call hlslens#draw_lens(1)'
+    call timer_start(0, {-> call('hlslens#draw_lens', [1])})
+endfunction
+
+function! VMlensExit() abort
+    call hlslens#reset()
+    if exists('b:hlslens_existed')
+        unlet b:hlslens_existed
+        call hlslens#start()
+    endif
+endfunction
+
 if executable('fzf')
     Plug 'junegunn/fzf.vim'
     nnoremap <silent> <leader>ft <Cmd>BTags<CR>
@@ -210,14 +238,15 @@ function s:wrap_vm_map(action) abort
 endfunction
 
 Plug 'andymass/vim-matchup'
-let g:loaded_matchit = 1
-let g:loaded_matchparen = 1
 
 let g:matchup_matchparen_timeout = 100
 let g:matchup_matchparen_deferred = 1
 let g:matchup_matchparen_deferred_show_delay = 150
 let g:matchup_matchparen_deferred_hide_delay = 700
 let g:matchup_matchparen_hi_surround_always = 1
+
+let g:matchup_matchparen_offscreen = {'method': 'popup'}
+let g:matchup_delim_start_plaintext = 0
 let g:matchup_motion_override_Npercent = 0
 let g:matchup_motion_cursor_end = 0
 let g:matchup_mappings_enabled = 0
@@ -247,3 +276,11 @@ omap a5 <Plug>(matchup-a%)
 xmap a5 <Plug>(matchup-a%)
 omap i5 <Plug>(matchup-i%)
 xmap i5 <Plug>(matchup-i%)
+
+Plug 'haya14busa/vim-asterisk'
+let g:asterisk#keeppos = 0
+
+map *  <Plug>(asterisk-z*)<Cmd>call hlslens#start()<CR>
+map #  <Plug>(asterisk-z#)<Cmd>call hlslens#start()<CR>
+map g* <Plug>(asterisk-gz*)<Cmd>call hlslens#start()<CR>
+map g# <Plug>(asterisk-gz#)<Cmd>call hlslens#start()<CR>

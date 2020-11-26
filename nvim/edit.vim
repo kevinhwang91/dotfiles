@@ -100,6 +100,9 @@ let g:cycle_default_groups_for_zsh = g:cycle_default_groups_for_sh
 let g:cycle_default_groups_for_vim = [
             \   [['elseif', 'else']]
             \ ]
+let g:cycle_default_groups_for_lua = [
+            \   [['elseif', 'else']]
+            \ ]
 
 Plug 'mbbill/undotree', {'on': []}
 let g:undotree_SplitWidth = 45

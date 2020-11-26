@@ -1,6 +1,8 @@
 Plug 'neoclide/coc.nvim', {'branch': 'master', 'do': 'yarn install --frozen-lockfile'}
 " Plug 'neoclide/coc.nvim'
 
+Plug 'rafcamlet/coc-nvim-lua'
+
 let g:coc_global_extensions = [
             \ 'coc-go',
             \ 'coc-html',
