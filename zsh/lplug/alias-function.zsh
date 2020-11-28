@@ -197,7 +197,7 @@ if (( $+commands[nvim] )); then
     alias ngl='_ngl'
     compdef __ngl_compdef _ngl
     _ngl() {
-        git status >/dev/null && nvim +"Flog -raw-args=$*" +1tabclose
+        git status >/dev/null && nvim +"Flog -raw-args=$*" +'bwipeout 1'
     }
     __ngl_compdef() {
         (( $+functions[_git-log] )) || _git
@@ -207,7 +207,14 @@ if (( $+commands[nvim] )); then
     if (( $+commands[gdb] )); then
         alias ngdb='_ngdb'
         _ngdb() {
-            nvim +"GdbStart gdb $*" +1tabclose
+            nvim +"GdbStart gdb $*" +'bwipeout 1'
+        }
+    fi
+
+    if (( $+commands[python] )); then
+        alias npdb='_npdb'
+        _npdb() {
+            nvim +"GdbStartPDB python -m pdb $*" +'bwipeout 1'
         }
     fi
 fi
