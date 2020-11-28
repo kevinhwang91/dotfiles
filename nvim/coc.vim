@@ -73,11 +73,13 @@ endfunction
 " Use K for show documentation in preview window
 nnoremap <silent> K <Cmd>call <SID>show_documentation()<CR>
 
-function s:show_documentation()
+function! s:show_documentation()
     if (index(['vim','help'], &filetype) >= 0)
-        execute('h '. expand('<cword>'))
+        execute 'h '.expand('<cword>')
+    elseif (coc#rpc#ready())
+        call CocActionAsync('doHover')
     else
-        call CocAction('doHover')
+        execute '!' . &keywordprg . ' ' . expand('<cword>')
     endif
 endfunction
 
@@ -85,7 +87,7 @@ let g:coc_enable_locationlist = 0
 augroup Coc
     autocmd!
     autocmd User CocLocationsChange ++nested call <SID>jump_to_loc(g:coc_jump_locations)
-    autocmd CursorHold * silent call CocActionAsync('highlight',
+    autocmd CursorHold * silent! call CocActionAsync('highlight',
                 \ '', function('s:highlight_fallback'))
     autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
     autocmd VimLeavePre * if get(g:, 'coc_process_pid', 0) |

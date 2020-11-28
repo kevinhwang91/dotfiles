@@ -108,7 +108,7 @@ Plug 'mbbill/undotree', {'on': []}
 let g:undotree_SplitWidth = 45
 let g:undotree_SetFocusWhenToggle = 1
 
-function Undotree_CustomMap()
+function! Undotree_CustomMap()
     nmap <buffer> <C-u> <Plug>UndotreeUndo
     nunmap <buffer> u
 endfunc

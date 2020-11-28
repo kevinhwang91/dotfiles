@@ -9,7 +9,7 @@ function s:update_remote_plugs() abort
     call remote#host#UpdateRemotePlugins()
     execute 'set rtp=' . save_rtp
 endfunction
-autocmd VimEnter * ++once command! -nargs=0 UpdateRemotePlugins call <SID>update_remote_plugs()
+command! -nargs=0 UpdateRemotePlugins call <SID>update_remote_plugs()
 
 " remove ansi color
 command! -range=% -nargs=0 RmAnsi <line1>,<line2>s/\%x1b\[[0-9;]*[Km]//g

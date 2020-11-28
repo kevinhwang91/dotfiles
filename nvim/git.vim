@@ -17,6 +17,7 @@ nnoremap <silent> <leader>gD <Cmd>Gdiffsplit HEAD<CR>
 nnoremap <silent> qd <Cmd>call fugitive#DiffClose()<CR>
 
 Plug 'ruanyl/vim-gh-line', {'on': ['<Plug>(gh-repo)', '<Plug>(gh-line)']}
+let g:gh_line_blame_map_default = 0
 map <leader>gO <Plug>(gh-repo)
 map <leader>gL <Plug>(gh-line)
 

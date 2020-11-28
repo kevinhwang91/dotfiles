@@ -31,7 +31,7 @@ set lazyredraw
 set inccommand=nosplit
 set shortmess+=aIc
 set signcolumn=yes:1
-set shada=!,'300,<50,s10,h,%
+set shada=!,'300,<50,s10,h
 set synmaxcol=300
 set textwidth=100
 
@@ -129,6 +129,7 @@ if has('nvim-0.5')
 endif
 tnoremap <M-\> <C-\><C-n>
 nnoremap <silent><C-w>O <Cmd>tabonly<CR>
+inoremap <M-;> <END>;
 
 nnoremap s d
 xnoremap s d

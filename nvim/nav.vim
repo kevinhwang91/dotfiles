@@ -102,13 +102,14 @@ let g:choosewin_color_other = {'gui': ['#2c323c']}
 Plug 'mhinz/vim-grepper', {'on': ['Grepper', '<Plug>(GrepperOperator)']}
 nnoremap <leader>rg <Cmd>Grepper -tool rg<CR>
 
+autocmd User Grepper belowright copen
 nmap gs <Plug>(GrepperOperator)
 xmap gs <Plug>(GrepperOperator)
 
 let g:grepper = {
             \ 'tools': ['rg', 'git'],
             \ 'dir': 'repo,file',
-            \ 'open': 1,
+            \ 'open': 0,
             \ 'switch': 1,
             \ 'jump': 0,
             \ 'simple_prompt': 1,
@@ -157,7 +158,7 @@ function! CtrlSFAfterMainWindowInit()
         doautocmd BufWinEnter <buffer>
     augroup end
 
-    let b:visual_multi_map = {'n': 'VM-Find-Next', 'N': 'VM-Find-Prev',
+    let b:visual_multi_map = {'n': 'VM-Find-Under', 'N': 'VM-Find-Prev',
                 \'q': 'VM-Skip-Region', 'Q': 'VM-Remove-Region',
                 \']': 'VM-Goto-Next', '[': 'VM-Goto-Prev'}
     nnoremap <buffer><expr><silent> <leader>1
@@ -222,7 +223,6 @@ function s:vm_match_pat()
     endif
     noautocmd normal! gE
     execute 'VMSearch! ' . ctrlsf_pat
-    execute "normal \<Plug>(VM-Show-Infoline)"
 endfunction
 
 function s:wrap_vm_map(action) abort
@@ -230,11 +230,10 @@ function s:wrap_vm_map(action) abort
     if preview
         let b:VM_skip_reset_once_on_bufleave = 1
     endif
-    execute "normal \<Plug>(" . a:action . ')'
+    execute 'normal ' . v:count1 . "\<Plug>(" . a:action . ')'
     if preview
         call ctrlsf#JumpTo('preview')
     endif
-    execute "normal \<Plug>(VM-Show-Infoline)"
 endfunction
 
 Plug 'andymass/vim-matchup'
