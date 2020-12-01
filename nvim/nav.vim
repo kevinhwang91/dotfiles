@@ -53,7 +53,6 @@ if executable('fzf')
     nnoremap <silent> <leader>fc <Cmd>BCommits<CR>
     nnoremap <silent> <leader>f/ <Cmd>History/<CR>
     nnoremap <silent> <leader>f; <Cmd>History:<CR>
-    nnoremap <silent> <leader>fr <Cmd>History<CR>
     nnoremap <silent> <leader>fg <Cmd>GFiles<CR>
     nnoremap <silent> <leader>fm <Cmd>Marks<CR>
     nnoremap <silent> <leader>ff <Cmd>FZF<CR>
@@ -72,12 +71,12 @@ if executable('fzf')
         try
             let layout = g:fzf_layout.window
             if &columns * layout.width - 2 > 100
-                let g:fzf_preview_window = 'right:50%'
+                let g:fzf_preview_window = ['right:50%']
             else
                 if &lines * layout.height - 2 > 25
-                    let g:fzf_preview_window = 'down:50%'
+                    let g:fzf_preview_window = ['down:50%']
                 else
-                    let g:fzf_preview_window = ''
+                    let g:fzf_preview_window = []
                 endif
             endif
         catch /^Vim\%((\a\+)\)\=:E/
@@ -85,6 +84,13 @@ if executable('fzf')
     endfunction
 
     call s:resize_fzf_preview()
+
+    augroup FzfMru
+        autocmd!
+        autocmd BufEnter,BufAdd * if !empty(bufname()) |
+                    \ call fzf_mru#update_mru(expand('<abuf>', 1)) | endif
+    augroup END
+    nnoremap <silent> <leader>fr <Cmd>call fzf_mru#mru()<CR>
 endif
 
 Plug 't9md/vim-choosewin', {'on': 'ChooseWin'}
@@ -102,7 +108,10 @@ let g:choosewin_color_other = {'gui': ['#2c323c']}
 Plug 'mhinz/vim-grepper', {'on': ['Grepper', '<Plug>(GrepperOperator)']}
 nnoremap <leader>rg <Cmd>Grepper -tool rg<CR>
 
-autocmd User Grepper belowright copen
+augroup Grepper
+    autocmd User Grepper belowright copen
+augroup END
+
 nmap gs <Plug>(GrepperOperator)
 xmap gs <Plug>(GrepperOperator)
 
@@ -150,93 +159,12 @@ nmap <leader>ct <Plug>CtrlSFCCwordExec
 xmap <leader>ct <Plug>CtrlSFVwordExec
 
 function! CtrlSFAfterMainWindowInit()
-    setlocal wrap
-    augroup CtrlSFMainWindow
-        autocmd!
-        autocmd BufWinEnter <buffer> call s:ctrlsf_enter()
-        autocmd BufWinLeave <buffer> call s:ctrlsf_leave()
-        doautocmd BufWinEnter <buffer>
-    augroup end
-
-    let b:visual_multi_map = {'n': 'VM-Find-Under', 'N': 'VM-Find-Prev',
-                \'q': 'VM-Skip-Region', 'Q': 'VM-Remove-Region',
-                \']': 'VM-Goto-Next', '[': 'VM-Goto-Prev'}
-    nnoremap <buffer><expr><silent> <leader>1
-                \ execute('let g:ctrlsf_auto_preview = !g:ctrlsf_auto_preview')
-    nnoremap <buffer><silent> <C-n> <Cmd>call <SID>vm_match_pat()<CR>
-
-    nnoremap <buffer><silent> [f <Cmd>call <SID>nav_file(0)<CR>
-    nnoremap <buffer><silent> ]f <Cmd>call <SID>nav_file(1)<CR>
+    call ctrlsf_vm#init()
 endfunction
 
-function! Wrap_VM_Start() abort
-    let b:vm_set_statusline = get(g:, 'VM_set_statusline', 2)
-    let g:VM_set_statusline = 0
-    for [key, val] in items(b:visual_multi_map)
-        execute 'nmap <buffer><nowait><silent> '. key .
-                    \' <Cmd>call <SID>wrap_vm_map("'. val . '")<CR>'
-    endfor
-    nmap <buffer><nowait><silent> <C-n> n
-endfunction
+Plug 'andymass/vim-matchup', {'on': []}
 
-function! Wrap_VM_Exit() abort
-    let g:VM_set_statusline = b:vm_set_statusline
-    for key in keys(b:visual_multi_map)
-        execute 'nunmap <buffer> ' . key
-    endfor
-    nnoremap <buffer><silent> <C-n> <Cmd>call <SID>vm_match_pat()<CR>
-endfunction
-
-function s:nav_file(forward) abort
-    call search('^\%(\([0-9]\+\)\|\.\.\.\.\)\@!.\+\ze:$', a:forward ? 'W' : 'bW')
-endfunction
-
-function s:ctrlsf_enter() abort
-    if get(g:, 'loaded_lightline', 0)
-        " autocmd! lightline BufEnter
-        autocmd! lightline WinEnter
-    endif
-    augroup CtrlSFWithVisualMulti
-        autocmd!
-        autocmd User visual_multi_start call Wrap_VM_Start()
-        autocmd User visual_multi_exit call Wrap_VM_Exit()
-    augroup END
-endfunction
-
-function s:ctrlsf_leave() abort
-    if get(g:, 'loaded_lightline', 0)
-        " autocmd lightline BufEnter * call lightline#update()
-        autocmd lightline WinEnter * call lightline#update()
-    endif
-    autocmd! CtrlSFWithVisualMulti
-endfunction
-
-function s:vm_match_pat()
-    for m in getmatches()
-        if m.group ==# 'ctrlsfMatch'
-            let ctrlsf_pat = m.pattern
-            break
-        endif
-    endfor
-    if !exists('ctrlsf_pat')
-        return
-    endif
-    noautocmd normal! gE
-    execute 'VMSearch! ' . ctrlsf_pat
-endfunction
-
-function s:wrap_vm_map(action) abort
-    let preview = get(g:, 'ctrlsf_auto_preview', 0)
-    if preview
-        let b:VM_skip_reset_once_on_bufleave = 1
-    endif
-    execute 'normal ' . v:count1 . "\<Plug>(" . a:action . ')'
-    if preview
-        call ctrlsf#JumpTo('preview')
-    endif
-endfunction
-
-Plug 'andymass/vim-matchup'
+autocmd VimEnter * ++once call timer_start(100, {-> call('plug#load', ['vim-matchup'])})
 
 let g:matchup_matchparen_timeout = 100
 let g:matchup_matchparen_deferred = 1
@@ -259,9 +187,6 @@ augroup END
 nmap % <Plug>(matchup-%)
 omap % <Plug>(matchup-%)
 xmap % <Plug>(matchup-%)
-nmap g5 <Plug>(matchup-g%)
-omap g5 <Plug>(matchup-g%)
-xmap g5 <Plug>(matchup-g%)
 nmap [5 <Plug>(matchup-[%)
 omap [5 <Plug>(matchup-[%)
 xmap [5 <Plug>(matchup-[%)

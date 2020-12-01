@@ -4,6 +4,8 @@ source "$(cd -P "$(dirname "$0")" && pwd -P)/../base.sh"
 
 do_install() {
     mkdir -p "$dst_conf/autoload" 2>/dev/null
+    mkdir -p "$dst_conf/colors" 2>/dev/null
+    mkdir -p "$dst_conf/autoload/lightline/colorscheme" 2>/dev/null
     mkdir -p "$dst_conf/lua" 2>/dev/null
 
     if [[ ! -f "$dst_conf/autoload/plug.vim" ]]; then
@@ -11,13 +13,31 @@ do_install() {
             'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
     fi
 
-    find "$src_conf/lua" -iname '*.lua' -type f | {
+    find "$src_conf/lua" -iname '*.lua' -type f -maxdepth 1 | {
         while read -r file; do
             link_file "$file" "$dst_conf/lua/$(basename $file)" </dev/tty
         done
     }
 
-    find "$src_conf" -iname '*.vim' -type f | {
+    find "$src_conf/autoload" -iname '*.vim' -type f -maxdepth 1 | {
+        while read -r file; do
+            link_file "$file" "$dst_conf/autoload/$(basename $file)" </dev/tty
+        done
+    }
+
+    find "$src_conf/colors" -iname '*.vim' -type f -maxdepth 1 | {
+        while read -r file; do
+            link_file "$file" "$dst_conf/colors/$(basename $file)" </dev/tty
+        done
+    }
+
+    find "$src_conf/autoload/lightline/colorscheme" -iname '*.vim' -type f -maxdepth 1 | {
+        while read -r file; do
+            link_file "$file" "$dst_conf/autoload/lightline/colorscheme/$(basename $file)" </dev/tty
+        done
+    }
+
+    find "$src_conf" -iname '*.vim' -type f -maxdepth 1 | {
         while read -r file; do
             link_file "$file" "$dst_conf/$(basename $file)" </dev/tty
         done

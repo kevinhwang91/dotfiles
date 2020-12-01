@@ -31,7 +31,7 @@ set lazyredraw
 set inccommand=nosplit
 set shortmess+=aIc
 set signcolumn=yes:1
-set shada=!,'300,<50,s10,h
+set shada=!,'20,<50,s10,h
 set synmaxcol=300
 set textwidth=100
 
@@ -234,6 +234,24 @@ endfunction
 nnoremap <silent> z[ <Cmd>call <SID>nav_fold(0, v:count1)<CR>
 nnoremap <silent> z] <Cmd>call <SID>nav_fold(1, v:count1)<CR>
 
+augroup ColorTheme
+    autocmd!
+    autocmd ColorScheme * call s:color_scheme()
+augroup end
+
+function s:color_scheme() abort
+    highlight! link TermCursor Cursor
+    highlight MatchWord cterm=underline gui=underline
+    highlight CurrentWord cterm=bold ctermbg=238 gui=bold guibg=#314365
+    highlight BqfPreviewBorder guifg=#50a14f ctermfg=71
+endfunction
+
+" color scheme
+try
+    colorscheme one
+catch
+endtry
+
 if empty($XDG_CONFIG_HOME)
     call plug#begin('~/.config/nvim/plugged')
 else
@@ -306,7 +324,7 @@ let g:NERDTrimTrailingWhitespace = 1
 map <C-_> <Plug>NERDCommenterToggle
 
 if has('nvim-0.5')
-    Plug 'nvim-treesitter/nvim-treesitter'
+    Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
     Plug 'nvim-treesitter/nvim-treesitter-textobjects'
     highlight default link TSPunctBracket NONE
     highlight default link TSVariable NONE
