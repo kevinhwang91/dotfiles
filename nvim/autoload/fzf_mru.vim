@@ -1,27 +1,41 @@
-let s:cache_file = $HOME . '/.mru_files'
+let s:disk_file = $HOME . '/.mru_files'
+let s:tmp_dir = '/tmp/fzf_mru'
+let s:tmp_file = s:tmp_dir . '/mru_files'
 let s:max = 10000
+let s:count = 0
+let s:losted = 0
 
-function s:list_mru()
+function s:list_mru(file) abort
     let mru_list = []
-    if filereadable(s:cache_file)
-        let mru_list = readfile(s:cache_file)
+    if filereadable(a:file)
+        let mru_list = readfile(a:file)
     endif
     if len(mru_list) > s:max
         call remove(mru_list, s:max - 1, -1)
     endif
     cal filter(mru_list, '!empty(glob(fnameescape(v:val)))')
-    retu mru_list
+    return mru_list
 endfunction
 
-function s:mru_source()
-    let mru_list = s:list_mru()
+function s:mru_source(file) abort
+    let mru_list = s:list_mru(a:file)
     if !empty(mru_list) && mru_list[0] == expand('%:p')
         call remove(mru_list, 0)
     endif
     return map(mru_list, 'fnamemodify(v:val, ":~:.")')
 endfunction
 
-function s:p(...)
+function s:write2disk() abort
+    let mru_list = s:list_mru(s:tmp_file)
+    call writefile(mru_list, s:disk_file)
+endfunction
+
+function s:write2ram() abort
+    let mru_list = s:list_mru(s:disk_file)
+    call writefile(mru_list, s:tmp_file)
+endfunction
+
+function s:p(...) abort
     let preview_args = get(g:, 'fzf_preview_window', ['right', 'ctrl-/'])
     if empty(preview_args)
         return {'options': ['--preview-window', 'hidden'] }
@@ -29,14 +43,19 @@ function s:p(...)
     return call('fzf#vim#with_preview', extend(copy(a:000), preview_args))
 endfunction
 
-function! fzf_mru#update_mru(bufnr)
-    let bufnr = str2nr(a:bufnr)
+function! fzf_mru#update_mru(bufnr) abort
+    if empty(a:bufnr) || type(a:bufnr) == v:t_number && a:bufnr == 0
+        let bufnr = bufnr()
+    else
+        let bufnr = str2nr(a:bufnr)
+    endif
     let bufname = bufname(bufnr)
     let filename = fnamemodify(bufname, ':p')
     if empty(bufname) || !empty(getbufvar(bufnr, '&buftype')) || !filereadable(filename)
         return
     endif
-    let mru_list = s:list_mru()
+
+    let mru_list = s:list_mru(s:tmp_file)
     let idx = index(mru_list, filename)
     if idx == 0
         return
@@ -44,12 +63,39 @@ function! fzf_mru#update_mru(bufnr)
         call remove(mru_list, idx)
     endif
     call insert(mru_list, filename)
-    silent call writefile(mru_list, s:cache_file)
+
+    let s:count = (s:count + 1) % 10
+    if s:count == 0
+        call s:write2disk()
+    endif
+    let g:test_mru = mru_list
+    call writefile(mru_list, s:tmp_file)
 endfunction
 
 function! fzf_mru#mru() abort
     let opt_dict = s:p()
     call extend(opt_dict.options, ['--prompt', 'MRU> '])
-    call extend(opt_dict, {'source': s:mru_source()})
+    call extend(opt_dict, {'source': s:mru_source(s:tmp_file)})
     call fzf#run(fzf#wrap('mru-files', opt_dict, 0))
+endfunction
+
+if !isdirectory(s:tmp_dir)
+    call mkdir(s:tmp_dir, 'p')
+endif
+if !filereadable(s:disk_file)
+    call writefile([], s:disk_file)
+    let mru_list = []
+else
+    let mru_list = s:list_mru(s:disk_file)
+endif
+
+function! fzf_mru#enable() abort
+    call fzf_mru#update_mru(0)
+    augroup FzfMru
+        autocmd!
+        autocmd BufEnter,BufAdd * call fzf_mru#update_mru(expand('<abuf>', 1))
+        autocmd VimLeavePre,VimSuspend * call <SID>write2disk()
+        autocmd FocusLost * call <SID>write2disk() | let s:losted = 1
+        " autocmd FocusGained * if s:losted | call <SID>write2ram() | endif
+    augroup END
 endfunction

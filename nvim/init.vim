@@ -341,9 +341,3 @@ call plug#end()
 if has('nvim-0.5')
     lua require('treesitter')
 endif
-
-" color scheme
-try
-    colorscheme one
-catch
-endtry

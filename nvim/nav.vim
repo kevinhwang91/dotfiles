@@ -85,11 +85,8 @@ if executable('fzf')
 
     call s:resize_fzf_preview()
 
-    augroup FzfMru
-        autocmd!
-        autocmd BufEnter,BufAdd * if !empty(bufname()) |
-                    \ call fzf_mru#update_mru(expand('<abuf>', 1)) | endif
-    augroup END
+    " TODO how to lazyload fzf mru?
+    call fzf_mru#enable()
     nnoremap <silent> <leader>fr <Cmd>call fzf_mru#mru()<CR>
 endif
 
