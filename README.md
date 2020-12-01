@@ -2,11 +2,10 @@
 
 This is my personal ArchLinux dotfiles.
 
-`git clone https://github.com/kevinhwang91/dotfiles.git && cd dotfiles`
-
 ## Install all configuration
 
-1. `./install_all.sh`
+1. `git clone https://github.com/kevinhwang91/dotfiles.git && cd dotfiles`
+2. `./install_all.sh`
 
 ## Install configuration respectively
 
