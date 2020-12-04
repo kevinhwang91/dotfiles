@@ -42,7 +42,7 @@ function s:reszie_shadow() abort
     call nvim_win_set_config(s:shadow_winid, {'width': &columns, 'height': &lines})
 endfunction
 
-function s:detect_other_floatwins(cur_winid) abort
+function s:detect_other_wins(cur_winid) abort
     if getwinvar(a:cur_winid, '&buftype') == 'nofile'
         return 1
     endif
@@ -50,7 +50,9 @@ function s:detect_other_floatwins(cur_winid) abort
         if winid == a:cur_winid
             continue
         endif
-        if !empty(nvim_win_get_config(winid).relative) && getwinvar(winid, '&buftype') != 'nofile'
+        let buftype = getwinvar(winid, '&buftype')
+        if !empty(nvim_win_get_config(winid).relative) && buftype != 'nofile' ||
+                    \ buftype == 'quickfix'
             return 1
         endif
     endfor
@@ -65,7 +67,7 @@ function s:toggle_shadow(timer) abort
     endif
     if empty(nvim_win_get_config(0).relative)
         call s:close_shadow()
-    elseif !s:detect_other_floatwins(cur_winid)
+    elseif !s:detect_other_wins(cur_winid)
         call s:create_shadow()
     endif
 endfunction

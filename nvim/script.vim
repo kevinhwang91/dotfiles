@@ -1,3 +1,10 @@
+" man
+let g:no_man_maps = 1
+augroup ManInit
+    autocmd!
+    autocmd FileType man nmap <buffer> gO :call man#show_toc()<CR>
+augroup END
+
 " wrap UpdateRemotePlugins command to update the lazyload plugins
 function s:update_remote_plugs() abort
     let save_rtp = &rtp

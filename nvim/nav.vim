@@ -169,7 +169,7 @@ let g:matchup_matchparen_deferred_show_delay = 150
 let g:matchup_matchparen_deferred_hide_delay = 700
 let g:matchup_matchparen_hi_surround_always = 1
 
-let g:matchup_matchparen_offscreen = {'method': 'popup'}
+let g:matchup_matchparen_offscreen = {'method': 'popup', 'highlight': 'CurrentWord'}
 let g:matchup_delim_start_plaintext = 0
 let g:matchup_motion_override_Npercent = 0
 let g:matchup_motion_cursor_end = 0

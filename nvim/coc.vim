@@ -85,10 +85,6 @@ omap ik <Plug>(coc-classobj-i)
 xmap ak <Plug>(coc-classobj-a)
 omap ak <Plug>(coc-classobj-a)
 
-" TODO
-map [f vafo<Esc>
-map ]f vaf<Esc>
-
 " Add `:OR` command for organize imports of the current buffer.
 command! -nargs=0 OR <Cmd>call CocAction('runCommand', 'editor.action.organizeImport')
 nnoremap <silent> <leader>qi <Cmd>OR<CR>

@@ -12,32 +12,5 @@ let g:vcoolor_lowercase = 1
 nnoremap <silent> <leader>pc <Cmd>VCoolor<CR>
 
 " suda, fix neovim ':w !sudo tee %' bug
-Plug 'kevinhwang91/suda.vim'
-nnoremap <leader>:w <Cmd>w suda://%<CR>
-
-" marks display
-" hide at startup https://github.com/neovim/neovim/issues/4295
-Plug 'kshenoy/vim-signature'
-let g:SignatureEnabledAtStartup = 0
-let g:SignatureMarkTextHL = 'Special'
-let g:SignatureMarkerTextHL = 'Statement'
-let g:SignatureMap = {
-            \ 'Leader'             :  "m",
-            \ 'PlaceNextMark'      :  "m,",
-            \ 'ToggleMarkAtLine'   :  "m;",
-            \ 'PurgeMarksAtLine'   :  "m-",
-            \ 'DeleteMark'         :  "sm",
-            \ 'PurgeMarks'         :  "m<Space>",
-            \ 'PurgeMarkers'       :  "m<BS>",
-            \ 'GotoNextLineByPos'  :  "]'",
-            \ 'GotoPrevLineByPos'  :  "['",
-            \ 'GotoNextSpotByPos'  :  "]`",
-            \ 'GotoPrevSpotByPos'  :  "[`",
-            \ 'GotoNextMarker'     :  "]-",
-            \ 'GotoPrevMarker'     :  "[-",
-            \ 'GotoNextMarkerAny'  :  "]=",
-            \ 'GotoPrevMarkerAny'  :  "[=",
-            \ 'ListBufferMarks'    :  "m/",
-            \ 'ListBufferMarkers'  :  "m?"
-            \ }
-nnoremap <silent> <leader>tm <Cmd>SignatureToggleSigns<CR>
+Plug 'kevinhwang91/suda.vim', {'on': 'SudaWrite'}
+nnoremap <leader>:w <Cmd>SudaWrite<CR>

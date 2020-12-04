@@ -14,7 +14,7 @@ function! coc_ext#go_to_definition()
             let w:gtd = 'tag'
             if def_size > 1
                 execute("normal! \<C-o>")
-                execute('lopen ' . def_size)
+                execute('aboveleft lwindow ' . def_size)
             elseif def_size == 1
                 lclose
                 call search(cword, 'c')

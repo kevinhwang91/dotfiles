@@ -3,7 +3,6 @@ let s:tmp_dir = '/tmp/fzf_mru'
 let s:tmp_file = s:tmp_dir . '/mru_files'
 let s:max = 10000
 let s:count = 0
-let s:losted = 0
 
 function s:list_mru(file) abort
     let mru_list = []
@@ -27,7 +26,9 @@ endfunction
 
 function s:write2disk() abort
     let mru_list = s:list_mru(s:tmp_file)
-    call writefile(mru_list, s:disk_file)
+    if !empty(mru_list)
+        call writefile(mru_list, s:disk_file)
+    endif
 endfunction
 
 function s:write2ram() abort
@@ -79,23 +80,17 @@ function! fzf_mru#mru() abort
     call fzf#run(fzf#wrap('mru-files', opt_dict, 0))
 endfunction
 
-if !isdirectory(s:tmp_dir)
-    call mkdir(s:tmp_dir, 'p')
-endif
-if !filereadable(s:disk_file)
-    call writefile([], s:disk_file)
-    let mru_list = []
-else
-    let mru_list = s:list_mru(s:disk_file)
-endif
-
 function! fzf_mru#enable() abort
+    if !filereadable(s:tmp_file)
+        silent! call mkdir(s:tmp_dir, 'p')
+        call s:write2ram()
+    endif
     call fzf_mru#update_mru(0)
     augroup FzfMru
         autocmd!
         autocmd BufEnter,BufAdd * call fzf_mru#update_mru(expand('<abuf>', 1))
         autocmd VimLeavePre,VimSuspend * call <SID>write2disk()
-        autocmd FocusLost * call <SID>write2disk() | let s:losted = 1
-        " autocmd FocusGained * if s:losted | call <SID>write2ram() | endif
+        autocmd FocusLost * call <SID>write2disk()
+        autocmd FocusGained * call <SID>write2ram()
     augroup END
 endfunction

@@ -43,6 +43,7 @@ xmap ah <Plug>(GitGutterTextObjectOuterVisual)
 Plug 'rbong/vim-flog', {'on': ['Flog', 'Flogsplit']}
 let g:flog_default_arguments = {'max_count': 1000}
 nnoremap <silent> <leader>gl <Cmd>Flog<CR>
+nnoremap <silent> <leader>gf <Cmd>Flog -path=%<CR>
 
 function s:vim_flog_map() abort
     nmap <buffer> ss <Plug>(FlogVDiffSplitRight)

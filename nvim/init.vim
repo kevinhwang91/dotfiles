@@ -234,6 +234,9 @@ endfunction
 nnoremap <silent> z[ <Cmd>call <SID>nav_fold(0, v:count1)<CR>
 nnoremap <silent> z] <Cmd>call <SID>nav_fold(1, v:count1)<CR>
 
+xnoremap <silent> iz :<C-U>normal [zv]z<CR>
+onoremap iz :normal viz<CR>
+
 augroup ColorTheme
     autocmd!
     autocmd ColorScheme * call s:color_scheme()
@@ -300,14 +303,9 @@ call s:source('misc.vim')
 " snippet
 Plug 'honza/vim-snippets'
 
-" man
-augroup ManInitPost
-    autocmd!
-    autocmd FileType man call timer_start(0, {-> execute('unmap <buffer> q')})
-augroup END
-
 " document
-Plug 'kkoomen/vim-doge', {'do': {-> doge#install()}}
+Plug 'kkoomen/vim-doge', {'do': {-> doge#install()},
+            \ 'on': ['DogeGenerate', 'DogeCreateDocStandard']}
 let g:doge_enable_mappings = 0
 nnoremap <leader>dg <Cmd>DogeGenerate<CR>
 let g:doge_mapping_comment_jump_forward = '<C-j>'
