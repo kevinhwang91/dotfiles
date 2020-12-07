@@ -86,6 +86,19 @@ elseif exists('$TMUX')
         let g:clipboard['copy']['+'] = ['tmux', 'load-buffer', '-w', '-']
         let g:clipboard['copy']['*'] = ['tmux', 'load-buffer', '-w', '-']
     endif
+elseif executable('osc52send')
+    let g:clipboard = {
+                \ 'name': 'osc52send',
+                \ 'copy': {
+                \   '+': ['osc52send'],
+                \   '*': ['osc52send'],
+                \  },
+                \ 'paste': {
+                \   '+': [''],
+                \   '*': [''],
+                \ },
+                \ 'cache_enabled': 1,
+                \ }
 endif
 
 " source config file function

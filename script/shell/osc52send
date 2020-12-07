@@ -9,8 +9,9 @@ if (( $(printf %s "$buf" | wc -c) > maxlen )); then
     exit 1
 fi
 if [[ -n $TMUX ]]; then
-    tty=$(tmux list-panes -F '#{pane_active} #{pane_tty}' | awk '$1==1 { print $2 }')
+    otty=$(tmux list-panes -F '#{pane_active} #{pane_tty}' | awk '$1==1 { print $2 }')
 else
-    tty='/dev/tty'
+    # neovim clipboard provider needs $(tty < /proc/$PPID/fd/0)
+    otty=${TTY:-$(tty < /proc/$PPID/fd/0)}
 fi
-printf '\033]52;c;%s\a' "$(printf %s "$buf" | head -c $maxlen | base64)" >$tty
+printf '\033]52;c;%s\a' "$(printf %s "$buf" | head -c $maxlen | base64)" >$otty
