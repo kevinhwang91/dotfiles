@@ -188,6 +188,9 @@ alias topp='top -p'
 alias lsf='lsof -w'
 alias lsfp='lsof -w -p'
 
+alias vmst='vmstat -SM 1'
+alias iost='iostat -y -d -h -t 1'
+
 if (( $+commands[nvim] )); then
     alias ng='_ng'
     _ng() {
