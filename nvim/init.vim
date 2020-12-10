@@ -110,10 +110,10 @@ function s:source(config) abort
     endif
 endfunction
 
+let mapleader = ' '
 call s:source('script.vim')
 
 " map
-let mapleader = ' '
 nnoremap <Space> <Nop>
 xnoremap <Space> <Nop>
 noremap q <Nop>
@@ -247,7 +247,7 @@ endfunction
 nnoremap <silent> z[ <Cmd>call <SID>nav_fold(0, v:count1)<CR>
 nnoremap <silent> z] <Cmd>call <SID>nav_fold(1, v:count1)<CR>
 
-xnoremap <silent> iz :<C-U>normal [zv]z<CR>
+xnoremap <silent> iz :<C-U>normal [zv]zg_<CR>
 onoremap iz :normal viz<CR>
 
 augroup ColorTheme

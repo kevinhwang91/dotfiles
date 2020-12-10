@@ -58,7 +58,7 @@ function s:zz() abort
         keepjumps execute 'normal! ' . line('.') . 'zb'
         return
     endif
-    normal! zz
+    normal! zvzz
     normal! L
     if line('.') == line('$')
         keepjumps execute 'normal! ' . line('.') . 'zb'
@@ -73,3 +73,6 @@ augroup ShadowWindow
     autocmd!
     autocmd WinEnter * call shadowwin#enable()
 augroup END
+
+command! Jumps call jumplist#to_qf()
+nnoremap <silent> <leader>jj <Cmd>Jumps<CR>

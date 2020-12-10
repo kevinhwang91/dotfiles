@@ -1,5 +1,14 @@
 {
 	"coc.preferences.useQuickfixForLocations": false,
+	"coc.preferences.extensionUpdateCheck": "weekly",
+	"workspace.progressTarget": "statusline",
+	"diagnostic.maxWindowWidth": 100,
+	"diagnostic.signPriority": 20,
+	"diagnostic.errorSign": "",
+	"diagnostic.warningSign": "",
+	"diagnostic.infoSign": "",
+	"diagnostic.hintSign": "",
+	"diagnostic.enableHighlightLineNumber": false,
 	"languageserver": {
 		"ccls": {
 			"command": "ccls",
@@ -11,6 +20,31 @@
 				},
 				"highlight": {
 					"lsRanges": true
+				}
+			}
+		},
+		"lua": {
+			"command": "lua-language-server",
+			"args": ["-E", "/usr/share/lua-language-server/main.lua"],
+			"filetypes": ["lua"],
+			"rootPatterns": [".git/"],
+			"settings": {
+				"Lua": {
+					"workspace": {
+						"library": {
+							"/home/kevin/.local/share/nvim/runtime/lua": true
+						},
+						"maxPreload": 2000,
+						"preloadFileSize": 1000
+					},
+					"diagnostics": {
+						"enable": true,
+						"globals": ["hs", "vim", "it", "describe", "before_each", "after_each"],
+						"disable": ["lowercase-global"]
+					},
+					"completion": {
+						"keywordSnippet": "Enable"
+					}
 				}
 			}
 		},
@@ -47,7 +81,6 @@
 	"yaml.format.singleQuote": true,
 	"yaml.completion": true,
 	"snippets.enableStatusItem": false,
-	"diagnostic.enableHighlightLineNumber": false,
 	"diagnostic-languageserver.filetypes": {
 		"sh": "shellcheck",
 		"python": "pylint"

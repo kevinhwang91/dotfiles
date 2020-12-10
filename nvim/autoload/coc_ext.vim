@@ -39,10 +39,27 @@ function! coc_ext#show_documentation()
     endif
 endfunction
 
+function! coc_ext#qf_diagnostic() abort
+    let diagnostic_list = CocAction('diagnosticList')
+    let items = []
+    let loc_ranges = []
+    for d in diagnostic_list
+        let type = d.severity[0]
+        let text = printf('[%s%s] %s [%s]', (empty(d.source) ? 'coc.nvim' : d.source),
+                    \ (d.code ? ' ' . d.code : ''), split(d.message, '\n')[0], type)
+        let item = {'filename': d.file, 'lnum': d.lnum, 'col': d.col, 'text': text, 'type': type}
+        call add(loc_ranges, d.location.range)
+        call add(items, item)
+    endfor
+    call setqflist([], ' ', {'title': 'CocDiagnosticList', 'items': items,
+                \ 'context': {'bqf': {'lsp_range_hl': loc_ranges}}})
+    belowright copen
+endfunction
+
 function! coc_ext#jump_to_loc(locs) abort
-    let loc_range = map(deepcopy(a:locs), 'v:val.range')
-    let loc = setloclist(0, [], ' ', {'title': 'CocLocationList', 'items': a:locs,
-                \ 'context': {'bqf': {'lsp_range_hl': loc_range}}})
+    let loc_ranges = map(deepcopy(a:locs), 'v:val.range')
+    call setloclist(0, [], ' ', {'title': 'CocLocationList', 'items': a:locs,
+                \ 'context': {'bqf': {'lsp_range_hl': loc_ranges}}})
     let winid = getloclist(0, {'winid': 0}).winid
     if winid == 0
         aboveleft lwindow
@@ -54,7 +71,7 @@ endfunction
 " CocHasProvider('documentHighlight') has probability of RPC failure
 " Write the hardcode of filetype for fallback highlight
 let s:fb_ft_black_list = [
-            \ 'qf', 'fzf', 'vim', 'sh', 'python', 'go', 'c', 'cpp', 'rust', 'java',
+            \ 'qf', 'fzf', 'vim', 'sh', 'python', 'go', 'c', 'cpp', 'rust', 'java', 'lua',
             \ 'typescript', 'javascript', 'css', 'html', 'xml'
             \ ]
 

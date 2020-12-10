@@ -2,8 +2,6 @@ Plug 'neoclide/coc.nvim', {'branch': 'master', 'do': 'yarn install --frozen-lock
 " Plug 'neoclide/coc.nvim'
 autocmd VimEnter * ++once call timer_start(100, {-> call('plug#load', ['coc.nvim'])})
 
-Plug 'rafcamlet/coc-nvim-lua'
-
 let g:coc_global_extensions = [
             \ 'coc-go',
             \ 'coc-html',
@@ -11,7 +9,6 @@ let g:coc_global_extensions = [
             \ 'coc-pyright',
             \ 'coc-java',
             \ 'coc-rust-analyzer',
-            \ 'coc-lua',
             \ 'coc-tsserver',
             \ 'coc-vimlsp',
             \ 'coc-xml',
@@ -90,3 +87,5 @@ command! -nargs=0 OR <Cmd>call CocAction('runCommand', 'editor.action.organizeIm
 nnoremap <silent> <leader>qi <Cmd>OR<CR>
 
 nnoremap <silent> <M-q> <Cmd>echo CocAction('getCurrentFunctionSymbol')<CR>
+
+nnoremap <silent> <leader>qd <Cmd>call coc_ext#qf_diagnostic()<CR>

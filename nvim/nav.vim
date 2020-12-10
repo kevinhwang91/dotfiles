@@ -106,6 +106,7 @@ Plug 'mhinz/vim-grepper', {'on': ['Grepper', '<Plug>(GrepperOperator)']}
 nnoremap <leader>rg <Cmd>Grepper -tool rg<CR>
 
 augroup Grepper
+    autocmd!
     autocmd User Grepper belowright copen
 augroup END
 
