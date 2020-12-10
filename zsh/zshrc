@@ -62,9 +62,6 @@ source $ZSH_LPLUG_DIR/fzf-plugin.zsh
 # python prompt toolkit color depth
 export PROMPT_TOOLKIT_COLOR_DEPTH=DEPTH_24_BIT
 
-# less
-export LESS=FKMRX
-
 # ranger
 if (( $+commands[ranger] )); then
     export RANGER_LOAD_DEFAULT_RC=FALSE

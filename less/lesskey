@@ -1,0 +1,16 @@
+#line-edit
+^A home
+^B left
+^D delete
+^E end
+^F right
+^N down
+^P up
+^W word-backspace
+\e\e abort
+\eb word-left
+\ed word-delete
+\ef word-right
+
+#env
+LESS = -FKMRX
