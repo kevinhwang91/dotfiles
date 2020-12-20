@@ -13,7 +13,7 @@ let g:neoformat_python_autopep8 = {'exe': 'autopep8', 'args': ['--max-line-lengt
 let g:neoformat_enabled_lua = ['luaformat']
 let g:neoformat_lua_luaformat = {'exe': 'lua-format', 'args': [
             \ '--column-limit=100', '--no-keep-simple-control-block-one-line',
-            \ '--no-keep-simple-function-one-line', 'no-align_args', '--no-align-parameter',
+            \ '--no-keep-simple-function-one-line', '--no-align-args', '--no-align-parameter',
             \ '--no-align-table-field', '--double-quote-to-single-quote']}
 
 " javascript

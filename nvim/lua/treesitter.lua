@@ -1,4 +1,4 @@
-require'nvim-treesitter.configs'.setup {
+require('nvim-treesitter.configs').setup({
     ensure_installed = 'maintained',
     highlight = {enable = true, disable = {'bash'}},
     textobjects = {
@@ -27,4 +27,4 @@ require'nvim-treesitter.configs'.setup {
             goto_previous_end = {['[M'] = '@function.outer'}
         }
     }
-}
+})

@@ -95,5 +95,3 @@ function! coc_ext#highlight_fallback(err, res)
 
     let w:coc_matchids_fb = matchadd('CocHighlightText', s:get_cur_word(), -1)
 endfunction
-
-

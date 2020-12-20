@@ -59,12 +59,12 @@ if exists('$DISPLAY') && executable('xsel')
     let g:clipboard = {
                 \ 'name': 'xsel',
                 \ 'copy': {
-                \   '+': ['xsel', '--nodetach', '-i', '-b'],
-                \   '*': ['xsel', '--nodetach', '-i', '-b'],
+                \   '+': 'xsel --nodetach -i -b',
+                \   '*': 'xsel --nodetach -i -b',
                 \ },
                 \ 'paste': {
-                \   '+': ['xsel', '-o', '-b'],
-                \   '*': ['xsel', '-o', '-b'],
+                \   '+': 'xsel -o -b',
+                \   '*': 'xsel -o -b',
                 \ },
                 \ 'cache_enabled': 1
                 \ }
@@ -72,30 +72,30 @@ elseif exists('$TMUX')
     let g:clipboard = {
                 \ 'name': 'tmux',
                 \ 'copy': {
-                \   '+': ['tmux', 'load-buffer', '-'],
-                \   '*': ['tmux', 'load-buffer', '-'],
+                \   '+': 'tmux load-buffer -',
+                \   '*': 'tmux load-buffer -',
                 \  },
                 \ 'paste': {
-                \   '+': ['tmux', 'save-buffer', '-'],
-                \   '*': ['tmux', 'save-buffer', '-'],
+                \   '+': 'tmux save-buffer -',
+                \   '*': 'tmux save-buffer -',
                 \ },
                 \ 'cache_enabled': 1,
                 \ }
     " load-buffer support -w in 3.3 version
     if str2float(matchstr(system('tmux -V')[0:-2], '\d\+\.\d\+')) >= 3.3
-        let g:clipboard['copy']['+'] = ['tmux', 'load-buffer', '-w', '-']
-        let g:clipboard['copy']['*'] = ['tmux', 'load-buffer', '-w', '-']
+        let g:clipboard['copy']['+'] = 'tmux load-buffer -w -'
+        let g:clipboard['copy']['*'] = 'tmux load-buffer -w -'
     endif
 elseif executable('osc52send')
     let g:clipboard = {
                 \ 'name': 'osc52send',
                 \ 'copy': {
-                \   '+': ['osc52send'],
-                \   '*': ['osc52send'],
+                \   '+': 'osc52send',
+                \   '*': 'osc52send',
                 \  },
                 \ 'paste': {
-                \   '+': [''],
-                \   '*': [''],
+                \   '+': '',
+                \   '*': '',
                 \ },
                 \ 'cache_enabled': 1,
                 \ }
@@ -268,6 +268,9 @@ try
 catch
 endtry
 
+let g:plug_window = 'tabnew'
+let g:plug_pwindow = 'above new'
+
 if empty($XDG_CONFIG_HOME)
     call plug#begin('~/.config/nvim/plugged')
 else
@@ -351,4 +354,5 @@ call plug#end()
 
 if has('nvim-0.5')
     lua require('treesitter')
+    lua require('nav')
 endif

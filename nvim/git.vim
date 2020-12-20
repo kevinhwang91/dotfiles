@@ -18,8 +18,9 @@ nnoremap <silent> qd <Cmd>call fugitive#DiffClose()<CR>
 
 Plug 'ruanyl/vim-gh-line', {'on': ['<Plug>(gh-repo)', '<Plug>(gh-line)']}
 let g:gh_line_blame_map_default = 0
-map <leader>gO <Plug>(gh-repo)
-map <leader>gL <Plug>(gh-line)
+nmap <leader>gO <Plug>(gh-repo)
+nmap <leader>gL <Plug>(gh-line)
+xmap <leader>gL <Plug>(gh-line)
 
 Plug 'airblade/vim-gitgutter'
 let g:gitgutter_highlight_linenrs = 1

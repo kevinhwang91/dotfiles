@@ -5,19 +5,6 @@ augroup ManInit
     autocmd FileType man nmap <buffer> gO :call man#show_toc()<CR>
 augroup END
 
-" wrap UpdateRemotePlugins command to update the lazyload plugins
-function s:update_remote_plugs() abort
-    let save_rtp = &rtp
-    let r_list = []
-    for info in values(g:plugs)
-        call add(r_list, info['dir'])
-    endfor
-    execute 'set rtp=' . join(r_list, ',')
-    call remote#host#UpdateRemotePlugins()
-    execute 'set rtp=' . save_rtp
-endfunction
-command! -nargs=0 UpdateRemotePlugins call <SID>update_remote_plugs()
-
 " remove ansi color
 command! -range=% -nargs=0 RmAnsi <line1>,<line2>s/\%x1b\[[0-9;]*[Km]//g
 
@@ -33,7 +20,7 @@ function s:follow_symlink(...) abort
     if getftype(fname) != 'link'
         return
     endif
-    execute 'file ' . fnameescape(resolve(fname))
+    execute 'keepalt file ' . fnameescape(resolve(fname))
 endfunction
 
 command! -nargs=? -complete=buffer FollowSymlink call <SID>follow_symlink(<f-args>)

@@ -19,9 +19,7 @@ function! jumplist#to_qf() abort
         let bufnr = bufnr(m[5])
         let text = '-'
         let [lnum, col] = m[3:4]
-        if col == 0
-            let col += 1
-        endif
+        let col += 1
         if bufnr < 0
             let bufnr = cur_bufnr
             let text = m[5]

@@ -24,8 +24,12 @@ function s:mru_source(file) abort
     return map(mru_list, 'fnamemodify(v:val, ":~:.")')
 endfunction
 
-function s:write2disk() abort
-    let mru_list = s:list_mru(s:tmp_file)
+function s:write2disk(...) abort
+    if a:0 == 1 && type(a:1) == v:t_list
+        let mru_list = a:1
+    else
+        let mru_list = s:list_mru(s:tmp_file)
+    endif
     if !empty(mru_list)
         call writefile(mru_list, s:disk_file)
     endif
@@ -67,9 +71,8 @@ function! fzf_mru#update_mru(bufnr) abort
 
     let s:count = (s:count + 1) % 10
     if s:count == 0
-        call s:write2disk()
+        call s:write2disk(mru_list)
     endif
-    let g:test_mru = mru_list
     call writefile(mru_list, s:tmp_file)
 endfunction
 
