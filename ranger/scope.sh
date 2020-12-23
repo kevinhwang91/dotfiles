@@ -104,7 +104,7 @@ handle_extension() {
             ;;
 
         ## JSON
-        json)
+        json|ipynb)
             jq --indent 4 --color-output . "${FILE_PATH}" && exit 5
             python -m json.tool -- "${FILE_PATH}" && exit 5
             ;;
@@ -140,14 +140,14 @@ handle_image() {
 
         ## Image
         image/*)
-            # local orientation
-            # orientation="$( identify -format '%[EXIF:Orientation]\n' -- "${FILE_PATH}" )"
-            # ## If orientation data is present and the image actually
-            # ## needs rotating ("1" means no rotation)...
-            # if [[ -n "$orientation" && "$orientation" != 1 ]]; then
-                # ## ...auto-rotate the image according to the EXIF data.
-                # convert -- "${FILE_PATH}" -auto-orient "${IMAGE_CACHE_PATH}" && exit 6
-            # fi
+            local orientation
+            orientation="$( identify -format '%[EXIF:Orientation]\n' -- "${FILE_PATH}" )"
+            ## If orientation data is present and the image actually
+            ## needs rotating ("1" means no rotation)...
+            if [[ -n "$orientation" && "$orientation" != 1 ]]; then
+                ## ...auto-rotate the image according to the EXIF data.
+                convert -- "${FILE_PATH}" -auto-orient "${IMAGE_CACHE_PATH}" && exit 6
+            fi
 
             ## `w3mimgdisplay` will be called for all images (unless overriden
             ## as above), but might fail for unsupported types.
@@ -291,22 +291,22 @@ handle_mime() {
 
         ## Text
         text/* | */xml)
-            env COLORTERM=8bit bat --color=always --style=plain --theme=TwoDark -n \
+            ## Syntax highlight
+            if [[ "$( stat --printf='%s' -- "${FILE_PATH}" )" -gt "${HIGHLIGHT_SIZE_MAX}" ]]; then
+                exit 2
+            fi
+            if [[ "$( tput colors )" -ge 256 ]]; then
+                local pygmentize_format='terminal256'
+                local highlight_format='xterm256'
+            else
+                local pygmentize_format='terminal'
+                local highlight_format='ansi'
+            fi
+            env HIGHLIGHT_OPTIONS="${HIGHLIGHT_OPTIONS}" highlight \
+                --out-format="${highlight_format}" \
+                --force -- "${FILE_PATH}" && exit 5
+            env COLORTERM=8bit bat --color=always --style="plain" \
                 -- "${FILE_PATH}" && exit 5
-            # Syntax highlight
-            # if [[ "$( stat --printf='%s' -- "${FILE_PATH}" )" -gt "${HIGHLIGHT_SIZE_MAX}" ]]; then
-                # exit 2
-            # fi
-            # if [[ "$( tput colors )" -ge 256 ]]; then
-                # local pygmentize_format='terminal256'
-                # local highlight_format='xterm256'
-            # else
-                # local pygmentize_format='terminal'
-                # local highlight_format='ansi'
-            # fi
-            # env HIGHLIGHT_OPTIONS="${HIGHLIGHT_OPTIONS}" highlight \
-                # --out-format="${highlight_format}" \
-                # --force -- "${FILE_PATH}" && exit 5
             pygmentize -f "${pygmentize_format}" -O "style=${PYGMENTIZE_STYLE}"\
                 -- "${FILE_PATH}" && exit 5
             exit 2;;
