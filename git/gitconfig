@@ -45,6 +45,6 @@
     line-numbers-right-format = {np:^4}
 
 [interactive]
-    diffFilter = delta --color-only --file-decoration-style=omit
+    diffFilter = delta --color-only
 
 # vim: ft=gitconfig
