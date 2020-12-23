@@ -19,8 +19,21 @@ let g:Hexokinase_ftOptOutPatterns = {
             \ }
 let g:Hexokinase_termDisabled = 1
 
-Plug 'jackguo380/vim-lsp-cxx-highlight', {'for': ['c', 'cpp']}
-highlight default link LspCxxHlSymParameter Parameter
-highlight default link LspCxxHlGroupMemberVariable Keyword
-highlight default link LspCxxHlSymUnknown NONE
-highlight default link LspCxxHlSymVariable NONE
+" coc has loaded lazily
+Plug 'jackguo380/vim-lsp-cxx-highlight', {'on': []}
+
+function s:lazy_load_cxx_highlight(timer) abort
+    highlight default link LspCxxHlSymParameter Parameter
+    highlight default link LspCxxHlGroupMemberVariable Keyword
+    highlight default link LspCxxHlSymUnknown NONE
+    highlight default link LspCxxHlSymVariable NONE
+    call plug#load('coc.nvim')
+    call plug#load('vim-lsp-cxx-highlight')
+    silent! augroup! CxxHighlightLazyLoad
+endfunction
+
+augroup CxxHighlightLazyLoad
+    autocmd!
+    autocmd FileType c,cpp,objc,objcpp,cc,cuda
+                \ call timer_start(100, function('s:lazy_load_cxx_highlight'))
+augroup end

@@ -78,7 +78,7 @@ endfunction
 
 function! fzf_mru#mru() abort
     let opt_dict = s:p()
-    call extend(opt_dict.options, ['--prompt', 'MRU> '])
+    call extend(opt_dict.options, ['--prompt', 'MRU> ', '--tiebreak', 'end,index'])
     call extend(opt_dict, {'source': s:mru_source(s:tmp_file)})
     call fzf#run(fzf#wrap('mru-files', opt_dict, 0))
 endfunction

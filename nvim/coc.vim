@@ -1,5 +1,5 @@
 Plug 'neoclide/coc.nvim', {'branch': 'master', 'do': 'yarn install --frozen-lockfile', 'on': []}
-" Plug 'neoclide/coc.nvim'
+" Plug 'neoclide/coc.nvim', {'on': []}
 autocmd VimEnter * ++once call timer_start(100, {-> call('plug#load', ['coc.nvim'])})
 
 let g:coc_global_extensions = [

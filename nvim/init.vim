@@ -328,13 +328,16 @@ let g:doge_mapping_comment_jump_forward = '<C-j>'
 let g:doge_mapping_comment_jump_backward = '<C-k>'
 
 " comment
-Plug 'preservim/nerdcommenter', {'on': ['<Plug>NERDCommenterToggle']}
+Plug 'preservim/nerdcommenter', {'on': ['<Plug>NERDCommenterToggle'], 'frozen': 1}
 let g:NERDCreateDefaultMappings = 0
 let g:NERDSpaceDelims = 1
 let g:NERDCompactSexyComs = 1
 let g:NERDDefaultAlign = 'left'
 let g:NERDToggleCheckAllLines = 1
 let g:NERDTrimTrailingWhitespace = 1
+let g:NERDCustomDelimiters = {
+            \ 'lua': {'left': '--', 'leftAlt': '--[=[', 'rightAlt': ']=]'},
+            \ }
 map <C-_> <Plug>NERDCommenterToggle
 
 if has('nvim-0.5')

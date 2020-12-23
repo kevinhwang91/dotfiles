@@ -1,6 +1,6 @@
 Plug 'tpope/vim-fugitive'
-let g:nremap = {'d?': 's?', 'dv': 'sv', 'dp': 'sp', 'ds': 'sh', 'dh': 'sh',
-            \ 'dd': 'ss', 'dq': 'qd', 's': 'S', 'u': '<C-u>', 'O': 'T',
+let g:nremap = {'d?': 's?', 'dv': 'sv', 'dp': 'sp', 'ds': 'sh', 'dh': 'sh', 'dq': 'qd',
+            \ 'd2o': 's2o', 'd3o': 's3o', 'dd': 'ss', 's': 'S', 'u': '<C-u>', 'O': 'T',
             \ '[m': '[f', ']m': ']f'}
 let g:xremap = {'s': 'S', 'u': '<C-u>'}
 
