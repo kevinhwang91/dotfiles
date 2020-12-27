@@ -33,7 +33,7 @@ function s:coc_lazy_init() abort
                     \ '', function('coc_ext#highlight_fallback'))
         autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
         autocmd VimLeavePre * if get(g:, 'coc_process_pid', 0) |
-                    \ call system('kill -9 ' . g:coc_process_pid) | endif
+                    \ call system('kill -9 -- -' . g:coc_process_pid) | endif
     augroup END
 endfunction
 
