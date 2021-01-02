@@ -6,6 +6,7 @@ _git_prompt_preexec() {
     typeset -gA git_info
     if [[ -n $git_info[top] ]]; then
         if [[ $2 =~ git\ (.*\ )?(pull|fetch)(\ .*)?$ ]]; then
+            git_info[fetch]=
             async_flush_jobs 'git_prompt'
         fi
 
@@ -45,6 +46,9 @@ _git_prompt_render() {
     fi
     if [[ -n $git_info[stash] ]]; then
         git_prompt+="%F{$git_colors[stash]}$git_info[stash]%f"
+    fi
+    if [[ -n $git_info[fetch] ]]; then
+        git_prompt+="%F{$git_colors[fetch]}$git_info[fetch]%f"
     fi
 
     RPROMPT=$git_prompt
@@ -95,7 +99,7 @@ _git_dirty_task() {
 
 _git_fetch_task() {
     export GIT_TERMINAL_PROMPT=0
-    command git -c gc.auto=0 fetch >/dev/null || return 99
+    command git -c gc.auto=0 fetch --no-tags --recurse-submodules=no >/dev/null || return 99
     _git_arrows_task
 }
 
@@ -127,7 +131,9 @@ _git_prompt_tasks() {
 
 _git_refresh() {
     typeset -gA git_info
+    typeset -gA git_symbols
     if [[ $git_info[top] != $HOME ]]; then
+        git_info[fetch]=$git_symbols[fetch]
         async_job 'git_prompt' _git_fetch_task
     fi
 
@@ -221,7 +227,21 @@ _git_prompt_async_callback() {
                 git_info[cached]=
             fi
             ;;
-        _git_fetch_task|_git_arrows_task)
+        _git_fetch_task)
+            case $code in
+                0)
+                    if [[ -n $git_info[fetch] ]]; then
+                        git_info[fetch]=
+                        do_render=1
+                    fi
+                    ;;
+                *)
+                    git_info[fetch]=
+                    do_render=1
+                    ;;
+            esac
+            ;;
+        _git_arrows_task)
             case $code in
                 0)
                     local arrows_status=$(_check_git_arrows ${(ps:\t:)output})
@@ -229,8 +249,6 @@ _git_prompt_async_callback() {
                         git_info[arrow]=$arrows_status
                         do_render=1
                     fi
-                    ;;
-                99)
                     ;;
                 *)
                     if [[ -n $git_info[arrow] ]]; then
@@ -269,6 +287,7 @@ typeset -gA git_symbols
 git_colors=(
     arrow        11
     branch       13
+    fetch        04
     cached       09
     action       10
     dirty        14
@@ -279,6 +298,7 @@ git_colors=(
 git_symbols=(
     arrow_up        ⇡
     arrow_down      ⇣
+    fetch           \&
     dirty           
     stash           
 )
