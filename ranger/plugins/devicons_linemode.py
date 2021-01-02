@@ -159,7 +159,7 @@ FILE_NODE_EXTENSIONS = {
     'sass'     : '',
     'scala'    : '',
     'scss'     : '',
-    'sh'       : '',
+    'sh'       : '',
     'slim'     : '',
     'sln'      : '',
     'so'       : '',
@@ -349,16 +349,6 @@ def devicon(fobj):
         return DIR_NODE_EXACT_MATCHES.get(fobj.relative_path, '')
     return FILE_NODE_EXACT_MATCHES.get(
         os.path.basename(fobj.relative_path), FILE_NODE_EXTENSIONS.get(fobj.extension, ''))
-
-
-@ranger.api.register_linemode
-class DevIconsLinemode(LinemodeBase):
-    name = "devicons"
-
-    uses_metadata = False
-
-    def filetitle(self, fobj, metadata):
-        return devicon(fobj) + ' ' + fobj.relative_path
 
 
 @ranger.api.register_linemode
