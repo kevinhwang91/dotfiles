@@ -11,7 +11,7 @@ endif
 Plug 'rrethy/vim-hexokinase', {'do': 'make hexokinase'}
 let s:all_hexokinase_pat = ['full_hex', 'triple_hex', 'rgb', 'rgba', 'hsl', 'hsla', 'colour_names']
 let g:Hexokinase_highlighters = ['backgroundfull']
-let g:Hexokinase_refreshEvents = ['BufWrite', 'BufRead', 'TextChanged', 'TextChangedI']
+let g:Hexokinase_refreshEvents = ['BufRead', 'TextChanged', 'InsertLeave']
 let g:Hexokinase_ftOptOutPatterns = {
             \ 'ctrlsf': s:all_hexokinase_pat,
             \ 'css': s:all_hexokinase_pat,

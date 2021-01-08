@@ -1,7 +1,7 @@
 let s:disk_file = $HOME . '/.mru_files'
 let s:tmp_dir = '/tmp/fzf_mru'
 let s:tmp_file = s:tmp_dir . '/mru_files'
-let s:max = 10000
+let s:max = 300
 let s:count = 0
 
 function s:list_mru(file) abort
@@ -10,7 +10,7 @@ function s:list_mru(file) abort
         let mru_list = readfile(a:file)
     endif
     if len(mru_list) > s:max
-        call remove(mru_list, s:max - 1, -1)
+        call remove(mru_list, s:max, -1)
     endif
     cal filter(mru_list, '!empty(glob(fnameescape(v:val)))')
     return mru_list
@@ -31,6 +31,13 @@ function s:write2disk(...) abort
         let mru_list = s:list_mru(s:tmp_file)
     endif
     if !empty(mru_list)
+        " race condition between processes
+        let d_mru_list = s:list_mru(s:disk_file)
+        if len(d_mru_list) - 10 > len(mru_list)
+            call system(printf("cp %s %s", s:tmp_file, '/tmp/mru_ram'))
+            call system(printf("cp %s %s", s:disk_file, '/tmp/mru_disk'))
+            return
+        endif
         call writefile(mru_list, s:disk_file)
     endif
 endfunction
@@ -71,14 +78,14 @@ function! fzf_mru#update_mru(bufnr) abort
 
     let s:count = (s:count + 1) % 10
     if s:count == 0
-        call s:write2disk(mru_list)
+        call s:write2disk()
     endif
     call writefile(mru_list, s:tmp_file)
 endfunction
 
 function! fzf_mru#mru() abort
     let opt_dict = s:p()
-    call extend(opt_dict.options, ['--prompt', 'MRU> ', '--tiebreak', 'end,index'])
+    call extend(opt_dict.options, ['--prompt', 'MRU> ', '--tiebreak', 'index'])
     call extend(opt_dict, {'source': s:mru_source(s:tmp_file)})
     call fzf#run(fzf#wrap('mru-files', opt_dict, 0))
 endfunction
@@ -94,6 +101,12 @@ function! fzf_mru#enable() abort
         autocmd BufEnter,BufAdd * call fzf_mru#update_mru(expand('<abuf>', 1))
         autocmd VimLeavePre,VimSuspend * call <SID>write2disk()
         autocmd FocusLost * call <SID>write2disk()
-        autocmd FocusGained * call <SID>write2ram()
+        " https://github.com/neovim/neovim/pull/7670
+        " TODO Neovim + Tmux will fire FocusGained on startup
+        if exists('$TMUX')
+            autocmd FocusGained * ++once execute('autocmd FocusGained * call <SID>write2ram()')
+        else
+            autocmd FocusGained * call <SID>write2ram()
+        endif
     augroup END
 endfunction

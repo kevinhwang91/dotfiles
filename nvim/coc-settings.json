@@ -24,7 +24,6 @@
 		},
 		"lua": {
 			"command": "lua-language-server",
-			"args": ["-E", "/usr/share/lua-language-server/main.lua"],
 			"filetypes": ["lua"],
 			"rootPatterns": [".git/"],
 			"settings": {

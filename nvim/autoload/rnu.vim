@@ -1,3 +1,5 @@
+let s:delay = 50
+
 function s:set_win_rnu(val) abort
     if !empty(nvim_win_get_config(0)['relative'])
         return
@@ -17,33 +19,41 @@ function s:set_win_rnu(val) abort
     endfor
 endfunction
 
+function s:set_rnu() abort
+    call s:set_win_rnu(v:true)
+    highlight! link FoldColumn NONE
+endfunction
+
+function s:unset_rnu() abort
+    call s:set_win_rnu(v:false)
+    highlight! link FoldColumn Ignore
+endfunction
+
 let s:focus_lock = 1
 function s:rnu_lost(timer) abort
     if s:focus_lock >= 0
-        call s:set_win_rnu(v:false)
-        highlight! link FoldColumn Ignore
+        call s:unset_rnu()
     endif
     let s:focus_lock += 1
 endfunction
 
 function s:rnu_gained(timer) abort
     if s:focus_lock >= 0
-        call s:set_win_rnu(v:true)
-        highlight! link FoldColumn NONE
+        call s:set_rnu()
     endif
     let s:focus_lock += 1
 endfunction
 
 function! rnu#focuslost() abort
     let s:focus_lock -= 1
-    call timer_start(50, function('s:rnu_lost'))
+    call timer_start(s:delay, function('s:rnu_lost'))
 endfunction
 
 function! rnu#focusgained() abort
     let s:focus_lock -= 1
-    call timer_start(50, function('s:rnu_gained'))
+    call timer_start(s:delay, function('s:rnu_gained'))
 endfunction
 
 function! rnu#winenter() abort
-    call s:rnu_gained(0)
+    call s:set_rnu()
 endfunction
