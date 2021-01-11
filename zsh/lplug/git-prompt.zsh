@@ -233,6 +233,7 @@ _git_prompt_async_callback() {
                     if [[ -n $git_info[fetch] ]]; then
                         git_info[fetch]=
                         do_render=1
+                        async_job 'git_prompt' _git_arrows_task
                     fi
                     ;;
                 *)
