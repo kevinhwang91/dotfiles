@@ -28,7 +28,7 @@ autocmd User CocNvimInit ++once call <SID>coc_lazy_init()
 function s:coc_lazy_init() abort
     augroup Coc
         autocmd!
-        autocmd User CocLocationsChange ++nested call coc_ext#jump_to_loc(g:coc_jump_locations)
+        autocmd User CocLocationsChange ++nested call coc_ext#jump2loc(g:coc_jump_locations)
         autocmd CursorHold * silent! call CocActionAsync('highlight',
                     \ '', function('coc_ext#highlight_fallback'))
         autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')

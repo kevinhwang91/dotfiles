@@ -41,16 +41,22 @@ command! -nargs=0 CleanEmptyBuf call <SID>clean_empty_buf()
 nnoremap <silent> qe <Cmd>CleanEmptyBuf<CR>
 
 function s:zz() abort
-    if line('.') == line('$')
-        keepjumps execute 'normal! ' . line('.') . 'zb'
+    let l1 = line('.')
+    let l_count = line('$')
+    if l1 == l_count
+        keepjumps execute 'normal! ' . l1 . 'zb'
         return
     endif
     normal! zvzz
+    let l1 = line('.')
     normal! L
-    if line('.') == line('$')
-        keepjumps execute 'normal! ' . line('.') . 'zb'
+    let l2 = line('.')
+    if l2 + &scrolloff >= l_count
+        keepjumps execute 'normal! ' . l2 . 'zb'
     endif
-    keepjumps normal! ``
+    if l1 != l2
+        keepjumps normal! ``
+    endif
 endfunction
 
 nnoremap zZ <Cmd>call <SID>zz()<CR>

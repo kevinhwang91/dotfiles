@@ -53,10 +53,10 @@ function! coc_ext#qf_diagnostic() abort
     endfor
     call setqflist([], ' ', {'title': 'CocDiagnosticList', 'items': items,
                 \ 'context': {'bqf': {'lsp_range_hl': loc_ranges}}})
-    belowright copen
+    botright copen
 endfunction
 
-function! coc_ext#jump_to_loc(locs) abort
+function! coc_ext#jump2loc(locs) abort
     let loc_ranges = map(deepcopy(a:locs), 'v:val.range')
     call setloclist(0, [], ' ', {'title': 'CocLocationList', 'items': a:locs,
                 \ 'context': {'bqf': {'lsp_range_hl': loc_ranges}}})

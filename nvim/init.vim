@@ -336,7 +336,7 @@ let g:NERDDefaultAlign = 'left'
 let g:NERDToggleCheckAllLines = 1
 let g:NERDTrimTrailingWhitespace = 1
 let g:NERDCustomDelimiters = {
-            \ 'lua': {'left': '--', 'leftAlt': '--[=[', 'rightAlt': ']=]'},
+            \ 'lua': {'left': '--', 'leftAlt': '', 'rightAlt': ''},
             \ }
 map <C-_> <Plug>NERDCommenterToggle
 

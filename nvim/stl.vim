@@ -48,7 +48,7 @@ let g:lightline = {
             \       ],
             \   },
             \   'inactive': {
-            \       'left': [ ['ifilename', 'ireadonly'] ],
+            \       'left': [ ['quickfix', 'ifilename', 'ireadonly'] ],
             \       'right':[ ['lineinfo'], ['fileencoding', 'fileformat'], ['filetype'] ]
             \   },
             \   'tabline': {'left': [ ['tabs'] ], 'right':[]},

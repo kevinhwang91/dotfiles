@@ -14,9 +14,7 @@ let g:rnvimr_ranger_views = [
             \ {'maxwidth': 49, 'ratio': [1]}
             \ ]
 
-" WIP
 Plug 'kevinhwang91/nvim-bqf'
-let g:bqf_auto_enable = 1
 
 Plug 'kevinhwang91/nvim-hlslens'
 let g:hlslens_auto_enable = 1
@@ -32,6 +30,7 @@ augroup VMlens
 augroup END
 
 if executable('fzf')
+    " set rtp+=/usr/share/vim/vimfiles
     Plug 'junegunn/fzf.vim'
     nnoremap <silent> <leader>ft <Cmd>BTags<CR>
     nnoremap <silent> <leader>fo <Cmd>Tags<CR>
@@ -92,14 +91,14 @@ nnoremap <leader>rg <Cmd>Grepper -tool rg<CR>
 
 augroup Grepper
     autocmd!
-    autocmd User Grepper belowright copen
+    autocmd User Grepper botright copen
 augroup END
 
 nmap gs <Plug>(GrepperOperator)
 xmap gs <Plug>(GrepperOperator)
 
 let g:grepper = {
-            \ 'tools': ['rg', 'git'],
+            \ 'tools': ['rg', 'grep'],
             \ 'dir': 'repo,file',
             \ 'open': 0,
             \ 'switch': 1,
