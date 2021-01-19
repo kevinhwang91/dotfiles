@@ -91,7 +91,9 @@ nnoremap <leader>rg <Cmd>Grepper -tool rg<CR>
 
 augroup Grepper
     autocmd!
-    autocmd User Grepper botright copen
+    autocmd User Grepper call setqflist([], 'r',
+                \ {'context': {'bqf': {'pattern_hl': histget('/')}}}) |
+                \ botright copen
 augroup END
 
 nmap gs <Plug>(GrepperOperator)
@@ -105,7 +107,8 @@ let g:grepper = {
             \ 'jump': 0,
             \ 'simple_prompt': 1,
             \ 'quickfix': 1,
-            \ 'highlight': 1,
+            \ 'searchreg': 1,
+            \ 'highlight': 0,
             \ 'rg': {
             \   'grepprg': 'rg -H --no-heading --vimgrep --smart-case',
             \   'grepformat': '%f:%l:%c:%m,%f:%l:%m',

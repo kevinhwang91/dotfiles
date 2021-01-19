@@ -120,6 +120,8 @@ noremap q <Nop>
 noremap Q <Nop>
 nnoremap - "_
 xnoremap - "_
+nnoremap <leader>2; @:
+xnoremap <leader>2; @:
 nnoremap <silent> qq <Cmd>confirm q<CR>
 nnoremap <silent> qa <Cmd>confirm qa<CR>
 nnoremap <silent> qt <Cmd>tabc<CR>

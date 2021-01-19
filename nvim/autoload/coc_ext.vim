@@ -52,14 +52,14 @@ function! coc_ext#qf_diagnostic() abort
         call add(items, item)
     endfor
     call setqflist([], ' ', {'title': 'CocDiagnosticList', 'items': items,
-                \ 'context': {'bqf': {'lsp_range_hl': loc_ranges}}})
+                \ 'context': {'bqf': {'lsp_ranges_hl': loc_ranges}}})
     botright copen
 endfunction
 
 function! coc_ext#jump2loc(locs) abort
     let loc_ranges = map(deepcopy(a:locs), 'v:val.range')
     call setloclist(0, [], ' ', {'title': 'CocLocationList', 'items': a:locs,
-                \ 'context': {'bqf': {'lsp_range_hl': loc_ranges}}})
+                \ 'context': {'bqf': {'lsp_ranges_hl': loc_ranges}}})
     let winid = getloclist(0, {'winid': 0}).winid
     if winid == 0
         aboveleft lwindow

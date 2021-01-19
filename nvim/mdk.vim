@@ -9,6 +9,7 @@ augroup VimMarkdown
     autocmd FileType markdown setlocal foldenable foldlevel=99 foldlevelstart=99
     autocmd FileType markdown nnoremap <silent><buffer> gO <Cmd>Toc<CR>
     autocmd FileType markdown vnoremap <silent><buffer> gO <Cmd>Toc<CR>
+    autocmd FileType markdown nnoremap <silent><buffer> <leader>to <Cmd>InsertToc<CR>
     autocmd FileType markdown nmap <buffer> ]] <Plug>Markdown_MoveToNextHeader
     autocmd FileType markdown vmap <buffer> ]] <Plug>Markdown_MoveToNextHeader
     autocmd FileType markdown nmap <buffer> [[ <Plug>Markdown_MoveToPreviousHeader
@@ -18,9 +19,6 @@ augroup VimMarkdown
     autocmd FileType markdown nmap <silent><buffer> ge <Plug>Markdown_EditUrlUnderCursor
     autocmd FileType markdown vmap <silent><buffer> ge <Plug>Markdown_EditUrlUnderCursor
 augroup END
-
-Plug 'mzlogin/vim-markdown-toc', {'for': 'markdown'}
-nnoremap <leader>to <Cmd>GenTocGFM<CR>
 
 Plug 'iamcco/markdown-preview.nvim', {'do': 'cd app && yarn install', 'for': 'markdown'}
 let g:mkdp_auto_close = 0
