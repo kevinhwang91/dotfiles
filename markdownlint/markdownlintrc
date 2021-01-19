@@ -1,9 +1,10 @@
 {
-    "MD013": {
-        "line_length": 100
-    },
-    "MD033": false,
-    "_vim_": {
-        "modeline": "/* vim: set ft=json: */"
-    }
+	"MD004": false,
+	"MD013": {
+		"line_length": 100
+	},
+	"MD033": false,
+	"_vim_": {
+		"modeline": "/* vim: set ft=json: */"
+	}
 }
