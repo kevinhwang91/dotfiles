@@ -117,10 +117,6 @@ function! LightlineFileName() abort
         let filename = '[No Name]'
     elseif &buftype == 'quickfix'
         let filename = get(w:, 'quickfix_title')
-    elseif bufname('%') == '__CtrlSF__'
-        let filename = pathshorten(ctrlsf#utils#SectionC())
-    elseif bufname('%') == '__CtrlSFPreview__'
-        let filename = ctrlsf#utils#PreviewSectionC()
     else
         let filename = expand('%:t')
     endif
@@ -131,10 +127,6 @@ endfunction
 function! LightlineInactiveFileName() abort
     if &buftype == 'quickfix'
         let filename = get(w:, 'quickfix_title')
-    elseif bufname('%') == '__CtrlSF__'
-        let filename = ctrlsf#utils#SectionC()
-    elseif bufname('%') == '__CtrlSFPreview__'
-        let filename = ctrlsf#utils#PreviewSectionC()
     else
         let filename = pathshorten(expand("%:~"))
     endif
@@ -145,7 +137,6 @@ endfunction
 function! LightlineFugitive() abort
     if empty(expand('%')) || !exists('*FugitiveHead') || !exists('*FugitiveExtractGitDir')
                 \ || !exists('*FugitiveParse') || winwidth(0) < 90
-                \ || bufname('%') == '__CtrlSF__' || bufname('%') == '__CtrlSFPreview__'
         return ''
     endif
 
@@ -169,7 +160,6 @@ endfunction
 
 function! LightlineGitGutter() abort
     if !exists('*GitGutterGetHunkSummary') || &readonly || ! &modifiable || winwidth(0) < 80
-                \ || bufname('%') == '__CtrlSF__' || bufname('%') == '__CtrlSFPreview__'
         return ''
     else
         let symbols_hl =  ['+', '~', '-']
@@ -219,10 +209,6 @@ function! LightlineCocWarnings() abort
 endfunction
 
 function! LightlineFiletype()
-    if bufname('%') == '__CtrlSF__'
-        return ctrlsf#utils#SectionX()
-    endif
-
     if !exists('*WebDevIconsGetFileTypeSymbol')
         return &filetype
     else
@@ -235,17 +221,13 @@ function! LightlineFiletype()
 endfunction
 
 function! LightlineFileencoding() abort
-    if winwidth(0) < 60 || bufname('%') == '__CtrlSF__' || bufname('%') == '__CtrlSFPreview__'
+    if winwidth(0) < 60
         return ''
     endif
     return printf(' %s ', &fenc !=# '' ? &fenc : &enc)
 endfunction
 
 function! LightlineFileformat() abort
-    if bufname('%') == '__CtrlSF__' || bufname('%') == '__CtrlSFPreview__'
-        return ''
-    endif
-
     if !exists('*WebDevIconsGetFileFormatSymbol')
         return printf(' %s ', &fileformat)
     else
@@ -254,7 +236,7 @@ function! LightlineFileformat() abort
 endfunction
 
 function! LightlineWhiteSpace() abort
-    if &readonly || !&modifiable || line('$') > 20000 || bufname('%') == '__CtrlSF__'
+    if &readonly || !&modifiable || line('$') > 20000
         return ''
     endif
 

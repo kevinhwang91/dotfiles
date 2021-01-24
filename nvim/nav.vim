@@ -115,38 +115,6 @@ let g:grepper = {
             \   }
             \ }
 
-Plug 'dyng/ctrlsf.vim'
-let g:ctrlsf_ackprg = 'rg'
-let g:ctrlsf_populate_qflist = 1
-let g:ctrlsf_auto_focus = {'at': 'start'}
-let g:ctrlsf_auto_preview = 1
-let g:ctrlsf_default_root = 'project'
-let g:ctrlsf_follow_symlinks = 1
-let g:ctrlsf_mapping = {
-            \ 'open': ['<CR>', 'o'],
-            \ 'openb': 'O',
-            \ 'split': '<C-x>',
-            \ 'vsplit': '<C-v>',
-            \ 'tab': 't',
-            \ 'tabb': 'T',
-            \ 'popen': 'p',
-            \ 'popenf': 'P',
-            \ 'quit': 'qq',
-            \ 'next': '<C-j>',
-            \ 'prev': '<C-k>',
-            \ 'pquit': 'qq',
-            \ 'loclist': '<C-s>',
-            \ 'chgmode': 'M',
-            \ 'stop': '<C-c>',
-            \ }
-highlight default link ctrlsfFilename Underlined
-nmap <leader>ct <Plug>CtrlSFCCwordExec
-xmap <leader>ct <Plug>CtrlSFVwordExec
-
-function! CtrlSFAfterMainWindowInit()
-    call ctrlsf_vm#init()
-endfunction
-
 Plug 'andymass/vim-matchup', {'on': []}
 
 autocmd VimEnter * ++once call timer_start(100, {-> call('plug#load', ['vim-matchup'])})

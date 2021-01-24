@@ -13,7 +13,6 @@ let s:all_hexokinase_pat = ['full_hex', 'triple_hex', 'rgb', 'rgba', 'hsl', 'hsl
 let g:Hexokinase_highlighters = ['backgroundfull']
 let g:Hexokinase_refreshEvents = ['BufRead', 'TextChanged', 'InsertLeave']
 let g:Hexokinase_ftOptOutPatterns = {
-            \ 'ctrlsf': s:all_hexokinase_pat,
             \ 'css': s:all_hexokinase_pat,
             \ 'scss': s:all_hexokinase_pat
             \ }
