@@ -55,6 +55,7 @@ function! GdbSetTKeymaps()
 endfunction
 
 let g:nvimgdb_config_override = {
+            \ 'codewin_command': 'vnew',
             \ 'sign_breakpoint_priority': 99,
             \ 'set_keymaps': 'GdbSetKeymaps',
             \ 'unset_keymaps': 'GdbUnsetKeymaps',

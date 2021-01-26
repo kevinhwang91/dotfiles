@@ -40,6 +40,11 @@ augroup GoFormat
     autocmd FileType go setlocal noexpandtab
 augroup end
 
+augroup MakeFileFormat
+    autocmd!
+    autocmd FileType make setlocal noexpandtab
+augroup end
+
 augroup PrettierFormat
     autocmd!
     autocmd FileType javascript,typescript,json setlocal noexpandtab

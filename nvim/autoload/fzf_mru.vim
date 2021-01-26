@@ -1,7 +1,7 @@
 let s:disk_file = $HOME . '/.mru_files'
 let s:tmp_dir = '/tmp/fzf_mru'
 let s:tmp_file = s:tmp_dir . '/mru_files'
-let s:max = 300
+let s:max = 1000
 let s:count = 0
 
 function s:list_mru(file) abort

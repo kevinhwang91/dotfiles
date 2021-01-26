@@ -5,11 +5,10 @@ let g:anyfold_motion = 0
 
 augroup FoldLazyLoad
     autocmd!
-    autocmd FileType vim,sh,zsh,python,yaml,xml,html,json,make,sql,tmux call <SID>load_anyfold()
-    autocmd FileType javascript,typescript,css call <SID>load_lspfold()
-    if has('nvim-0.5')
-        autocmd FileType c,cpp,go,rust,java,lua call <SID>load_treesitter()
-    endif
+    autocmd FileType vim,python,yaml,xml,html,make,sql,tmux call <SID>load_anyfold()
+        autocmd FileType c,cpp,go,rust,java,lua,javascript,typescript,css,json,sh,zsh
+                    \ if has('nvim-0.5') | call <SID>load_treesitter() |
+                    \ else | call <SID>load_anyfold() | endif
 augroup END
 
 function s:set_fold_opt() abort
@@ -59,41 +58,9 @@ function s:lazy_load_anyfold(timer) abort
     endif
 endfunction
 
-function s:load_lspfold() abort
-    let b:lazy_load_fold = str2nr(expand('<abuf>'))
-    augroup FoldLazyLoad
-        autocmd! BufEnter <buffer=abuf>
-        autocmd BufEnter <buffer=abuf> call timer_start(2000,
-                    \ function('s:lazy_load_lsp'), {'repeat': 10})
-    augroup END
-endfunction
-
-function s:handle_callback(err, res) abort
-    if a:res
-        call s:set_fold_opt()
-        augroup FoldLazyLoad
-            execute 'autocmd! BufEnter <buffer=' . b:lazy_load_fold . '>'
-        augroup END
-        unlet b:lazy_load_fold
-    endif
-endfunction
-
-function s:lazy_load_lsp(timer) abort
-    if exists('b:lazy_load_fold') && b:lazy_load_fold
-        silent! let has_folding_range = CocHasProvider('foldingRange')
-        if exists('has_folding_range') && has_folding_range
-            call CocActionAsync('fold', '', function('s:handle_callback'))
-        endif
-    else
-        call timer_stop(a:timer)
-    endif
-endfunction
-
 command! -nargs=0 AnyFold call <SID>set_fold_opt() | AnyFoldActivate
 command! -nargs=0 TreesitterFold call <SID>set_fold_opt() |
             \ setlocal foldmethod=expr foldexpr=nvim_treesitter#foldexpr()
-command! -nargs=0 LspFold execute 'setlocal foldmethod=manual | normal! zE' |
-            \ call CocActionAsync('fold', '', function('s:handle_callback'))
 
 function! FoldText() abort
     let fs = v:foldstart

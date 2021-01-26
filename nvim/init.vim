@@ -31,7 +31,7 @@ set lazyredraw
 set inccommand=nosplit
 set shortmess+=aIc
 set signcolumn=yes:1
-set shada=!,'20,<50,s10,h
+set shada=!,'20,<50,s10,/100,@1000,h
 set synmaxcol=300
 set textwidth=100
 
@@ -46,7 +46,6 @@ set noswapfile
 " true color
 if (has('termguicolors'))
     set termguicolors
-    set guicursor=n-v-c-sm:block-Cursor,i-ci-ve:ver25-Cursor,r-cr-o:hor20
 endif
 
 let g:loaded_netrwPlugin = 1
@@ -202,12 +201,12 @@ nnoremap <expr> ] <SID>prefix_timeout(']')
 xnoremap <expr> ] <SID>prefix_timeout(']')
 nnoremap <silent> [b <Cmd>bprevious<CR>
 nnoremap <silent> ]b <Cmd>bnext<CR>
-nnoremap <silent> [q <Cmd>execute(v:count1 . 'cprevious')<CR>
-nnoremap <silent> ]q <Cmd>execute(v:count1 . 'cnext')<CR>
+nnoremap <silent> [q <Cmd>execute v:count1 . 'cprevious'<CR>
+nnoremap <silent> ]q <Cmd>execute v:count1 . 'cnext'<CR>
 nnoremap [Q <Cmd>cfirst<CR>
 nnoremap ]Q <Cmd>clast<CR>
-nnoremap <silent> [s <Cmd>execute(v:count1 . 'lprevious')<CR>
-nnoremap <silent> ]s <Cmd>execute(v:count1 . 'lnext')<CR>
+nnoremap <silent> [s <Cmd>execute v:count1 . 'lprevious'<CR>
+nnoremap <silent> ]s <Cmd>execute v:count1 . 'lnext'<CR>
 nnoremap [S <Cmd>lfirst<CR>
 nnoremap ]S <Cmd>llast<CR>
 nnoremap [z [z_
@@ -263,7 +262,6 @@ function s:color_scheme() abort
     highlight CurrentWord cterm=bold ctermbg=238 gui=bold guibg=#314365
     highlight BqfPreviewBorder guifg=#50a14f ctermfg=71
 endfunction
-
 " color scheme
 try
     colorscheme one
@@ -358,6 +356,5 @@ endif
 call plug#end()
 
 if has('nvim-0.5')
-    lua require('treesitter')
-    lua require('nav')
+    lua vim.defer_fn(function() require('treesitter') require('nav') end, 100)
 endif
