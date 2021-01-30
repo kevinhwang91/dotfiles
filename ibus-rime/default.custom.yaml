@@ -1,3 +1,6 @@
 patch:
   menu:
     page_size: 9
+
+style:
+  horizontal: true
