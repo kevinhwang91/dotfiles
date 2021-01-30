@@ -56,7 +56,9 @@ _git_prompt_render() {
     local expanded_prompt
     expanded_prompt=${(%%)RPROMPT}
     if [[ $last_prompt != $expanded_prompt ]]; then
-        zle && zle reset-prompt
+        if [[ $CONTEXT != 'start' ]]; then
+            zle && zle reset-prompt
+        fi
     fi
     typeset -g last_prompt=$expanded_prompt
 }
