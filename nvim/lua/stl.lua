@@ -195,7 +195,7 @@ function M.statusline()
         table.insert(stl, ' %3l/%-3L %3v ')
     else
         local bufnr = fn.winbufnr(vim.g.statusline_winid)
-        table.insert(stl, ' %t')
+        table.insert(stl, '    %t')
         table.insert(stl, readonly(bufnr))
 
         table.insert(stl, '%<%=')

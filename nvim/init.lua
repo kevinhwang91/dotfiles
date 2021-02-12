@@ -431,7 +431,6 @@ api.nvim_exec([[
     augroup END
 ]], false)
 
-
 -- bootleq/vim-cycle
 g.cycle_no_mappings = 1
 g.cycle_default_groups = {
@@ -494,6 +493,14 @@ map('n', '<leader>gr',
 map('n', '<leader>gd', '<Cmd>Gdiffsplit<CR>')
 map('n', '<leader>gD', '<Cmd>Gdiffsplit HEAD<CR>')
 map('n', 'qd', '<Cmd>call fugitive#DiffClose()<CR>')
+
+api.nvim_exec([[
+    augroup Fugitive
+        autocmd!
+        autocmd FuncUndefined fugitive#* packadd vim-fugitive
+        autocmd CmdUndefined Git,Gread,Gwrite,Gdiffsplit,Gvdiffsplit packadd vim-fugitive
+    augroup END
+]], false)
 
 -- ruanyl/vim-gh-line
 g.gh_line_blame_map_default = 0
@@ -683,10 +690,12 @@ vim.schedule(function()
     vim.defer_fn(function()
         cmd('packadd vim-matchup')
         fn['matchup#loader#init_buffer']()
+        cmd('HexokinaseTurnOn')
     end, 200)
     vim.defer_fn(function()
+        cmd('packadd vim-fugitive')
         cmd('packadd vim-gitgutter')
-    end, 300)
+    end, 400)
     vim.defer_fn(function()
         cmd('packadd coc.nvim')
         cmd('packadd tmux-complete.vim')

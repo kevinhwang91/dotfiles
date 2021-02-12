@@ -63,7 +63,7 @@ return require('packer').startup({
 
         use {'mbbill/undotree', opt = true}
 
-        use {'tpope/vim-fugitive'}
+        use {'tpope/vim-fugitive', opt = true}
 
         use {'ruanyl/vim-gh-line', keys = {'<Plug>(gh-repo)', '<Plug>(gh-line)'}}
 
@@ -76,8 +76,7 @@ return require('packer').startup({
         use {
             'rrethy/vim-hexokinase',
             run = 'make hexokinase',
-            cmd = {'HexokinaseToggle', 'HexokinaseTurnOn'},
-            event = 'BufReadPost *'
+            cmd = {'HexokinaseToggle', 'HexokinaseTurnOn'}
         }
 
         use {'sbdchd/neoformat', cmd = 'Neoformat'}
