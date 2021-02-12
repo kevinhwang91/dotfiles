@@ -3,10 +3,10 @@
 	"coc.preferences.extensionUpdateCheck": "weekly",
 	"diagnostic.maxWindowWidth": 100,
 	"diagnostic.signPriority": 20,
-	"diagnostic.errorSign": "",
-	"diagnostic.warningSign": "",
+	"diagnostic.errorSign": "",
+	"diagnostic.warningSign": "",
 	"diagnostic.infoSign": "",
-	"diagnostic.hintSign": "",
+	"diagnostic.hintSign": "",
 	"diagnostic.enableHighlightLineNumber": false,
 	"languageserver": {
 		"ccls": {
@@ -29,9 +29,6 @@
 			"settings": {
 				"Lua": {
 					"workspace": {
-						"library": {
-							"/home/kevin/.local/share/nvim/runtime/lua": true
-						},
 						"maxPreload": 2000,
 						"preloadFileSize": 1000
 					},
@@ -66,75 +63,15 @@
 	"html.trace.server": "off",
 	"yaml.trace.server": "off",
 	"css.trace.server": "off",
-	"pyright.disableLanguageServices": false,
-	"pyright.disableCompletion": false,
 	"java.enabled": true,
 	"java.codeGeneration.useBlocks": true,
 	"java.import.maven.enabled": true,
 	"java.maven.downloadSources": true,
 	"go.goplsUseDaemon": false,
-	"rust-analyzer.serverPath": "rust-analyzer",
+	"rust-analyzer.server.path": "rust-analyzer",
 	"yaml.validate": true,
 	"yaml.format.singleQuote": true,
 	"yaml.completion": true,
 	"snippets.enableStatusItem": false,
-	"diagnostic-languageserver.filetypes": {
-		"sh": "shellcheck",
-		"python": "pylint"
-	},
-	"diagnostic-languageserver.linters": {
-		"shellcheck": {
-			"command": "shellcheck",
-			"debounce": 100,
-			"args": ["--format", "json", "-"],
-			"sourceName": "shellcheck",
-			"parseJson": {
-				"line": "line",
-				"column": "column",
-				"endLine": "endLine",
-				"endColumn": "endColumn",
-				"message": "${message} [${code}]",
-				"security": "level"
-			},
-			"securities": {
-				"error": "error",
-				"warning": "warning",
-				"info": "info",
-				"style": "hint"
-			}
-		},
-		"pylint": {
-			"sourceName": "pylint",
-			"command": "pylint",
-			"args": [
-				"--output-format",
-				"text",
-				"--score",
-				"no",
-				"--msg-template",
-				"'{line}:{column}:{category}:{msg} ({msg_id}:{symbol})'",
-				"%file"
-			],
-			"formatPattern": [
-				"^(\\d+?):(\\d+?):([a-z]+?):(.*)$",
-				{
-					"line": 1,
-					"column": 2,
-					"security": 3,
-					"message": 4
-				}
-			],
-			"rootPatterns": [".git", "pyproject.toml", "setup.py"],
-			"securities": {
-				"informational": "hint",
-				"refactor": "info",
-				"convention": "info",
-				"warning": "warning",
-				"error": "error",
-				"fatal": "error"
-			},
-			"offsetColumn": 1,
-			"formatLines": 1
-		}
-	}
+	"snippets.ultisnips.enable": false
 }

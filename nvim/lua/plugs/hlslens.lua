@@ -1,11 +1,10 @@
-M = {}
+local M = {}
 local hlslens = require('hlslens')
 local hlslens_started = false
 local line_lens_bak
 
-hlslens.setup({calm_down = false})
-
 local override_line_lens = function(lnum, loc, idx, r_idx, count, hls_ns)
+    local _ = r_idx
     local text, chunks
     if loc ~= 'c' then
         text = string.format('[%d]', idx)
