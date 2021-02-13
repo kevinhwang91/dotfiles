@@ -11,7 +11,13 @@ fi
 if [[ -n $TMUX ]]; then
     otty=$(tmux list-panes -F '#{pane_active} #{pane_tty}' | awk '$1==1 { print $2 }')
 else
-    # neovim clipboard provider needs $(tty < /proc/$PPID/fd/0)
-    otty=${TTY:-$(tty < /proc/$PPID/fd/0)}
+    otty=${TTY:-$SSH_TTY}
+    if [[ -z $otty ]]; then
+        otty="/dev/$(ps -p $PPID -o tty=)"
+    fi
+    if [[ -z $otty ]]; then
+        echo -n "$buf"
+        exit 2
+    fi
 fi
 printf '\033]52;c;%s\a' "$(printf %s "$buf" | head -c $maxlen | base64)" >$otty
