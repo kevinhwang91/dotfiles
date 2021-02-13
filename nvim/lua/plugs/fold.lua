@@ -17,6 +17,7 @@ local function init()
 
     cmd([[command! -nargs=0 Fold lua require('plugs.fold').do_fold()]])
     _G.foldtext = M.foldtext
+    M.do_fold()
 end
 
 local function gutter_size()

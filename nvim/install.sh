@@ -17,6 +17,7 @@ do_install() {
             link_file "$src_conf/coc-settings.json" "$dst_conf/coc-settings.json"
         fi
     fi
+    nvim --headless +PackerInstall +qa
 }
 
 install

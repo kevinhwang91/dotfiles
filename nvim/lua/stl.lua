@@ -155,20 +155,21 @@ local coc_diagnostic = (function()
     end
 end)()
 
-local function fileformat(bufnr)
-    local icon
-    if vim.bo[bufnr].fileformat == 'mac' then
-        icon = ''
-    elseif vim.bo[bufnr].fileformat == 'unix' then
-        icon = 'ﱦ'
-    else
-        icon = ''
+local fileformat = (function()
+    local is_mac = fn.has('macunix') == 1
+    return function(bufnr)
+        local icon
+        if vim.bo[bufnr].fileformat == 'unix' then
+            icon = is_mac and '' or 'ﱦ'
+        else
+            icon = ''
+        end
+        if bufnr == 0 then
+            return '%#StatusLineFormat#' .. icon .. '%#StatusLine#'
+        end
+        return icon
     end
-    if bufnr == 0 then
-        return '%#StatusLineFormat#' .. icon .. '%#StatusLine#'
-    end
-    return icon
-end
+end)()
 
 function M.statusline()
     local stl = {}
@@ -178,11 +179,10 @@ function M.statusline()
         table.insert(stl, m_hl .. ' ' .. m_name .. ' %#StatusLine#')
         table.insert(stl, filename())
         table.insert(stl, readonly(0))
-        table.insert(stl, '%<')
+
+        table.insert(stl, '%<%=')
+
         table.insert(stl, coc_status())
-
-        table.insert(stl, '%=')
-
         table.insert(stl, coc_diagnostic())
         if width > 75 then
             table.insert(stl, gitgutter())

@@ -9,19 +9,6 @@
 	"diagnostic.hintSign": "",
 	"diagnostic.enableHighlightLineNumber": false,
 	"languageserver": {
-		"ccls": {
-			"command": "ccls",
-			"filetypes": ["c", "cpp", "cuda", "objc", "objcpp"],
-			"rootPatterns": [".ccls", "compile_commands.json", ".vim/", ".git/", ".hg/"],
-			"initializationOptions": {
-				"cache": {
-					"directory": "/tmp/ccls"
-				},
-				"highlight": {
-					"lsRanges": true
-				}
-			}
-		},
 		"lua": {
 			"command": "lua-language-server",
 			"filetypes": ["lua"],
@@ -53,6 +40,9 @@
 			"filetypes": ["sh"]
 		}
 	},
+	"clangd.enabled": true,
+	"clangd.semanticHighlighting": true,
+	"clangd.trace": "off",
 	"go.trace.server": "off",
 	"rust-analyzer.trace.server": "off",
 	"tsserver.trace.server": "off",

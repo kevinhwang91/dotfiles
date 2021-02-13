@@ -14,7 +14,11 @@ return require('packer').startup({
 
         use {'kevinhwang91/nvim-hlslens'}
 
-        use {'junegunn/fzf.vim', opt = true}
+        use {
+            'junegunn/fzf.vim',
+            opt = true,
+            requires = {{'junegunn/fzf', opt = true, run = './install --bin'}}
+        }
 
         use {'t9md/vim-choosewin', cmd = 'ChooseWin'}
 
@@ -63,7 +67,7 @@ return require('packer').startup({
 
         use {'mbbill/undotree', opt = true}
 
-        use {'tpope/vim-fugitive', opt = true}
+        use {'tpope/vim-fugitive'}
 
         use {'ruanyl/vim-gh-line', keys = {'<Plug>(gh-repo)', '<Plug>(gh-line)'}}
 

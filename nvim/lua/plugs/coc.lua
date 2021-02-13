@@ -54,10 +54,13 @@ local function init()
 
     map('x', '<leader>x', '<Plug>(coc-convert-snippet)', {})
 
-    cmd([[command! -nargs=0 OR <Cmd>call CocAction('runCommand', 'editor.action.organizeImport')]])
+    cmd([[command! -nargs=0 OR call CocAction('runCommand', 'editor.action.organizeImport')]])
     map('n', '<leader>qi', '<Cmd>OR<CR>')
     map('n', '<M-q>', [[<Cmd>echo CocAction('getCurrentFunctionSymbol')<CR>]])
     map('n', '<leader>qd', [[<Cmd>lua require('plugs.coc').diagnostic()<CR>]])
+
+    cmd([[command! -nargs=0 ClangdSH call CocAction('runCommand', 'clangd.switchSourceHeader')]])
+    map('n', '<leader>sh', '<Cmd>ClangdSH<CR>')
 end
 
 function M.go2def()

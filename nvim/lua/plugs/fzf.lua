@@ -5,13 +5,7 @@ local cmd = vim.cmd
 
 local mru = require('mru')
 
-local fzf_plugin = '/usr/share/vim/vimfiles/plugin/fzf.vim'
-
 local function init()
-    if fn.executable('fzf') == 0 then
-        return
-    end
-
     vim.env.FZF_DEFAULT_OPTS = vim.env.FZF_DEFAULT_OPTS .. ' --reverse --info=inline --border'
     vim.env.BAT_STYLE = 'numbers'
     vim.g.fzf_layout = {window = {width = 0.7, height = 0.7}}
@@ -29,7 +23,7 @@ local function init()
     ]], false)
 
     vim.g.loaded_fzf = nil
-    cmd('source ' .. fzf_plugin)
+    cmd('packadd fzf')
     cmd('packadd fzf.vim')
 
 end

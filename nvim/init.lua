@@ -88,7 +88,7 @@ elseif fn.executable('osc52send') then
     g.clipboard = {
         name = 'osc52send',
         copy = {['+'] = 'osc52send', ['*'] = 'osc52send'},
-        paste = {['+'] = '', ['*'] = ''},
+        paste = {['+'] = 'true', ['*'] = 'true'},
         cache_enabled = true
     }
 end
@@ -205,7 +205,6 @@ end
 
 require('mru')
 require('stl')
-require('plugs.fold')
 
 g.loaded_remote_plugins = fn.stdpath('data') .. '/rplugin.vim'
 cmd([[command! -bar UpdateRemotePlugins call remote#host#UpdateRemotePlugins()]])
@@ -218,6 +217,7 @@ api.nvim_exec([[
 ]], false)
 
 -- junegunn/fzf.vim
+-- `pacman -S fzf` will force nvim load plugin in /usr/share/vim/vimfiles/plugin/fzf.vim
 vim.g.loaded_fzf = true
 map('n', '<leader>ft', '<Cmd>BTags<CR>')
 map('n', '<leader>fo', '<Cmd>Tags<CR>')
@@ -494,14 +494,6 @@ map('n', '<leader>gd', '<Cmd>Gdiffsplit<CR>')
 map('n', '<leader>gD', '<Cmd>Gdiffsplit HEAD<CR>')
 map('n', 'qd', '<Cmd>call fugitive#DiffClose()<CR>')
 
-api.nvim_exec([[
-    augroup Fugitive
-        autocmd!
-        autocmd FuncUndefined fugitive#* packadd vim-fugitive
-        autocmd CmdUndefined Git,Gread,Gwrite,Gdiffsplit,Gvdiffsplit packadd vim-fugitive
-    augroup END
-]], false)
-
 -- ruanyl/vim-gh-line
 g.gh_line_blame_map_default = 0
 map('n', '<leader>gO', '<Plug>(gh-repo)', {})
@@ -686,6 +678,7 @@ map('n', '<leader>jj', '<Cmd>Jumps<CR>')
 vim.schedule(function()
     vim.defer_fn(function()
         require('plugs.treesitter')
+        require('plugs.fold')
     end, 50)
     vim.defer_fn(function()
         cmd('packadd vim-matchup')
@@ -693,7 +686,6 @@ vim.schedule(function()
         cmd('HexokinaseTurnOn')
     end, 200)
     vim.defer_fn(function()
-        cmd('packadd vim-fugitive')
         cmd('packadd vim-gitgutter')
     end, 400)
     vim.defer_fn(function()
