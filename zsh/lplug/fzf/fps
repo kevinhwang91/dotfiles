@@ -10,8 +10,8 @@ _fps() {
         render='cat'
     fi
 
-    ps -eo user,pid,ppid,pgid,stat,tname,cmd | awk '
-    BEGIN { "ps -p $$ -o pgid --no-headers | tr -d \"[:blank:]\"" | getline pgid } {
+    ps -eo user,pid,ppid,pgid,stat,command | awk '
+    BEGIN { "ps -p $$ -o pgid= | tr -d \"[:blank:]\"" | getline pgid } {
         if ($4 != pgid || $2 == pgid)
             print
     }' | ${(z)render}
@@ -22,7 +22,12 @@ ${commands[grcat]:+--ansi} --height=60% \
 --min-height=15 --tac --reverse \
 --preview-window=down:2"
 
-local fzf_preview_cmd="ps -o pcpu,pmem,vsz,rss,thcount,start_time,time -p {2}"
+local nlwp='nlwp'
+if [[ $OSTYPE == darwin* ]]; then
+    nlwp='wq'
+fi
+
+local fzf_preview_cmd="ps -o pcpu,pmem,vsz,rss,$nlwp,start,time -p {2}"
 
 _fps | $FZF_CMD ${(z)fzf_opts} --preview=$fzf_preview_cmd |
     awk -v sep=${FZF_MUL_DELIM:- } '{ printf "%s%c", $2, sep }' | sed -E "s/${FZF_MUL_DELIM:- }$//"
