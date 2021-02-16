@@ -42,7 +42,6 @@
 	},
 	"clangd.enabled": true,
 	"clangd.semanticHighlighting": true,
-	"clangd.trace": "off",
 	"go.trace.server": "off",
 	"rust-analyzer.trace.server": "off",
 	"tsserver.trace.server": "off",
@@ -63,5 +62,9 @@
 	"yaml.format.singleQuote": true,
 	"yaml.completion": true,
 	"snippets.enableStatusItem": false,
-	"snippets.ultisnips.enable": false
+	"snippets.ultisnips.enable": false,
+	"diagnostic-languageserver.filetypes": {
+		"sh": "shellcheck",
+		"python": "pylint"
+	}
 }

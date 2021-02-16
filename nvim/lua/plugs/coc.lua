@@ -107,7 +107,7 @@ function M.diagnostic()
     local items, loc_ranges = {}, {}
     for _, d in ipairs(diagnostics) do
         local text = string.format('[%s%s] %s', (d.source == '' and 'coc.nvim' or d.source),
-            (d.code and ' ' .. d.code or ''), d.message:match('[^\n]+\n*'))
+            (d.code == vim.NIL and '' or ' ' .. d.code), d.message:match('[^\n]+\n*'))
         local item = {filename = d.file, lnum = d.lnum, col = d.col, text = text, type = d.severity}
         table.insert(loc_ranges, d.location.range)
         table.insert(items, item)

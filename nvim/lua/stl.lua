@@ -87,8 +87,7 @@ local fugitive = (function()
 
         local branch
         if bufname ~= last_branch[1] or os.clock() - tick > threshold then
-            vim.b.git_dir = fn['FugitiveExtractGitDir'](fn.resolve(bufname))
-            if vim.b.git_dir == '' then
+            if not vim.b.git_dir or vim.b.git_dir == '' then
                 return nil
             end
             branch = fn['FugitiveHead']()

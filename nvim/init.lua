@@ -88,7 +88,6 @@ elseif fn.executable('osc52send') then
     g.clipboard = {
         name = 'osc52send',
         copy = {['+'] = 'osc52send', ['*'] = 'osc52send'},
-        paste = {['+'] = 'true', ['*'] = 'true'},
         cache_enabled = true
     }
 end
@@ -109,7 +108,7 @@ map('n', 'qt', '<Cmd>tabc<CR>')
 map('n', 'qc', '<Cmd>ccl<CR>')
 map('n', 'qs', '<Cmd>lcl<CR>')
 map('n', '<leader>w', '<Cmd>up<CR>')
-map('n', '<leader>wq', '<Cmd>wq<CR>')
+map('n', '<leader>W', '<Cmd>wq<CR>')
 map('n', '<C-g>', '1<C-g>')
 map('n', '<leader>3', '<Cmd>buffer #<CR>')
 map('n', '<leader>l', ':nohlsearch<CR>')
@@ -233,7 +232,7 @@ api.nvim_exec([[
     augroup Fzf
         autocmd!
         autocmd FuncUndefined fzf#* lua require('plugs.fzf')
-        autocmd CmdUndefined FZF,BTags,BCommits,History,GFiles,Marks,Buffers,Maps lua require('plugs.fzf')
+        autocmd CmdUndefined FZF,BTags,BCommits,History,GFiles,Marks,Buffers,Maps,Helptags lua require('plugs.fzf')
     augroup END
 ]], false)
 
@@ -478,21 +477,21 @@ g.nremap = {
     s = 'S',
     u = '<C-u>',
     O = 'T',
+    ['<C-W>gf'] = 'gF',
     ['[m'] = '[f',
     [']m'] = ']f'
 }
 g.xremap = {s = 'S', u = '<C-u>'}
 map('n', '<leader>gg', '<Cmd>tab Git<CR>')
-map('n', '<leader>gc', ':Git commit<Space>')
-map('n', '<leader>gC', ':Git commit --amend<Space>')
+map('n', '<leader>gc', ':Git commit<Space>', {silent = false})
+map('n', '<leader>gC', ':Git commit --amend<Space>', {silent = false})
 map('n', '<leader>ge', '<Cmd>Gedit<CR>')
 map('n', '<leader>gb', '<Cmd>Git blame -w <bar>wincmd p<CR>')
 map('n', '<leader>gw', [[<Cmd>lua require('kutils').follow_symlink()<CR><Cmd>Gwrite<CR>]])
 map('n', '<leader>gr',
     [[<Cmd>lua require('kutils').follow_symlink()<CR><Cmd>keepalt Gread <bar> up!<CR>]])
-map('n', '<leader>gd', '<Cmd>Gdiffsplit<CR>')
-map('n', '<leader>gD', '<Cmd>Gdiffsplit HEAD<CR>')
-map('n', 'qd', '<Cmd>call fugitive#DiffClose()<CR>')
+map('n', '<leader>gd', ':Gdiffsplit<Space>', {silent = false})
+map('n', '<leader>gt', ':Git difftool -y<Space>', {silent = false})
 
 -- ruanyl/vim-gh-line
 g.gh_line_blame_map_default = 0

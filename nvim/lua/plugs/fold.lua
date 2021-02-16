@@ -3,21 +3,21 @@ local cmd = vim.cmd
 local fn = vim.fn
 local api = vim.api
 
-local anyfold_ft = {'vim', 'python', 'yaml', 'xml', 'html', 'make', 'sql', 'tmux'}
-local ts_ft = {
-    'c', 'cpp', 'go', 'rust', 'java', 'lua', 'javascript', 'typescript', 'css', 'json', 'sh', 'zsh'
-}
+local parsers = require('nvim-treesitter.parsers')
+
+local anyfold_prefer_ft = {'python'}
 
 local function init()
-    cmd('augroup FoldLoad')
-    cmd('autocmd!')
-    cmd(string.format([[autocmd FileType %s,%s lua require('plugs.fold').defer_load()]],
-        table.concat(anyfold_ft, ','), table.concat(ts_ft, ',')))
-    cmd('augroup END')
+    api.nvim_exec([[
+        augroup FoldLoad
+            autocmd!
+            autocmd FileType * lua require('plugs.fold').defer_load()
+        augroup END
+    ]], false)
 
     cmd([[command! -nargs=0 Fold lua require('plugs.fold').do_fold()]])
     _G.foldtext = M.foldtext
-    M.do_fold()
+    M.defer_load()
 end
 
 local function gutter_size()
@@ -29,17 +29,25 @@ local function gutter_size()
 end
 
 function M.do_fold()
-    if vim.tbl_contains(ts_ft, vim.bo.filetype) then
-        vim.wo.foldmethod = 'expr'
-        vim.wo.foldexpr = 'nvim_treesitter#foldexpr()'
-    elseif vim.tbl_contains(anyfold_ft, vim.bo.filetype) then
-        local fsize = fn.getfsize(fn.bufname('%'))
-        if 0 >= fsize or fsize > 524288 then
-            return
+    local ret = false
+    local fsize
+    if vim.tbl_contains(anyfold_prefer_ft, vim.bo.filetype) then
+        fsize = fn.getfsize(fn.bufname('%'))
+        if 0 < fsize and fsize < 524288 then
+            cmd('AnyFoldActivate')
+            ret = true
         end
-        cmd('AnyFoldActivate')
-    else
-        return
+    end
+    if not ret then
+        if parsers.has_parser() then
+            vim.wo.foldmethod = 'expr'
+            vim.wo.foldexpr = 'nvim_treesitter#foldexpr()'
+        elseif not fsize then
+            fsize = fn.getfsize(fn.bufname('%'))
+            if 0 < fsize and fsize < 524288 then
+                cmd('AnyFoldActivate')
+            end
+        end
     end
     vim.wo.foldenable = true
     vim.wo.foldlevel = 99
@@ -51,7 +59,10 @@ function M.defer_load()
     if vim.b.loaded_fold or vim.wo.foldmethod == 'diff' then
         return
     end
-    local bufnr = tonumber(fn.expand('<abuf>'))
+    if vim.bo.buftype == 'terminal' or vim.bo.buftype == 'quickfix' then
+        return
+    end
+    local bufnr = tonumber(fn.expand('<abuf>')) or api.nvim_get_current_buf()
     vim.defer_fn(function()
         if vim.b.loaded_fold or vim.wo.foldmethod == 'diff' then
             return
@@ -59,7 +70,7 @@ function M.defer_load()
         local cur_bufnr = api.nvim_get_current_buf()
         if cur_bufnr == bufnr then
             M.do_fold()
-        else
+        elseif api.nvim_buf_is_valid(bufnr) then
             cmd(string.format('autocmd FoldLoad BufEnter <buffer=%d> ++once %s', bufnr,
                 [[lua require('plugs.fold').do_fold()]]))
         end

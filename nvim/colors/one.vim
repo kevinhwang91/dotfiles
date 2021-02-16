@@ -24,12 +24,15 @@ let s:black_1 = ['#202326', '16']
 let s:black_2 = ['#282c34', '236']
 let s:red_1 = ['#e06c75', '168']
 let s:red_2 = ['#be5046', '130']
+let s:red_3 = ['#450a15', '52']
 let s:green_1 = ['#98c379', '114']
 let s:green_2 = ['#50a14f', '71']
+let s:green_3 = ['#0b4820', '22']
 let s:yellow_1 = ['#d19a66', '173']
 let s:yellow_2 = ['#e5c07b', '180']
 let s:blue_1 = ['#61afef', '75']
 let s:blue_2 = ['#528bff', '69']
+let s:blue_3 = ['#263F78', '237']
 let s:purple_1 = ['#c678dd', '176']
 let s:cyan_1 = ['#56b6c2', '73']
 let s:white_1 = ['#abb2bf', '249']
@@ -38,7 +41,7 @@ let s:mono_1 = ['#5c6370', '241']
 let s:mono_2 = ['#4b5263', '239']
 let s:mono_3 = ['#3e4452', '238']
 let s:mono_4 = ['#333841', '237']
-let s:mono_5 = ['#314365', '238']
+let s:mono_5 = ['#31435e', '238']
 let s:mono_6 = ['#30353f', '236']
 
 " editor color
@@ -126,10 +129,10 @@ call <sid>X('Parameter', s:green_2, '', '')
 call <sid>X('CurrentWord', '', s:mono_5, 'bold')
 
 " diff
-call <sid>X('DiffAdd', s:green_1, s:mono_3, 'none')
-call <sid>X('DiffChange', s:yellow_1, s:mono_3, 'none')
-call <sid>X('DiffDelete', s:red_1, s:mono_3, 'none')
-call <sid>X('DiffText', s:blue_1, s:mono_3, '')
+call <sid>X('DiffAdd', s:none, s:green_3, 'none')
+call <sid>X('DiffChange', s:none, s:mono_6, 'none')
+call <sid>X('DiffDelete', s:none, s:red_3, 'none')
+call <sid>X('DiffText', s:none, s:blue_3, 'bold')
 
 " help
 highlight link helpCommand Type
