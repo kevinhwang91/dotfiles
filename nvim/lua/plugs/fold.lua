@@ -5,6 +5,7 @@ local api = vim.api
 
 local parsers = require('nvim-treesitter.parsers')
 
+local bl_ft = {'man', 'help', 'markdown'}
 local anyfold_prefer_ft = {'python'}
 
 local function init()
@@ -60,6 +61,9 @@ function M.defer_load()
         return
     end
     if vim.bo.buftype == 'terminal' or vim.bo.buftype == 'quickfix' then
+        return
+    end
+    if vim.tbl_contains(bl_ft, vim.bo.filetype) then
         return
     end
     local bufnr = tonumber(fn.expand('<abuf>')) or api.nvim_get_current_buf()

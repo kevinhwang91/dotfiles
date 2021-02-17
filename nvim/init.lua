@@ -205,7 +205,7 @@ function _G.prefix_timeout(prefix)
     if type(char) == 'number' then
         char = fn.nr2char(char)
     end
-    return char == '' and [[\<Nul>]] or prefix .. char
+    return char == '' and [[\<Ignore>]] or prefix .. char
 end
 
 require('mru')
@@ -373,6 +373,7 @@ map('', '#', [[<Plug>(asterisk-z#)<Cmd>lua require('hlslens').start()<CR>]], {})
 map('', 'g*', [[<Plug>(asterisk-gz*)<Cmd>lua require('hlslens').start()<CR>]], {})
 map('', 'g#', [[<Plug>(asterisk-gz#)<Cmd>lua require('hlslens').start()<CR>]], {})
 
+-- tpope/vim-surround
 g.surround_no_mappings = 1
 map('n', 'sd', '<Plug>Dsurround', {})
 map('n', 'cs', '<Plug>Csurround', {})
@@ -616,6 +617,7 @@ map('n', '<C-c>l', '<Plug>SlimeLineSend', {})
 -- plasticboy/vim-markdown
 g.vim_markdown_toc_autofit = 1
 g.vim_markdown_no_default_key_mappings = 1
+g.vim_markdown_folding_disabled = 1
 g.vim_markdown_emphasis_multiline = 0
 g.vim_markdown_edit_url_in = 'current'
 

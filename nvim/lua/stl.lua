@@ -44,7 +44,7 @@ local function quickfix()
     what = {nr = '$'}
     local nr = (qf_type == 'loc' and fn.getloclist(0, what) or fn.getqflist(what)).nr
     local prefix = qf_type == 'loc' and 'Location' or 'Quickfix'
-    return string.format('%s (%d/%d) [%d]', prefix, info.nr, nr, info.size)
+    return string.format('%s (%d/%d) [%d] %s', prefix, info.nr, nr, info.size, vim.w.quickfix_title)
 end
 
 local function filename()

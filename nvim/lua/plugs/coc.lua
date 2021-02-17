@@ -140,7 +140,7 @@ end
 
 -- CocHasProvider('documentHighlight') has probability of RPC failure
 -- Write the hardcode of filetype for fallback highlight
-local fb_ft_black_list = {
+local fb_bl_ft = {
     'qf', 'fzf', 'vim', 'sh', 'python', 'go', 'c', 'cpp', 'rust', 'java', 'lua', 'typescript',
     'javascript', 'css', 'html', 'xml'
 }
@@ -154,7 +154,7 @@ local function get_cur_word()
 end
 
 function M.hl_fallback()
-    if vim.bo.buftype == 'terminal' or vim.tbl_contains(fb_ft_black_list, vim.bo.filetype) then
+    if vim.bo.buftype == 'terminal' or vim.tbl_contains(fb_bl_ft, vim.bo.filetype) then
         return
     end
 
