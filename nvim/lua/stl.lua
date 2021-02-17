@@ -110,7 +110,7 @@ local function gitgutter()
         return nil
     else
         local cnt = fn['GitGutterGetHunkSummary']()
-        if cnt[1] == 0 and cnt[2] == 0 and cnt[3] == 0 then
+        if type(cnt) ~= 'table' or #cnt ~= 3 or cnt[1] == 0 and cnt[2] == 0 and cnt[3] == 0 then
             return nil
         else
             local list = {}

@@ -31,8 +31,8 @@ local function init()
 
     map('n', '<C-f>', [[coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"]], map_opt)
     map('n', '<C-b>', [[coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"]], map_opt)
-    map('v', '<C-f>', [[coc#float#has_scroll() ? coc#float#nvim_scroll(1, 1) : "\<C-f>"]], map_opt)
-    map('v', '<C-b>', [[coc#float#has_scroll() ? coc#float#nvim_scroll(0, 1) : "\<C-b>"]], map_opt)
+    map('v', '<C-f>', [[coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"]], map_opt)
+    map('v', '<C-b>', [[coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"]], map_opt)
     map('i', '<C-f>', [[coc#float#has_scroll() ? "\<C-r>=coc#float#scroll(1)\<cr>" : "\<Right>"]],
         map_opt)
     map('i', '<C-b>', [[coc#float#has_scroll() ? "\<C-r>=coc#float#scroll(0)\<cr>" : "\<Left>"]],

@@ -1,1 +1,1 @@
-setlocal nocursorline nocursorbind
+setlocal nocursorline

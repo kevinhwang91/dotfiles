@@ -49,6 +49,7 @@ o.history = 3000
 o.lazyredraw = true
 o.inccommand = 'nosplit'
 o.shortmess = o.shortmess .. 'aIc'
+o.confirm = true
 o.diffopt = o.diffopt .. ',vertical'
 o.shada = [[!,'20,<50,s10,/100,@1000,h]]
 
@@ -82,14 +83,19 @@ elseif vim.env.TMUX then
         name = 'tmux',
         copy = {['+'] = 'tmux load-buffer -w -', ['*'] = 'tmux load-buffer -w -'},
         paste = {['+'] = 'tmux save-buffer -', ['*'] = 'tmux save-buffer -'},
-        cache_enabled = true
+        cache_enabled = false
     }
 elseif fn.executable('osc52send') then
     g.clipboard = {
         name = 'osc52send',
         copy = {['+'] = 'osc52send', ['*'] = 'osc52send'},
-        cache_enabled = true
+        paste = {['+'] = '', ['*'] = ''},
+        cache_enabled = false
     }
+    api.nvim_exec([[
+        let g:clipboard.paste['+'] = {-> [getreg('"', 1, 1), getregtype('"')]}
+        let g:clipboard.paste['*'] = g:clipboard.paste['+']
+    ]], false)
 end
 
 -- map
@@ -102,13 +108,13 @@ map('n', '-', '"_')
 map('x', '-', '"_')
 map('n', '<leader>2;', '@:')
 map('x', '<leader>2;', '@:')
-map('n', 'qq', '<Cmd>confirm q<CR>')
-map('n', 'qa', '<Cmd>confirm qa<CR>')
+map('n', 'qq', '<Cmd>q<CR>')
+map('n', 'qa', '<Cmd>qa<CR>')
 map('n', 'qt', '<Cmd>tabc<CR>')
 map('n', 'qc', '<Cmd>ccl<CR>')
 map('n', 'qs', '<Cmd>lcl<CR>')
 map('n', '<leader>w', '<Cmd>up<CR>')
-map('n', '<leader>W', '<Cmd>wq<CR>')
+map('n', '<leader>;w', '<Cmd>wq<CR>')
 map('n', '<C-g>', '1<C-g>')
 map('n', '<leader>3', '<Cmd>buffer #<CR>')
 map('n', '<leader>l', ':nohlsearch<CR>')
@@ -206,7 +212,7 @@ require('mru')
 require('stl')
 
 g.loaded_remote_plugins = fn.stdpath('data') .. '/rplugin.vim'
-cmd([[command! -bar UpdateRemotePlugins call remote#host#UpdateRemotePlugins()]])
+cmd([[command! -Bar UpdateRemotePlugins call remote#host#UpdateRemotePlugins()]])
 
 -- sakhnik/nvim-gdb
 api.nvim_exec([[
@@ -386,7 +392,7 @@ g.targets_aiAI = 'aIAi'
 g.targets_seekRanges =
     'cc cr cb cB lc ac Ac lr lb ar ab lB Ar aB Ab AB rr ll rb al rB Al bb aa bB Aa BB AA'
 g.targets_jumpRanges = g.targets_seekRanges
-g.targets_nl = 'nl'
+g.targets_nl = 'nm'
 
 -- tommcdo/vim-exchange
 g.exchange_no_mappings = 1
@@ -486,12 +492,19 @@ map('n', '<leader>gg', '<Cmd>tab Git<CR>')
 map('n', '<leader>gc', ':Git commit<Space>', {silent = false})
 map('n', '<leader>gC', ':Git commit --amend<Space>', {silent = false})
 map('n', '<leader>ge', '<Cmd>Gedit<CR>')
-map('n', '<leader>gb', '<Cmd>Git blame -w <bar>wincmd p<CR>')
+map('n', '<leader>gb', '<Cmd>Git blame -w <Bar>wincmd p<CR>')
 map('n', '<leader>gw', [[<Cmd>lua require('kutils').follow_symlink()<CR><Cmd>Gwrite<CR>]])
 map('n', '<leader>gr',
-    [[<Cmd>lua require('kutils').follow_symlink()<CR><Cmd>keepalt Gread <bar> up!<CR>]])
-map('n', '<leader>gd', ':Gdiffsplit<Space>', {silent = false})
+    [[<Cmd>lua require('kutils').follow_symlink()<CR><Cmd>keepalt Gread <Bar> up!<CR>]])
+map('n', '<leader>gd', ':Gdiffsplit!<Space>', {silent = false})
 map('n', '<leader>gt', ':Git difftool -y<Space>', {silent = false})
+
+api.nvim_exec([[
+    augroup FugitiveCustom
+        autocmd!
+        autocmd User FugitiveIndex nmap <silent><buffer> st :Gtabedit <Plug><cfile> <Bar>Gdiffsplit!<CR>
+    augroup end
+]], true)
 
 -- ruanyl/vim-gh-line
 g.gh_line_blame_map_default = 0
@@ -611,7 +624,7 @@ g.mkdp_auto_close = 0
 
 -- neoclide/coc.nvim
 g.coc_global_extensions = {
-    'coc-go', 'coc-html', 'coc-json', 'coc-pyright', 'coc-java', 'coc-rust-analyzer',
+    'coc-clangd', 'coc-go', 'coc-html', 'coc-json', 'coc-pyright', 'coc-java', 'coc-rust-analyzer',
     'coc-tsserver', 'coc-vimlsp', 'coc-xml', 'coc-yaml', 'coc-css', 'coc-diagnostic',
     'coc-dictionary', 'coc-markdownlint', 'coc-snippets', 'coc-word'
 }
@@ -644,7 +657,7 @@ g.vcoolor_lowercase = 1
 map('n', '<leader>pc', '<Cmd>VCoolor<CR>')
 
 -- kevinhwang91/suda.vim
-map('n', '<leader>:w', '<Cmd>SudaWrite<CR>')
+map('n', '<leader>W', '<Cmd>SudaWrite<CR>')
 
 -- remove ansi color
 cmd([[command! -range=% -nargs=0 RmAnsi <line1>,<line2>s/\%x1b\[[0-9;]*[Km]//g]])
@@ -652,7 +665,9 @@ cmd([[command! -range=% -nargs=0 RmAnsi <line1>,<line2>s/\%x1b\[[0-9;]*[Km]//g]]
 cmd(
     [[command! -nargs=? -complete=buffer FollowSymlink lua require('kutils').follow_symlink(<f-args>)]])
 
-cmd([[command! -nargs=0 CleanEmptyBuf lua require('kutils').clean_empty_buf()]])
+cmd([[command! -nargs=0 CleanEmptyBuf lua require('kutils').clean_empty_bufs()]])
+
+cmd([[command! -nargs=0 CleanDiffTab tabdo lua require('kutils').clean_diffed_tab()]])
 
 api.nvim_exec([[
     augroup RnuColumn

@@ -11,7 +11,7 @@ function M.follow_symlink(fname)
     cmd(string.format('keepalt file %s', fn.fnameescape(fn.resolve(fname))))
 end
 
-function M.clean_empty_buf()
+function M.clean_empty_bufs()
     local bufnrs = {}
     for _, bufnr in ipairs(api.nvim_list_bufs()) do
         if not vim.bo[bufnr].modified and api.nvim_buf_get_name(bufnr) == '' then
@@ -19,8 +19,21 @@ function M.clean_empty_buf()
         end
     end
     if #bufnrs > 0 then
-        cmd(string.format('bwipeout %s', table.concat(bufnrs, ' ')))
+        cmd('bwipeout ' .. table.concat(bufnrs, ' '))
     end
+end
+
+function M.clean_diffed_tab(tabpage)
+    if fn.tabpagenr('$') == 1 then
+        return
+    end
+    tabpage = tabpage or api.nvim_get_current_tabpage()
+    for _, winid in pairs(api.nvim_tabpage_list_wins(tabpage)) do
+        if not vim.wo[winid].diff then
+            return
+        end
+    end
+    cmd('tabclose ' .. api.nvim_tabpage_get_number(tabpage))
 end
 
 function M.zz()
