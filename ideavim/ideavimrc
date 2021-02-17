@@ -22,6 +22,8 @@ set argtextobj
 
 set ideajoin
 
+set NERDTree
+
 set surround
 unmap ds
 nmap sd <Plug>DSurround
