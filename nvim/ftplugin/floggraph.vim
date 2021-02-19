@@ -13,8 +13,8 @@ nnoremap <buffer><silent> ]r <Cmd>call flog#next_ref() <Bar> belowright Flogspli
 nnoremap <buffer><silent> [r <Cmd>call flog#previous_ref() <Bar> belowright Flogsplitcommit<CR>
 nnoremap <buffer> rl :Floggit reset <C-r>=flog#get_commit_at_line().short_commit_hash<CR>
 nnoremap <buffer> rh :Floggit reset --hard <C-r>=flog#get_commit_at_line().short_commit_hash<CR>
-nnoremap <buffer> gt :Floggit difftool -y <C-r>=flog#get_commit_at_line().short_commit_hash<CR>
-xnoremap <buffer> gt :Floggit difftool -y<Space>
+nnoremap <buffer> <leader>gt :Floggit difftool -y <C-r>=flog#get_commit_at_line().short_commit_hash<CR>
+xnoremap <buffer> <leader>gt :Floggit difftool -y<Space>
 
 function s:scroll(direction) abort
     let winnr = winnr('$')

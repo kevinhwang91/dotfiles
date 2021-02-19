@@ -50,6 +50,8 @@ local function init()
 
     map('n', '<leader>rn', '<Plug>(coc-refactor)', {})
     map('n', '<leader>ac', '<Plug>(coc-codeaction)', {})
+    map('n', '<M-CR>', '<Plug>(coc-codeaction-line)', {})
+    map('x', '<M-CR>', '<Plug>(coc-codeaction-selected)', {})
     map('n', '<leader>qf', '<Plug>(coc-fix-current)', {})
 
     map('x', '<leader>x', '<Plug>(coc-convert-snippet)', {})

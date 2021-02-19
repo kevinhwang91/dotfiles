@@ -219,6 +219,8 @@ function M.tabline()
         local bufnr = fn.winbufnr(api.nvim_tabpage_get_win(tp))
         if vim.bo[bufnr].modifiable then
             name = fn.fnamemodify(fn.bufname(bufnr), ':t')
+        else
+            name = vim.bo[bufnr].filetype
         end
         if name and name ~= '' then
             table.insert(tl, name .. ' ')

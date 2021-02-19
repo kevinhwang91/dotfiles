@@ -116,6 +116,7 @@ map('n', 'qs', '<Cmd>lcl<CR>')
 map('n', '<leader>w', '<Cmd>up<CR>')
 map('n', '<leader>;w', '<Cmd>wq<CR>')
 map('n', '<C-g>', '1<C-g>')
+map('n', '<C-w><C-t>', '<Cmd>tab split<CR>')
 map('n', '<leader>3', '<Cmd>buffer #<CR>')
 map('n', '<leader>l', ':nohlsearch<CR>')
 map('c', '<C-b>', '<Left>')
@@ -384,8 +385,8 @@ map('n', 'yss', '<Plug>Yssurround', {})
 map('n', 'ygs', '<Plug>YSsurround', {})
 map('x', 'S', '<Plug>VSurround', {})
 map('x', 'gS', '<Plug>VgSurround', {})
-map('n', '<C-S>', '<Plug>Isurround', {})
 
+-- tpope/vim-repeat
 map('n', 'U', '<Plug>(RepeatUndo)', {})
 
 -- wellle/targets.vim
