@@ -159,6 +159,8 @@ map('x', [[m']], [[m`]])
 map('n', [['0]], [[<Cmd>normal! `0<CR><Cmd>silent! CleanEmptyBuf<CR>]])
 map('n', '<leader>i', '<Cmd>silent! normal! `^<CR>')
 
+map('n', '<M-j>', '<Cmd>move +1<CR>')
+map('n', '<M-k>', '<Cmd>move -2<CR>')
 map('x', '<M-j>', [[:move '>+1<CR>gv=gv]])
 map('x', '<M-k>', [[:move '<-2<CR>gv=gv]])
 map('n', 'yd', [[<Cmd>call setreg(v:register, expand('%:p:h'))<CR>:echo expand('%:p:h')<CR>]])
@@ -578,10 +580,19 @@ g.neoformat_yaml_prettier = {
     stdin = 1
 }
 
+-- sql
+g.neoformat_enabled_sql = {'sqlformatter'}
+g.neoformat_sql_sqlformatter = {exe = 'sql-formatter', stdin = 1}
+
 api.nvim_exec([[
     augroup GoFormat
         autocmd!
         autocmd FileType go setlocal noexpandtab
+    augroup end
+
+    augroup SqlFormat
+        autocmd!
+        autocmd FileType sql setlocal tabstop=2 shiftwidth=2
     augroup end
 
     augroup MakeFileFormat
