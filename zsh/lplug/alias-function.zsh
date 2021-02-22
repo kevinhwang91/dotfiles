@@ -24,7 +24,7 @@ alias ga='git add'
 alias grm='git rm'
 alias gd='git diff'
 alias gdc='git diff --cached'
-alias gdt='git difftool --dir-diff'
+alias gdt='git difftool'
 alias glt='git log --no-walk --tags --pretty="%h %ci %d %s"'
 alias glct='git describe --tags $(git rev-list --tags --max-count=1)'
 alias grt='cd "$(git rev-parse --show-toplevel || echo .)"'
@@ -161,6 +161,7 @@ alias mux='_mux'
 _mux() {
     tmux attach $@ 2>/dev/null || tmux
 }
+
 alias rr='ranger'
 
 alias rsync-cp='rsync -avz --progress -h'
@@ -207,10 +208,24 @@ if (( $+commands[nvim] )); then
         _git-log
     }
 
+    alias ngdt='_ngdt'
+    compdef __ngdt_compdef _ngdt
+    _ngdt() {
+        git status >/dev/null && nvim +"Git difftool -y $*" +'bwipeout 1'
+    }
+    __ngdt_compdef() {
+        (( $+functions[_git-difftool] )) || _git
+        _git-difftool
+    }
+
     if (( $+commands[gdb] )); then
         alias ngdb='_ngdb'
+        compdef __ngdb_compdef _ngdb
         _ngdb() {
             nvim +"GdbStart gdb $*" +'bwipeout 1'
+        }
+        __ngdb_compdef() {
+            _gdb
         }
     fi
 
