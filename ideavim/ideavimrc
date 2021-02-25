@@ -11,6 +11,9 @@ set showmode
 set timeout
 set timeoutlen=500
 
+set ideajoin
+set idearefactormode=select
+
 let mapleader = ' '
 
 set multiple-cursors
@@ -20,9 +23,9 @@ let g:highlightedyank_highlight_duration = '800'
 
 set argtextobj
 
-set ideajoin
-
 set NERDTree
+let g:NERDTreeMapCloseDir = 'h'
+let g:NERDTreeMapOpenRecursively = 'l'
 
 set surround
 unmap ds
@@ -71,13 +74,28 @@ cnoremap <C-a> <Home>
 
 nmap <C-o> <Action>(Back)
 nmap <C-i> <Action>(Forward)
-nmap g, <Action>(JumpToLastChange)
-nmap g; <Action>(JumpToNextChange)
+nmap g; <Action>(JumpToLastChange)
+nmap g, <Action>(JumpToNextChange)
 nmap gd <Action>(GotoDeclaration)
 nmap gi <Action>(GotoImplementation)
 nmap gr <Action>(ShowUsages)
 nmap gp <Action>(GotoSuperMethod)
 nmap gy <Action>(GotoTypeDeclaration)
+
+" ge]M $[M % w o ge]M ge
+xnoremap if ge]M$[M%woge]Mge
+
+" ge]M $[M % bF)%_ o ge]M
+xnoremap af ge]M$[M%bF)%_oge]M
+
+nnoremap * my*`y
+nnoremap # my#`y
+
+xnoremap * "yy/<C-r>s<CR>N
+xnoremap # "yy?<C-r>s<CR>N
+
+nmap + <Action>(EditorSelectWord)
+xmap + <Action>(EditorSelectWord)
 
 noremap 'a `A
 noremap 'b `B
@@ -135,7 +153,10 @@ nmap m; <Action>(ToggleBookmarkWithMnemonic)
 noremap m<space> :delmarks A-Z0-9<CR>
 nmap <leader>fm <Action>(ShowBookmarks)
 
-nmap <leader>ic <Action>(Generate)
+nmap <leader>sr <Action>(SurroundWith)
+xmap <leader>sr <Action>(SurroundWith)
+nmap <leader>su <Action>(Unwrap)
+xmap <leader>su <Action>(Unwrap)
 
 nmap <leader>gb <Action>(Annotate)
 nmap <leader>gp <Action>(Vcs.QuickListPopupAction)
@@ -157,14 +178,26 @@ nmap <leader>hm <Action>(MethodHierarchy)
 nmap <leader>ht <Action>(TypeHierarchy)
 
 nmap <leader>fp <Action>(ViewBreakpoints)
-nmap <leader>ba <Action>(ToggleBreakpointAction)
-nmap <leader>bb <Action>(ToggleLineBreakpoint)
 
 nmap <leader>hp <Action>(VcsShowCurrentChangeMarker)
 nmap <leader>hu <Action>(Vcs.RollbackChangedLines)
+nmap <leader>gg <Action>(ActivateVersionControlToolWindow)
+nmap <leader>gc <Action>(CheckinProject)
+nmap <leader>gl <Action>(Vcs.Show.Log)
+nmap <leader>gf <Action>(Vcs.ShowTabbedFileHistory)
+xmap <leader>gf <Action>(Vcs.ShowHistoryForBlock)
+nmap <leader>gd <Action>(Compare.SameVersion)
+
+nmap <A-u> <Action>(LocalHistory.ShowHistory)
+xmap <A-u> <Action>(LocalHistory.ShowSelectionHistory)
+
 nmap [c <Action>(VcsShowPrevChangeMarker)
 nmap ]c <Action>(VcsShowNextChangeMarker)
 
 nmap <leader>td <Action>(ShowErrorDescription)
 nmap [d <Action>(GotoPreviousError)
 nmap ]d <Action>(GotoNextError)
+
+nmap <leader>jj <Action>(RecentLocations)
+
+nmap <leader>rg <Action>(FindInPath)
