@@ -116,9 +116,7 @@ map('n', 'qs', '<Cmd>lcl<CR>')
 map('n', '<leader>w', '<Cmd>up<CR>')
 map('n', '<leader>;w', '<Cmd>wq<CR>')
 map('n', '<C-g>', '1<C-g>')
-map('n', '<C-w><C-t>', '<Cmd>tab split<CR>')
-map('n', '<leader>3', '<Cmd>buffer #<CR>')
-map('n', '<leader>l', ':nohlsearch<CR>')
+map('n', '<leader>l', ':noh<CR>')
 map('c', '<C-b>', '<Left>')
 map('c', '<C-f>', '<Right>')
 map('c', '<C-a>', '<Home>')
@@ -128,7 +126,13 @@ map('c', '<M-b>', '<C-Left>')
 map('c', '<M-f>', '<C-Right>')
 map('c', '<CR>', [[pumvisible() ? "\<C-y>" : "\<CR>"]], {noremap = true, expr = true})
 map('t', [[<M-\>]], [[<C-\><C-n>]])
-map('n', '<C-w>O', '<Cmd>tabonly<CR>')
+
+map('n', '<C-w><C-t>', '<Cmd>tab sp<CR>')
+map('n', '<leader>3', '<Cmd>b #<CR>')
+map('n', '<C-w>s', [[<Cmd>lua require('bultin').split_lastbuf()<CR>]])
+map('n', '<C-w>v', [[<Cmd>lua require('bultin').split_lastbuf(true)<CR>]])
+map('n', '<C-w>O', '<Cmd>tabo<CR>')
+
 map('i', '<M-;>', '<END>')
 
 map('n', 's', 'd')
@@ -156,13 +160,13 @@ map('x', [[g`]], [[g']])
 map('n', [[m']], [[m`]])
 map('x', [[m']], [[m`]])
 
-map('n', [['0]], [[<Cmd>normal! `0<CR><Cmd>silent! CleanEmptyBuf<CR>]])
-map('n', '<leader>i', '<Cmd>silent! normal! `^<CR>')
+map('n', [['0]], [[<Cmd>norm! `0<CR><Cmd>sil! CleanEmptyBuf<CR>]])
+map('n', '<leader>i', '<Cmd>sil! norm! `^<CR>')
 
-map('n', '<M-j>', '<Cmd>move +1<CR>')
-map('n', '<M-k>', '<Cmd>move -2<CR>')
-map('x', '<M-j>', [[:move '>+1<CR>gv=gv]])
-map('x', '<M-k>', [[:move '<-2<CR>gv=gv]])
+map('n', '<M-j>', '<Cmd>m +1<CR>')
+map('n', '<M-k>', '<Cmd>m -2<CR>')
+map('x', '<M-j>', [[:m '>+1<CR>gv=gv]])
+map('x', '<M-k>', [[:m '<-2<CR>gv=gv]])
 map('n', 'yd', [[<Cmd>call setreg(v:register, expand('%:p:h'))<CR>:echo expand('%:p:h')<CR>]])
 map('n', 'yn', [[<Cmd>call setreg(v:register, expand('%:t'))<CR>:echo expand('%:t')<CR>]])
 map('n', 'yp', [[<Cmd>call setreg(v:register, expand('%:p'))<CR>:echo expand('%:p')<CR>]])
@@ -172,16 +176,16 @@ map('n', '[', [[v:lua._G.prefix_timeout('[')]], {noremap = true, expr = true})
 map('x', '[', [[v:lua._G.prefix_timeout('[')]], {noremap = true, expr = true})
 map('n', ']', [[v:lua._G.prefix_timeout(']')]], {noremap = true, expr = true})
 map('x', ']', [[v:lua._G.prefix_timeout(']')]], {noremap = true, expr = true})
-map('n', '[b', '<Cmd>bprevious<CR>')
-map('n', ']b', '<Cmd>bnext<CR>')
+map('n', '[b', '<Cmd>bp<CR>')
+map('n', ']b', '<Cmd>bn<CR>')
 map('n', '[q', [[<Cmd>execute(v:count1 . 'cprevious')<CR>]])
 map('n', ']q', [[<Cmd>execute(v:count1 . 'cnext')<CR>]])
-map('n', '[Q', '<Cmd>cfirst<CR>')
-map('n', ']Q', '<Cmd>clast<CR>')
+map('n', '[Q', '<Cmd>cfir<CR>')
+map('n', ']Q', '<Cmd>cla<CR>')
 map('n', '[s', [[<Cmd>execute(v:count1 . 'lprevious')<CR>]])
 map('n', ']s', [[<Cmd>execute(v:count1 . 'lnext')<CR>]])
-map('n', '[S', '<Cmd>lfirst<CR>')
-map('n', ']S', '<Cmd>llast<CR>')
+map('n', '[S', '<Cmd>lfir<CR>')
+map('n', ']S', '<Cmd>lla<CR>')
 map('n', '[z', '[z_')
 map('x', '[z', '[z_')
 map('n', ']z', ']z_')
@@ -199,8 +203,8 @@ map('x', 'zZ', [[<Cmd>lua require('kutils').zz()<CR>]])
 map('n', 'z[', [[<Cmd>lua require('kutils').nav_fold(false, vim.v.count1)<CR>]])
 map('n', 'z]', [[<Cmd>lua require('kutils').nav_fold(true, vim.v.count1)<CR>]])
 
-map('x', 'iz', [[:<C-U>normal [zv]zg_<CR>]])
-map('o', 'iz', [[:normal viz<CR>]])
+map('x', 'iz', [[:<C-U>norm [zv]zg_<CR>]])
+map('o', 'iz', [[:norm viz<CR>]])
 
 -- https://github.com/neovim/neovim/issues/13862
 function _G.prefix_timeout(prefix)
@@ -265,10 +269,8 @@ vim.api.nvim_exec([[
 pcall(cmd, 'colorscheme one')
 
 -- kevinhwang91/nvim-hlslens
-map('n', 'n',
-    [[<Cmd>execute('normal! ' . v:count1 . 'n')<CR><Cmd>lua require('hlslens').start()<CR>]])
-map('n', 'N',
-    [[<Cmd>execute('normal! ' . v:count1 . 'N')<CR><Cmd>lua require('hlslens').start()<CR>]])
+map('n', 'n', [[<Cmd>execute('norm! ' . v:count1 . 'n')<CR><Cmd>lua require('hlslens').start()<CR>]])
+map('n', 'N', [[<Cmd>execute('norm! ' . v:count1 . 'N')<CR><Cmd>lua require('hlslens').start()<CR>]])
 
 api.nvim_exec([[
     augroup VMlens
@@ -288,6 +290,7 @@ g.rnvimr_ranger_views = {
     {minwidth = 90, ratio = {}}, {minwidth = 50, maxwidth = 89, ratio = {1, 1}},
     {maxwidth = 49, ratio = {1}}
 }
+g.rnvimr_action = {['<CR>'] = 'NvimEdit tabedit'}
 cmd('highlight link RnvimrNormal CursorLine')
 map('t', '<M-i>', [[<C-\><C-n><Cmd>RnvimrResize<CR>]])
 map('t', '<M-o>', [[<C-\><C-n><Cmd>RnvimrToggle<CR>]])
@@ -519,7 +522,6 @@ map('x', '<leader>gL', '<Plug>(gh-line)', {})
 -- airblade/vim-gitgutter
 g.gitgutter_highlight_linenrs = 1
 g.gitgutter_signs = 0
-g.gitgutter_max_signs = 9999
 g.gitgutter_map_keys = 0
 map('n', '<leader>hp', '<Plug>(GitGutterPreviewHunk)', {})
 map('n', '<leader>hs', '<Plug>(GitGutterStageHunk)', {})
@@ -699,7 +701,7 @@ api.nvim_exec([[
     augroup END
 ]], false)
 
-cmd([[command! Jumps lua require('jumplist').jumps2qf()]])
+cmd([[command! Jumps lua require('bultin').jumps2qf()]])
 
 map('n', '<leader>jj', '<Cmd>Jumps<CR>')
 

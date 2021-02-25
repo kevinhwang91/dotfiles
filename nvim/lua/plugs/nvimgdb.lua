@@ -45,6 +45,8 @@ function M.manual_init(args)
         cmd('source ' .. vim.g.loaded_remote_plugins)
         fn['GdbInit'](unpack(args))
     end)
+
+    M.manual_init = nil
 end
 
 -- alacritty has remaped Control-([1-9]|[0]) to Control-[F1-F10] (F25-F34)
@@ -83,7 +85,7 @@ function M.unset_keymaps()
 end
 
 function M.set_tkeymaps()
-    bmap('t', '<C-t>', [[<C-\><C-n>:wincmd p<CR>]])
+    bmap('t', '<C-t>', [[<C-\><C-n>:winc p<CR>]])
 end
 
 function M.start()

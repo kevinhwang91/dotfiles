@@ -1,6 +1,7 @@
 {
 	"coc.preferences.useQuickfixForLocations": false,
 	"coc.preferences.extensionUpdateCheck": "weekly",
+	"suggest.noselect": false,
 	"diagnostic.maxWindowWidth": 100,
 	"diagnostic.signPriority": 20,
 	"diagnostic.errorSign": "",
@@ -63,6 +64,7 @@
 	"yaml.completion": true,
 	"snippets.enableStatusItem": false,
 	"snippets.ultisnips.enable": false,
+	"snippets.snipmate.enable": false,
 	"diagnostic-languageserver.filetypes": {
 		"sh": "shellcheck",
 		"python": "pylint"

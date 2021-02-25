@@ -6,7 +6,7 @@ nmap <buffer> U <Plug>(FlogUpdate)
 nmap <buffer> o <Plug>(FlogVSplitCommitRight)
 nmap <buffer> ]R <Plug>(FlogVNextRefRight)
 nmap <buffer> [R <Plug>(FlogVPrevRefRight)
-nnoremap <buffer><silent> <CR> <Cmd>belowright Flogsplitcommit<CR>
+nnoremap <buffer><silent> <CR> <Cmd>bel Flogsplitcommit<CR>
 nnoremap <buffer><silent> <C-n> <Cmd>call flog#next_commit() <Bar> belowright Flogsplitcommit<CR>
 nnoremap <buffer><silent> <C-p> <Cmd>call flog#previous_commit() <Bar> belowright Flogsplitcommit<CR>
 nnoremap <buffer><silent> ]r <Cmd>call flog#next_ref() <Bar> belowright Flogsplitcommit<CR>
@@ -20,17 +20,17 @@ function s:scroll(direction) abort
     let winnr = winnr('$')
     if winnr < 2
         if a:direction
-            execute "normal! \<C-f>"
+            execute "norm! \<C-f>"
         else
-            execute "normal! \<C-b>"
+            execute "norm! \<C-b>"
         endif
         return
     endif
     noautocmd wincmd p
     if a:direction
-        execute "normal! \<C-d>"
+        execute "norm! \<C-d>"
     else
-        execute "normal! \<C-u>"
+        execute "norm! \<C-u>"
     endif
     noautocmd wincmd p
 endfunction

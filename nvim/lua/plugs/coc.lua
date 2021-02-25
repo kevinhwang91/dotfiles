@@ -17,10 +17,10 @@ local function init()
     augroup Coc
         autocmd!
         autocmd User CocLocationsChange ++nested lua require('plugs.coc').jump2loc()
-        autocmd CursorHold * silent! call CocActionAsync('highlight', '', v:lua.require('plugs.coc').hl_fallback)
+        autocmd CursorHold * sil! call CocActionAsync('highlight', '', v:lua.require('plugs.coc').hl_fallback)
         autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
         autocmd VimLeavePre * if get(g:, 'coc_process_pid', 0) | call system('kill -9 -- -' . g:coc_process_pid) | endif
-        autocmd InsertCharPre * ++once call CocAction('activeExtension', 'coc-snippets')
+        autocmd InsertCharPre * lua require('plugs.coc').enable_ultisnips()
     augroup END]], false)
 
     cmd('highlight link CocHighlightText CurrentWord')
@@ -54,7 +54,8 @@ local function init()
     map('x', '<M-CR>', '<Plug>(coc-codeaction-selected)', {})
     map('n', '<leader>qf', '<Plug>(coc-fix-current)', {})
 
-    map('x', '<leader>x', '<Plug>(coc-convert-snippet)', {})
+    map('x', '<leader>sr', [[<Cmd>lua require('plugs.coc').enable_ultisnips()<CR><Plug>(coc-snippets-select)]], {})
+    map('x', '<leader>sx', '<Plug>(coc-convert-snippet)', {})
 
     cmd([[command! -nargs=0 OR call CocAction('runCommand', 'editor.action.organizeImport')]])
     map('n', '<leader>qi', '<Cmd>OR<CR>')
@@ -63,6 +64,13 @@ local function init()
 
     cmd([[command! -nargs=0 ClangdSH call CocAction('runCommand', 'clangd.switchSourceHeader')]])
     map('n', '<leader>sh', '<Cmd>ClangdSH<CR>')
+end
+
+function M.enable_ultisnips()
+    fn.CocAction('activeExtension', 'coc-snippets')
+    map('x', '<leader>sr', '<Plug>(coc-snippets-select)', {})
+    cmd('autocmd! Coc InsertCharPre *')
+    M.enable_ultisnips = nil
 end
 
 function M.go2def()
@@ -90,7 +98,7 @@ function M.go2def()
         end
     end
     if api.nvim_get_current_buf() ~= cur_bufnr then
-        cmd('normal! zz')
+        cmd('norm! zz')
     end
 end
 
@@ -100,7 +108,7 @@ function M.show_documentation()
     elseif api.nvim_exec([[echo CocAction('hasProvider', 'hover')]], true) == 'v:true' then
         fn['CocActionAsync']('doHover')
     else
-        cmd('normal! K')
+        cmd('norm! K')
     end
 end
 

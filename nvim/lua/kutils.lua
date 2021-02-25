@@ -39,36 +39,36 @@ end
 function M.zz()
     local lnum1, lcount = api.nvim_win_get_cursor(0)[1], api.nvim_buf_line_count(0)
     if lnum1 == lcount then
-        fn.execute(string.format('keepjumps normal! %dzb', lnum1))
+        fn.execute(string.format('keepj norm! %dzb', lnum1))
         return
     end
-    cmd('normal! zvzz')
+    cmd('norm! zvzz')
     lnum1 = api.nvim_win_get_cursor(0)[1]
-    cmd('normal! L')
+    cmd('norm! L')
     local lnum2 = api.nvim_win_get_cursor(0)[1]
     if lnum2 + fn.getwinvar(0, '&scrolloff') >= lcount then
-        fn.execute(string.format('keepjumps normal! %dzb', lnum2))
+        fn.execute(string.format('keepj norm! %dzb', lnum2))
     end
     if lnum1 ~= lnum2 then
-        cmd('keepjumps normal! ``')
+        cmd('keepj norm! ``')
     end
 end
 
 function M.nav_fold(forward, cnt)
     local wv = fn.winsaveview()
-    cmd([[normal! m']])
+    cmd([[norm! m']])
     local cur_l, cur_c
     while cnt > 0 do
         if forward then
-            cmd('keepjumps normal! ]z')
+            cmd('keepj norm! ]z')
         else
-            cmd('keepjumps normal! zk')
+            cmd('keepj norm! zk')
         end
         cur_l, cur_c = unpack(api.nvim_win_get_cursor(0))
         if forward then
-            cmd('keepjumps normal! zj_')
+            cmd('keepj norm! zj_')
         else
-            cmd('keepjumps normal! [z_')
+            cmd('keepj norm! [z_')
         end
         cnt = cnt - 1
     end
@@ -77,7 +77,7 @@ function M.nav_fold(forward, cnt)
     if cur_l == cur_l1 and cur_c == cur_c1 then
         fn.winrestview(wv)
     else
-        cmd([[normal! m']])
+        cmd([[norm! m']])
     end
 end
 
