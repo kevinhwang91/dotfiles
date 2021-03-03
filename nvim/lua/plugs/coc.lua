@@ -54,7 +54,8 @@ local function init()
     map('x', '<M-CR>', '<Plug>(coc-codeaction-selected)', {})
     map('n', '<leader>qf', '<Plug>(coc-fix-current)', {})
 
-    map('x', '<leader>sr', [[<Cmd>lua require('plugs.coc').enable_ultisnips()<CR><Plug>(coc-snippets-select)]], {})
+    map('x', '<leader>sr',
+        [[<Cmd>lua require('plugs.coc').enable_ultisnips()<CR><Plug>(coc-snippets-select)]], {})
     map('x', '<leader>sx', '<Plug>(coc-convert-snippet)', {})
 
     cmd([[command! -nargs=0 OR call CocAction('runCommand', 'editor.action.organizeImport')]])

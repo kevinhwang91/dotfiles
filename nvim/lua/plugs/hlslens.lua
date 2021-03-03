@@ -14,10 +14,11 @@ local override_line_lens = function(lnum, loc, idx, r_idx, count, hls_ns)
         chunks = {{' ', 'Ignore'}, {text, 'HlSearchLensCur'}}
     end
     vim.api.nvim_buf_clear_namespace(0, -1, lnum - 1, lnum)
-    vim.api.nvim_buf_set_virtual_text(0, hls_ns, lnum - 1, chunks, {})
+    vim.api.nvim_buf_set_extmark(0, hls_ns, lnum - 1, -1, {virt_text = chunks})
 end
 
 function M.vmlens_start()
+    vim.api.nvim_buf_set_keymap(0, 'n', 'n', '<C-n>', {silent = true})
     if not hlslens then
         return
     end
@@ -29,10 +30,10 @@ function M.vmlens_start()
         hlslens.disable()
     end
     hlslens.start()
-
 end
 
 function M.vmlens_exit()
+    vim.api.nvim_buf_del_keymap(0, 'n', 'n')
     if not hlslens then
         return
     end

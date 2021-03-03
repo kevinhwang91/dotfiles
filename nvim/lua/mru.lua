@@ -4,7 +4,7 @@ local fn = vim.fn
 local cmd = vim.cmd
 
 local disk_file = vim.env.HOME .. '/.mru_file'
-local tmp_file = '/tmp/mru_file'
+local tmp_file = '/tmp/' .. vim.env.USER .. '_mru_file'
 local max = 1000
 local count = 0
 
