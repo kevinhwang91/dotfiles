@@ -193,6 +193,16 @@ alias vmst='vmstat -SM 1'
 alias iost='iostat -y -d -h -t 1'
 
 if (( $+commands[nvim] )); then
+    alias nrg='_nrg'
+    compdef __nrg_compdef _nrg
+    _nrg() {
+        opts=$(printf '%q ' "$@")
+        nvim +"Grepper -noprompt -dir cwd -grepprg rg $opts -H --no-heading --vimgrep -C0 --color=never"
+    }
+    __nrg_compdef() {
+        _rg
+    }
+
     alias ng='_ng'
     _ng() {
         git status >/dev/null && nvim +Git +'wincmd o' +'bwipeout #'
