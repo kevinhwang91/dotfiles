@@ -290,7 +290,6 @@ g.rnvimr_ranger_views = {
     {minwidth = 90, ratio = {}}, {minwidth = 50, maxwidth = 89, ratio = {1, 1}},
     {maxwidth = 49, ratio = {1}}
 }
-g.rnvimr_action = {['<CR>'] = 'NvimEdit tabedit'}
 cmd('highlight link RnvimrNormal CursorLine')
 map('t', '<M-i>', [[<C-\><C-n><Cmd>RnvimrResize<CR>]])
 map('t', '<M-o>', [[<C-\><C-n><Cmd>RnvimrToggle<CR>]])

@@ -1,7 +1,6 @@
 {
 	"coc.preferences.useQuickfixForLocations": false,
 	"coc.preferences.extensionUpdateCheck": "weekly",
-	"suggest.noselect": false,
 	"diagnostic.maxWindowWidth": 100,
 	"diagnostic.signPriority": 20,
 	"diagnostic.errorSign": "",

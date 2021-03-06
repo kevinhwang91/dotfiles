@@ -32,6 +32,7 @@ local function init()
         cmd([[autocmd Mru FocusGained * lua require('mru').write2ram()]])
     end
 end
+
 local function list(file)
     local mru_list = {}
     local fd = io.open(file, 'r')
