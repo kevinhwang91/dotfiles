@@ -23,23 +23,33 @@ _fishy_path() {
         result+=/$part
         shift tree
     done
-    print ${result:-/}
+    print -n ${result:-/}
 }
 
-_path_color() {
+_prompt_path() {
+    if (( TMUX_CP_PROMPT)); then
+        print -n %U
+    fi
+
     if [[ -z $SSH_CONNECTION ]]; then
-        print %F{012}
+        print -n %F{012}
     else
-        print %F{013}
+        print -n %F{013}
+    fi
+
+    _fishy_path
+
+    if (( TMUX_CP_PROMPT)); then
+        print -n %u
     fi
 }
 
 _py_virtual_env () {
     if [[ -n $VIRTUAL_ENV ]]; then
-        print "%F{005}${VIRTUAL_ENV:t} "
+        print -n "%F{005}${VIRTUAL_ENV:t} "
     fi
 }
 
 export VIRTUAL_ENV_DISABLE_PROMPT=1
-PROMPT='%B%(?.%F{002}✔ .%F{001}✘ )$(_py_virtual_env)$(_path_color)$(_fishy_path)\
+PROMPT='%B%(?.%F{002}✔ .%F{001}✘ )$(_py_virtual_env)$(_prompt_path)\
  %(1j.%F{003}[%j] .)%(2L.%F{006}(%L) .)%f%b'
