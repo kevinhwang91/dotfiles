@@ -18,7 +18,7 @@ let mapleader = ' '
 
 set multiple-cursors
 set highlightedyank
-let g:highlightedyank_highlight_color = 'rgba(209, 154, 102, 100)'
+let g:highlightedyank_highlight_color = 'rgba(209, 154, 102, 155)'
 let g:highlightedyank_highlight_duration = '800'
 
 set argtextobj
@@ -62,10 +62,13 @@ nnoremap q <Nop>
 nnoremap qq <C-w>c
 nnoremap qa :qa<CR>
 
+nnoremap <C-w>v :vs<CR>:e #<CR>
+nnoremap <C-w>s :sp<CR>:e #<CR>
+
 nnoremap - "_
 xnoremap - "_
-nnoremap <leader>3 :edit #<CR>
-nnoremap <leader>l :nohlsearch<CR>
+nnoremap <leader>3 :e #<CR>
+nnoremap <leader>l :noh<CR>
 nnoremap Y y$
 
 cnoremap <C-b> <Left>
@@ -82,17 +85,21 @@ nmap gr <Action>(ShowUsages)
 nmap gp <Action>(GotoSuperMethod)
 nmap gy <Action>(GotoTypeDeclaration)
 
+nmap [s <Action>(PreviousOccurence)
+nmap ]s <Action>(NextOccurence)
+
 " ge]M $[M % w o ge]M ge
 xnoremap if ge]M$[M%woge]Mge
 
 " ge]M $[M % bF)%_ o ge]M
 xnoremap af ge]M$[M%bF)%_oge]M
 
-nnoremap * my*`y
-nnoremap # my#`y
+" bug: /\< or /\\< can't work
+nnoremap * my"yyiwge/<C-r>y\><CR><CR>`y
+nnoremap # my"yyiww?<C-r>y\><CR><CR>`y
 
-xnoremap * "yy/<C-r>s<CR>N
-xnoremap # "yy?<C-r>s<CR>N
+xnoremap * my"yyge/\V<C-r>y<CR><CR>`y
+xnoremap # my"yyw?\V<C-r>y<CR><CR>`y
 
 nmap + <Action>(EditorSelectWord)
 xmap + <Action>(EditorSelectWord)
@@ -150,7 +157,7 @@ noremap mx mX
 noremap my mY
 noremap mz mZ
 nmap m; <Action>(ToggleBookmarkWithMnemonic)
-noremap m<space> :delmarks A-Z0-9<CR>
+noremap <leader>dm :delm A-Z0-9<CR>
 nmap <leader>fm <Action>(ShowBookmarks)
 
 nmap <leader>sr <Action>(SurroundWith)
@@ -166,12 +173,11 @@ nmap <leader>rf <Action>(RenameFile)
 nmap <leader>rn <Action>(RenameElement)
 
 nmap <leader>fa <Action>(GotoAction)
-nmap <leader>fc <Action>(GotoClass)
+nmap <leader>fk <Action>(GotoClass)
 nmap <leader>ff <Action>(GotoFile)
 nmap <leader>fs <Action>(GotoSymbol)
-
 nmap <leader>ft <Action>(FileStructurePopup)
-nmap <leader>fu <Action>(FindUsages)
+nmap <leader>fu <Action>(ShowRecentFindUsagesGroup)
 
 nmap <leader>hc <Action>(CallHierarchy)
 nmap <leader>hm <Action>(MethodHierarchy)
