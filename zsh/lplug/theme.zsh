@@ -53,3 +53,5 @@ _py_virtual_env () {
 export VIRTUAL_ENV_DISABLE_PROMPT=1
 PROMPT='%B%(?.%F{002}✔ .%F{001}✘ )$(_py_virtual_env)$(_prompt_path)\
  %(1j.%F{003}[%j] .)%(2L.%F{006}(%L) .)%f%b'
+
+PROMPT_EOL_MARK='%B%S%(!.#. )%s%b'

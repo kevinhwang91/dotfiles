@@ -157,10 +157,7 @@ alias pyhp='python -m http.server'
 alias ipy='ipython'
 alias pluo='pip list --user --outdated --format=freeze'
 
-alias mux='_mux'
-_mux() {
-    tmux attach $@ 2>/dev/null || tmux
-}
+alias mux="tmux new -A -s $USER"
 
 alias rr='ranger'
 
