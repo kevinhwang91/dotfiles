@@ -67,8 +67,8 @@ nnoremap <C-w>s :sp<CR>:e #<CR>
 
 nnoremap - "_
 xnoremap - "_
-nnoremap <leader>3 :e #<CR>
-nnoremap <leader>l :noh<CR>
+nnoremap <Leader>3 :e #<CR>
+nnoremap <Leader>l :noh<CR>
 nnoremap Y y$
 
 cnoremap <C-b> <Left>
@@ -85,14 +85,21 @@ nmap gr <Action>(ShowUsages)
 nmap gp <Action>(GotoSuperMethod)
 nmap gy <Action>(GotoTypeDeclaration)
 
+nmap % <Action>(EditorMatchBrace)
+xmap % <Action>(EditorMatchBrace)<Esc>gv
+
+nmap + <Action>(EditorSelectWord)
+xmap + <Action>(EditorSelectWord)
+
 nmap [s <Action>(PreviousOccurence)
 nmap ]s <Action>(NextOccurence)
 
+nmap [m <Action>(MethodUp)
+nmap ]m <Action>(MethodDown)
+
 " ge]M $[M % w o ge]M ge
 xnoremap if ge]M$[M%woge]Mge
-
-" ge]M $[M % bF)%_ o ge]M
-xnoremap af ge]M$[M%bF)%_oge]M
+xmap af ge]M$[M%oge]M<Action>(EditorSelectWord)
 
 " bug: /\< or /\\< can't work
 nnoremap * my"yyiwge/<C-r>y\><CR><CR>`y
@@ -100,9 +107,6 @@ nnoremap # my"yyiww?<C-r>y\><CR><CR>`y
 
 xnoremap * my"yyge/\V<C-r>y<CR><CR>`y
 xnoremap # my"yyw?\V<C-r>y<CR><CR>`y
-
-nmap + <Action>(EditorSelectWord)
-xmap + <Action>(EditorSelectWord)
 
 noremap 'a `A
 noremap 'b `B
@@ -157,42 +161,42 @@ noremap mx mX
 noremap my mY
 noremap mz mZ
 nmap m; <Action>(ToggleBookmarkWithMnemonic)
-noremap <leader>dm :delm A-Z0-9<CR>
-nmap <leader>fm <Action>(ShowBookmarks)
+noremap <Leader>dm :delm A-Z0-9<CR>
+nmap <Leader>fm <Action>(ShowBookmarks)
 
-nmap <leader>sr <Action>(SurroundWith)
-xmap <leader>sr <Action>(SurroundWith)
-nmap <leader>su <Action>(Unwrap)
-xmap <leader>su <Action>(Unwrap)
+nmap <Leader>sr <Action>(SurroundWith)
+xmap <Leader>sr <Action>(SurroundWith)
+nmap <Leader>su <Action>(Unwrap)
+xmap <Leader>su <Action>(Unwrap)
 
-nmap <leader>gb <Action>(Annotate)
-nmap <leader>gp <Action>(Vcs.QuickListPopupAction)
-nmap <leader>gm <Action>(Vcs.ShowHistoryForBlock)
+nmap <Leader>gb <Action>(Annotate)
+nmap <Leader>gp <Action>(Vcs.QuickListPopupAction)
+nmap <Leader>gm <Action>(Vcs.ShowHistoryForBlock)
 
-nmap <leader>rf <Action>(RenameFile)
-nmap <leader>rn <Action>(RenameElement)
+nmap <Leader>rf <Action>(RenameFile)
+nmap <Leader>rn <Action>(RenameElement)
 
-nmap <leader>fa <Action>(GotoAction)
-nmap <leader>fk <Action>(GotoClass)
-nmap <leader>ff <Action>(GotoFile)
-nmap <leader>fs <Action>(GotoSymbol)
-nmap <leader>ft <Action>(FileStructurePopup)
-nmap <leader>fu <Action>(ShowRecentFindUsagesGroup)
+nmap <Leader>fa <Action>(GotoAction)
+nmap <Leader>fk <Action>(GotoClass)
+nmap <Leader>ff <Action>(GotoFile)
+nmap <Leader>fs <Action>(GotoSymbol)
+nmap <Leader>ft <Action>(FileStructurePopup)
+nmap <Leader>fu <Action>(ShowRecentFindUsagesGroup)
 
-nmap <leader>hc <Action>(CallHierarchy)
-nmap <leader>hm <Action>(MethodHierarchy)
-nmap <leader>ht <Action>(TypeHierarchy)
+nmap <Leader>hc <Action>(CallHierarchy)
+nmap <Leader>hm <Action>(MethodHierarchy)
+nmap <Leader>ht <Action>(TypeHierarchy)
 
-nmap <leader>fp <Action>(ViewBreakpoints)
+nmap <Leader>fp <Action>(ViewBreakpoints)
 
-nmap <leader>hp <Action>(VcsShowCurrentChangeMarker)
-nmap <leader>hu <Action>(Vcs.RollbackChangedLines)
-nmap <leader>gg <Action>(ActivateVersionControlToolWindow)
-nmap <leader>gc <Action>(CheckinProject)
-nmap <leader>gl <Action>(Vcs.Show.Log)
-nmap <leader>gf <Action>(Vcs.ShowTabbedFileHistory)
-xmap <leader>gf <Action>(Vcs.ShowHistoryForBlock)
-nmap <leader>gd <Action>(Compare.SameVersion)
+nmap <Leader>hp <Action>(VcsShowCurrentChangeMarker)
+nmap <Leader>hu <Action>(Vcs.RollbackChangedLines)
+nmap <Leader>gg <Action>(ActivateVersionControlToolWindow)
+nmap <Leader>gc <Action>(CheckinProject)
+nmap <Leader>gl <Action>(Vcs.Show.Log)
+nmap <Leader>gf <Action>(Vcs.ShowTabbedFileHistory)
+xmap <Leader>gf <Action>(Vcs.ShowHistoryForBlock)
+nmap <Leader>gd <Action>(Compare.SameVersion)
 
 nmap <A-u> <Action>(LocalHistory.ShowHistory)
 xmap <A-u> <Action>(LocalHistory.ShowSelectionHistory)
@@ -200,10 +204,10 @@ xmap <A-u> <Action>(LocalHistory.ShowSelectionHistory)
 nmap [c <Action>(VcsShowPrevChangeMarker)
 nmap ]c <Action>(VcsShowNextChangeMarker)
 
-nmap <leader>td <Action>(ShowErrorDescription)
+nmap <Leader>td <Action>(ShowErrorDescription)
 nmap [d <Action>(GotoPreviousError)
 nmap ]d <Action>(GotoNextError)
 
-nmap <leader>jj <Action>(RecentLocations)
+nmap <Leader>jj <Action>(RecentLocations)
 
-nmap <leader>rg <Action>(FindInPath)
+nmap <Leader>rg <Action>(FindInPath)
