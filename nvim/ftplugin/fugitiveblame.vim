@@ -1,1 +1,1 @@
-setlocal nocursorline
+setl nocursorline

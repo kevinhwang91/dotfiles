@@ -10,13 +10,13 @@ local anyfold_prefer_ft = {'python'}
 
 local function init()
     api.nvim_exec([[
-        augroup FoldLoad
-            autocmd!
-            autocmd FileType * lua require('plugs.fold').defer_load()
-        augroup END
+        aug FoldLoad
+            au!
+            au FileType * lua require('plugs.fold').defer_load()
+        aug END
     ]], false)
 
-    cmd([[command! -nargs=0 Fold lua require('plugs.fold').do_fold()]])
+    cmd([[com! -nargs=0 Fold lua require('plugs.fold').do_fold()]])
     _G.foldtext = M.foldtext
     M.defer_load()
 end
@@ -75,7 +75,7 @@ function M.defer_load()
         if cur_bufnr == bufnr then
             M.do_fold()
         elseif api.nvim_buf_is_valid(bufnr) then
-            cmd(string.format('autocmd FoldLoad BufEnter <buffer=%d> ++once %s', bufnr,
+            cmd(string.format('au FoldLoad BufEnter <buffer=%d> ++once %s', bufnr,
                 [[lua require('plugs.fold').do_fold()]]))
         end
     end, 1500)

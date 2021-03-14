@@ -19,13 +19,13 @@ function M.manual_init(args)
         unset_keymaps = 'GdbUnsetKeymaps',
         set_tkeymaps = 'GdbSetTKeymaps'
     }
-    map('n', '<leader>dd', ':GdbStart gdb -q<Space>')
-    map('n', '<leader>dp', ':GdbStartPDB python -m pdb<Space>')
+    map('n', '<Leader>dd', ':GdbStart gdb -q<Space>')
+    map('n', '<Leader>dp', ':GdbStartPDB python -m pdb<Space>')
 
     api.nvim_exec([[
-        augroup NvimGdb
-            autocmd User NvimGdbStart lua require('plugs.nvimgdb').start()
-        augroup end
+        aug NvimGdb
+            au User NvimGdbStart lua require('plugs.nvimgdb').start()
+        aug end
 
         function! GdbSetKeymaps()
             call v:lua.require('plugs.nvimgdb').set_keymaps()
@@ -41,8 +41,8 @@ function M.manual_init(args)
     ]], false)
 
     vim.schedule(function()
-        cmd('delfunction! GdbInit')
-        cmd('source ' .. vim.g.loaded_remote_plugins)
+        cmd('delf! GdbInit')
+        cmd('so ' .. vim.g.loaded_remote_plugins)
         fn['GdbInit'](unpack(args))
     end)
 
@@ -65,7 +65,7 @@ function M.set_keymaps()
     bmap('n', '<F34>', '<Cmd>GdbBreakpointToggle<CR>')
     bmap('n', '<C-P>', '<Cmd>GdbFrameUp<CR>')
     bmap('n', '<C-N>', '<Cmd>GdbFrameDown<CR>')
-    bmap('n', '<leader>wl', '<Cmd>GdbCreateWatch info locals<CR>')
+    bmap('n', '<Leader>wl', '<Cmd>GdbCreateWatch info locals<CR>')
 end
 
 function M.unset_keymaps()
@@ -81,7 +81,7 @@ function M.unset_keymaps()
     bunmap('', '<F34>')
     bunmap('', '<C-P>')
     bunmap('', '<C-N>')
-    bunmap('', '<leader>wl')
+    bunmap('', '<Leader>wl')
 end
 
 function M.set_tkeymaps()

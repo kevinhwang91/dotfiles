@@ -14,16 +14,16 @@ local function init()
         {library = {[vim.env.VIMRUNTIME .. '/lua'] = true}})
 
     api.nvim_exec([[
-    augroup Coc
-        autocmd!
-        autocmd User CocLocationsChange ++nested lua require('plugs.coc').jump2loc()
-        autocmd CursorHold * sil! call CocActionAsync('highlight', '', v:lua.require('plugs.coc').hl_fallback)
-        autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
-        autocmd VimLeavePre * if get(g:, 'coc_process_pid', 0) | call system('kill -9 -- -' . g:coc_process_pid) | endif
-        autocmd InsertCharPre * lua require('plugs.coc').enable_ultisnips()
-    augroup END]], false)
+    aug Coc
+        au!
+        au User CocLocationsChange ++nested lua require('plugs.coc').jump2loc()
+        au CursorHold * sil! call CocActionAsync('highlight', '', v:lua.require('plugs.coc').hl_fallback)
+        au User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
+        au VimLeavePre * if get(g:, 'coc_process_pid', 0) | call system('kill -9 -- -' . g:coc_process_pid) | endif
+        au InsertCharPre * lua require('plugs.coc').enable_ultisnips()
+    aug END]], false)
 
-    cmd('highlight link CocHighlightText CurrentWord')
+    cmd('hi link CocHighlightText CurrentWord')
 
     local map_opt = {noremap = true, silent = true, expr = true}
     map('i', '<C-space>', 'coc#refresh()', map_opt)
@@ -48,29 +48,29 @@ local function init()
 
     map('n', 'K', [[<Cmd>lua require('plugs.coc').show_documentation()<CR>]])
 
-    map('n', '<leader>rn', '<Plug>(coc-refactor)', {})
-    map('n', '<leader>ac', '<Plug>(coc-codeaction)', {})
+    map('n', '<Leader>rn', '<Plug>(coc-refactor)', {})
+    map('n', '<Leader>ac', '<Plug>(coc-codeaction)', {})
     map('n', '<M-CR>', '<Plug>(coc-codeaction-line)', {})
     map('x', '<M-CR>', '<Plug>(coc-codeaction-selected)', {})
-    map('n', '<leader>qf', '<Plug>(coc-fix-current)', {})
+    map('n', '<Leader>qf', '<Plug>(coc-fix-current)', {})
 
-    map('x', '<leader>sr',
+    map('x', '<Leader>sr',
         [[<Cmd>lua require('plugs.coc').enable_ultisnips()<CR><Plug>(coc-snippets-select)]], {})
-    map('x', '<leader>sx', '<Plug>(coc-convert-snippet)', {})
+    map('x', '<Leader>sx', '<Plug>(coc-convert-snippet)', {})
 
-    cmd([[command! -nargs=0 OR call CocAction('runCommand', 'editor.action.organizeImport')]])
-    map('n', '<leader>qi', '<Cmd>OR<CR>')
+    cmd([[com! -nargs=0 OR call CocAction('runcom', 'editor.action.organizeImport')]])
+    map('n', '<Leader>qi', '<Cmd>OR<CR>')
     map('n', '<M-q>', [[<Cmd>echo CocAction('getCurrentFunctionSymbol')<CR>]])
-    map('n', '<leader>qd', [[<Cmd>lua require('plugs.coc').diagnostic()<CR>]])
+    map('n', '<Leader>qd', [[<Cmd>lua require('plugs.coc').diagnostic()<CR>]])
 
-    cmd([[command! -nargs=0 ClangdSH call CocAction('runCommand', 'clangd.switchSourceHeader')]])
-    map('n', '<leader>sh', '<Cmd>ClangdSH<CR>')
+    cmd([[com! -nargs=0 ClangdSH call CocAction('runcom', 'clangd.switchSourceHeader')]])
+    map('n', '<Leader>sh', '<Cmd>ClangdSH<CR>')
 end
 
 function M.enable_ultisnips()
     fn.CocAction('activeExtension', 'coc-snippets')
-    map('x', '<leader>sr', '<Plug>(coc-snippets-select)', {})
-    cmd('autocmd! Coc InsertCharPre *')
+    map('x', '<Leader>sr', '<Plug>(coc-snippets-select)', {})
+    cmd('au! Coc InsertCharPre *')
     M.enable_ultisnips = nil
 end
 
@@ -88,9 +88,9 @@ function M.go2def()
             if def_size > 1 then
                 api.nvim_set_current_buf(cur_bufnr)
                 fn.winrestview(wv)
-                cmd('aboveleft lwindow')
+                cmd('abo lw')
             elseif def_size == 1 then
-                cmd('lclose')
+                cmd('lcl')
                 fn.search(cword, 'c')
             end
         end) then
@@ -128,7 +128,7 @@ function M.diagnostic()
         items = items,
         context = {bqf = {lsp_ranges_hl = loc_ranges}}
     })
-    cmd('botright copen')
+    cmd('bo cope')
 end
 
 function M.jump2loc(locs)
@@ -143,7 +143,7 @@ function M.jump2loc(locs)
     })
     local winid = fn.getloclist(0, {winid = 0}).winid
     if winid == 0 then
-        cmd('aboveleft lwindow')
+        cmd('abo lw')
     else
         api.nvim_set_current_win(winid)
     end
@@ -165,7 +165,8 @@ local function get_cur_word()
 end
 
 function M.hl_fallback()
-    if vim.bo.buftype == 'terminal' or vim.tbl_contains(fb_bl_ft, vim.bo.filetype) then
+    if vim.bo.buftype == 'terminal' and api.nvim_get_mode() == 't' or
+        vim.tbl_contains(fb_bl_ft, vim.bo.filetype) then
         return
     end
 

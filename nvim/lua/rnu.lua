@@ -24,12 +24,12 @@ end
 
 local function set_rnu()
     set_win_rnu(true)
-    cmd('highlight! link FoldColumn NONE')
+    cmd('hi! link FoldColumn NONE')
 end
 
 local function unset_rnu()
     set_win_rnu(false)
-    cmd('highlight! link FoldColumn Ignore')
+    cmd('hi! link FoldColumn Ignore')
 end
 
 function M.focus(gained)

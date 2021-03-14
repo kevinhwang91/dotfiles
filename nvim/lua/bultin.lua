@@ -24,7 +24,7 @@ function M.jumps2qf()
     fn.setloclist(0, {}, ' ', {title = 'JumpList', items = items, idx = idx})
     local winid = fn.getloclist(0, {winid = 0}).winid
     if winid == 0 then
-        cmd('aboveleft lwindow')
+        cmd('abo lw')
     else
         api.nvim_set_current_win(winid)
     end

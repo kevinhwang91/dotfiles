@@ -13,8 +13,8 @@ nnoremap <buffer><silent> ]r <Cmd>call flog#next_ref() <Bar> belowright Flogspli
 nnoremap <buffer><silent> [r <Cmd>call flog#previous_ref() <Bar> belowright Flogsplitcommit<CR>
 nnoremap <buffer> rl :Floggit reset <C-r>=flog#get_commit_at_line().short_commit_hash<CR>
 nnoremap <buffer> rh :Floggit reset --hard <C-r>=flog#get_commit_at_line().short_commit_hash<CR>
-nnoremap <buffer> <leader>gt :Floggit difftool -y <C-r>=flog#get_commit_at_line().short_commit_hash<CR>
-xnoremap <buffer> <leader>gt :Floggit difftool -y<Space>
+nnoremap <buffer> <Leader>gt :Floggit difftool -y <C-r>=flog#get_commit_at_line().short_commit_hash<CR>
+xnoremap <buffer> <Leader>gt :Floggit difftool -y<Space>
 
 function s:scroll(direction) abort
     let winnr = winnr('$')
@@ -26,13 +26,13 @@ function s:scroll(direction) abort
         endif
         return
     endif
-    noautocmd wincmd p
+    noa wincmd p
     if a:direction
         execute "norm! \<C-d>"
     else
         execute "norm! \<C-u>"
     endif
-    noautocmd wincmd p
+    noa wincmd p
 endfunction
 
 nnoremap <buffer><silent> <C-f> <Cmd>call <SID>scroll(1)<CR>

@@ -16,10 +16,10 @@ local function init()
     ]], false)
 
     api.nvim_exec([[
-        augroup Fzf
-            autocmd!
-            autocmd VimResized * lua require('plugs.fzf').resize_preview_layout()
-        augroup END
+        aug Fzf
+            au!
+            au VimResized * lua require('plugs.fzf').resize_preview_layout()
+        aug END
     ]], false)
 
     vim.g.loaded_fzf = nil

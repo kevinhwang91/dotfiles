@@ -66,7 +66,7 @@ local function filename()
         fname = quickfix()
     else
         fname = fn.expand('%:t')
-        if fn.expand('%:e') == '' and vim.bo.filetype ~= '' then
+        if fn.expand('%:e') == '' or vim.bo.filetype == '' then
             fname = string.format('%s (%s)', fname, vim.bo.filetype)
         end
     end

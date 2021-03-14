@@ -63,7 +63,7 @@
 	"yaml.completion": true,
 	"snippets.enableStatusItem": false,
 	"snippets.ultisnips.enable": false,
-	"snippets.snipmate.enable": false,
+	"snippets.snipmate.enable": true,
 	"diagnostic-languageserver.filetypes": {
 		"sh": "shellcheck",
 		"python": "pylint"

@@ -19,7 +19,7 @@ function M.clean_empty_bufs()
         end
     end
     if #bufnrs > 0 then
-        cmd('bwipeout ' .. table.concat(bufnrs, ' '))
+        cmd('bw ' .. table.concat(bufnrs, ' '))
     end
 end
 
@@ -33,7 +33,7 @@ function M.clean_diffed_tab(tabpage)
             return
         end
     end
-    cmd('tabclose ' .. api.nvim_tabpage_get_number(tabpage))
+    cmd('tabc ' .. api.nvim_tabpage_get_number(tabpage))
 end
 
 function M.zz()

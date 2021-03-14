@@ -72,20 +72,20 @@ function M.toggle()
     if api.nvim_win_get_config(cur_winid).relative == '' then
         if close() then
             api.nvim_exec([[
-                augroup ShadowWindow
-                    autocmd!
-                    autocmd WinEnter * lua require('shadowwin').toggle()
-                augroup END
+                aug ShadowWindow
+                    au!
+                    au WinEnter * lua require('shadowwin').toggle()
+                aug END
             ]], false)
         end
     elseif not detect_other_wins(cur_winid) then
         if create() then
             api.nvim_exec([[
-                augroup ShadowWindow
-                    autocmd!
-                    autocmd VimResized * lua require('shadowwin').resize()
-                    autocmd WinEnter * lua vim.defer_fn(function() require('shadowwin').toggle() end, 50)
-                augroup END
+                aug ShadowWindow
+                    au!
+                    au VimResized * lua require('shadowwin').resize()
+                    au WinEnter * lua vim.defer_fn(function() require('shadowwin').toggle() end, 50)
+                aug END
             ]], false)
         end
     end
