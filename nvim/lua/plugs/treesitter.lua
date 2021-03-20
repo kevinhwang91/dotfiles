@@ -2,8 +2,8 @@ local M = {}
 local cmd = vim.cmd
 
 local function init()
-    cmd('packadd nvim-treesitter')
-    cmd('packadd nvim-treesitter-textobjects')
+    cmd('pa nvim-treesitter')
+    cmd('pa nvim-treesitter-textobjects')
     require('nvim-treesitter.configs').setup({
         ensure_installed = 'maintained',
         highlight = {enable = true, disable = {'bash'}},

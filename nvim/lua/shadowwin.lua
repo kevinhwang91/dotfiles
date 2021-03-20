@@ -6,7 +6,12 @@ local shadow_winblend = 70
 local shadow_winid = -1
 
 local function existed()
-    return shadow_winid > 0 and api.nvim_win_is_valid(shadow_winid)
+    local ret = shadow_winid > 0 and api.nvim_win_is_valid(shadow_winid)
+    if ret and not vim.tbl_contains(api.nvim_tabpage_list_wins(0), shadow_winid) then
+        api.nvim_win_close(shadow_winid, false)
+        ret = false
+    end
+    return ret
 end
 
 local function create()

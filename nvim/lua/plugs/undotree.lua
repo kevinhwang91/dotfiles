@@ -12,7 +12,7 @@ local function init()
             nunmap <buffer> u
         endfunc
     ]], false)
-    cmd('packadd undotree')
+    cmd('pa undotree')
 end
 
 function M.toggle()

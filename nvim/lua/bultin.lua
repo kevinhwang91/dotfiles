@@ -38,7 +38,7 @@ function M.split_lastbuf(vertical)
     local last_buf_info = {}
     for _, info in ipairs(buf_info) do
         if fn.bufwinnr(info.bufnr) == -1 then
-            if not last_buf_info.lastbuf or last_buf_info.lastbuf > info.lastused then
+            if not last_buf_info.lastbuf or last_buf_info.lastbuf < info.lastused then
                 last_buf_info = info
             end
         end

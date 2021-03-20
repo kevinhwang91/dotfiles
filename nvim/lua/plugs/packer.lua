@@ -2,35 +2,48 @@ local install_path = vim.fn.stdpath('data') .. '/site/pack/packer/opt/packer.nvi
 if vim.fn.empty(vim.fn.glob(install_path)) == 1 then
     vim.cmd('!git clone https://github.com/wbthomason/packer.nvim ' .. install_path)
 end
-vim.cmd('packadd packer.nvim')
+vim.cmd('pa packer.nvim')
 
 return require('packer').startup({
+    config = {
+        opt_default = true,
+        display = {open_cmd = 'tabedit', keybindings = {prompt_revert = 'R', diff = 'D'}}
+    },
     function(use)
-        use {'wbthomason/packer.nvim', opt = true}
-
-        use {'kevinhwang91/rnvimr'}
-
-        use {'kevinhwang91/nvim-bqf'}
-
-        use {'kevinhwang91/nvim-hlslens'}
-
         use {
-            'junegunn/fzf.vim',
-            opt = true,
-            requires = {{'junegunn/fzf', opt = true, run = './install --bin'}}
+            'wbthomason/packer.nvim',
+            setup = function()
+                for _, flag in ipairs({
+                    'loaded_grepper', 'loaded_eregex', 'loaded_git_messenger', 'loaded_slime',
+                    'loaded_nerd_comments', 'loaded_suda', 'vcoolor_loaded', 'loaded_choosewin',
+                    'loaded_cycle', 'loaded_doge', 'loaded_gh_line', 'loaded_hexokinase'
+                }) do
+                    if vim.g[flag] ~= nil then
+                        vim.g[flag] = nil
+                    end
+                end
+            end
         }
+
+        use {'kevinhwang91/rnvimr', opt = false}
+
+        use {'kevinhwang91/nvim-bqf', opt = false}
+
+        use {'kevinhwang91/nvim-hlslens', opt = false}
+
+        use {'junegunn/fzf.vim', requires = {{'junegunn/fzf', run = './install --bin'}}}
 
         use {'t9md/vim-choosewin', cmd = 'ChooseWin'}
 
         use {'mhinz/vim-grepper', cmd = 'Grepper', keys = '<Plug>(GrepperOperator)'}
 
-        use {'andymass/vim-matchup', opt = true}
+        use {'andymass/vim-matchup'}
 
-        use {'haya14busa/vim-asterisk'}
+        use {'haya14busa/vim-asterisk', opt = false}
 
-        use {'tpope/vim-surround'}
+        use {'tpope/vim-surround', opt = false}
 
-        use {'tpope/vim-repeat'}
+        use {'tpope/vim-repeat', opt = false}
 
         use {
             'michaeljsmith/vim-indent-object',
@@ -39,7 +52,7 @@ return require('packer').startup({
                 {'v', 'aI'}, {'v', 'iI'}
             }
         }
-        use {'wellle/targets.vim'}
+        use {'wellle/targets.vim', opt = false}
 
         use {
             'tommcdo/vim-exchange',
@@ -52,42 +65,29 @@ return require('packer').startup({
             config = [[vim.fn['AutoPairsTryInit']()]]
         }
 
-        use {
-            'mg979/vim-visual-multi',
-            cmd = {'VMSearch'},
-            keys = {
-                '<Plug>(VM-Find-Under)', '<Plug>(VM-Visual-Cursors)',
-                '<Plug>(VM-Add-Cursor-At-Pos)', '<Plug>(VM-Select-All)', '<Plug>(VM-Visual-All)',
-                '<Plug>(VM-Select-Cursor-Up)', '<Plug>(VM-Select-Cursor-Down)',
-                '<Plug>(VM-Start-Regex-Search)', '<Plug>(VM-Find-Subword-Under)'
-            }
-        }
+        use {'mg979/vim-visual-multi'}
 
         use {'bootleq/vim-cycle', keys = {'<Plug>CyclePrev', '<Plug>CycleNext'}}
 
-        use {'mbbill/undotree', opt = true}
+        use {'mbbill/undotree'}
 
-        use {'tpope/vim-fugitive'}
+        use {'tpope/vim-fugitive', opt = false}
 
         use {'ruanyl/vim-gh-line', keys = {'<Plug>(gh-repo)', '<Plug>(gh-line)'}}
 
-        use {'airblade/vim-gitgutter', opt = true}
+        use {'airblade/vim-gitgutter'}
 
         use {'rbong/vim-flog', cmd = {'Flog', 'Flogsplit'}}
 
         use {'rhysd/git-messenger.vim', cmd = {'GitMessenger'}}
 
-        use {
-            'rrethy/vim-hexokinase',
-            run = 'make hexokinase',
-            cmd = {'HexokinaseToggle', 'HexokinaseTurnOn'}
-        }
+        use {'rrethy/vim-hexokinase', run = 'make hexokinase'}
 
         use {'sbdchd/neoformat', cmd = 'Neoformat'}
 
-        use {'editorconfig/editorconfig-vim'}
+        use {'editorconfig/editorconfig-vim', opt = false}
 
-        use {'honza/vim-snippets'}
+        use {'honza/vim-snippets', opt = false}
 
         use {'pseewald/vim-anyfold', cmd = 'AnyFoldActivate'}
 
@@ -107,9 +107,9 @@ return require('packer').startup({
             ft = {'markdown', 'html'}
         }
 
-        use {'sakhnik/nvim-gdb', run = ':UpdateRemotePlugins'}
+        use {'sakhnik/nvim-gdb', run = ':UpdateRemotePlugins', opt = false}
 
-        use {'kevinhwang91/vim-ibus-sw'}
+        use {'kevinhwang91/vim-ibus-sw', opt = false}
 
         use {'othree/eregex.vim', cmd = 'E2v'}
 
@@ -117,16 +117,11 @@ return require('packer').startup({
 
         use {'kevinhwang91/suda.vim', cmd = 'SudaWrite'}
 
-        use {
-            'neoclide/coc.nvim',
-            opt = true,
-            branch = 'master',
-            run = 'yarn install --frozen-lockfile'
-        }
+        use {'neoclide/coc.nvim', branch = 'master', run = 'yarn install --frozen-lockfile'}
 
-        use {'kevinhwang91/vim-lsp-cxx-highlight', opt = true}
+        use {'kevinhwang91/vim-lsp-cxx-highlight'}
 
-        use {'wellle/tmux-complete.vim', opt = true}
+        use {'wellle/tmux-complete.vim'}
 
         use {
             'kkoomen/vim-doge',
@@ -140,9 +135,8 @@ return require('packer').startup({
 
         use {'tweekmonster/startuptime.vim', cmd = 'StartupTime'}
 
-        use {'nvim-treesitter/nvim-treesitter', run = ':TSUpdate', opt = true}
+        use {'nvim-treesitter/nvim-treesitter', run = ':TSUpdate'}
 
-        use {'nvim-treesitter/nvim-treesitter-textobjects', opt = true}
-    end,
-    config = {display = {open_cmd = 'tabedit', keybindings = {prompt_revert = 'R', diff = 'D'}}}
+        use {'nvim-treesitter/nvim-treesitter-textobjects'}
+    end
 })

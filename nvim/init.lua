@@ -50,6 +50,7 @@ o.lazyredraw = true
 o.inccommand = 'nosplit'
 o.shortmess = o.shortmess .. 'aIc'
 o.confirm = true
+o.jumpoptions = 'stack'
 o.diffopt = o.diffopt .. ',vertical'
 o.shada = [[!,'20,<50,s10,/100,@1000,h]]
 
@@ -103,6 +104,7 @@ g.mapleader = ' '
 map('n', '<Space>', '')
 map('x', '<Space>', '')
 map('n', 'q', '')
+map('x', 'q', '')
 map('n', 'Q', '')
 map('n', '-', '"_')
 map('x', '-', '"_')
@@ -246,8 +248,10 @@ api.nvim_exec([[
     aug Fzf
         au!
         au FuncUndefined fzf#* lua require('plugs.fzf')
-        au CmdUndefined FZF,BTags,BCommits,History,GFiles,Marks,Buffers,Maps,Helptags lua require('plugs.fzf')
+        au CmdUndefined FZF,BTags,BCommits,History,GFiles,Marks,Buffers lua require('plugs.fzf')
     aug END
+    com! -nargs=* -bar -bang Maps call fzf#vim#maps(<q-args>, <bang>0)
+    com! -bar -bang Helptags call fzf#vim#helptags(<bang>0)
 ]], false)
 
 if fn.empty(fn.glob(fn.stdpath('config') .. '/plugin/packer_compiled.vim')) == 1 then
@@ -341,19 +345,12 @@ g.matchup_matchparen_deferred_show_delay = 150
 g.matchup_matchparen_deferred_hide_delay = 700
 g.matchup_matchparen_hi_surround_always = 1
 g.matchup_matchparen_offscreen = {method = 'popup', highlight = 'CurrentWord'}
-g.matchup_delim_start_plaintext = 0
+g.matchup_delim_start_plaintext = 1
 g.matchup_motion_override_Npercent = 0
 g.matchup_motion_cursor_end = 0
 g.matchup_mappings_enabled = 0
 
 cmd('hi link MatchWord Underlined')
-api.nvim_exec([[
-    aug MatchupMatch
-        au!
-        au TermEnter * call clearmatches()
-        au TermOpen * let [b:matchup_matchparen_enabled, b:matchup_matchparen_fallback] = [0, 0]
-    aug END
-]], false)
 
 map('n', '%', '<Plug>(matchup-%)', {})
 map('x', '%', '<Plug>(matchup-%)', {})
@@ -364,9 +361,9 @@ map('o', '[5', '<Plug>(matchup-[%)', {})
 map('n', ']5', '<Plug>(matchup-]%)', {})
 map('x', ']5', '<Plug>(matchup-]%)', {})
 map('o', ']5', '<Plug>(matchup-]%)', {})
-map('n', [[z']], '<Plug>(matchup-z%)', {})
-map('x', [[z']], '<Plug>(matchup-z%)', {})
-map('o', [[z']], '<Plug>(matchup-z%)', {})
+map('n', '<Leader>5', '<Plug>(matchup-z%)', {})
+map('x', '<Leader>5', '<Plug>(matchup-z%)', {})
+map('o', '<Leader>5', '<Plug>(matchup-z%)', {})
 map('x', 'a5', '<Plug>(matchup-a%)', {})
 map('o', 'a5', '<Plug>(matchup-a%)', {})
 map('x', 'i5', '<Plug>(matchup-i%)', {})
@@ -435,6 +432,17 @@ map('n', '<M-C-k>', '<Plug>(VM-Select-Cursor-Up)', {})
 map('n', '<M-C-j>', '<Plug>(VM-Select-Cursor-Down)', {})
 map('n', '<Leader>g/', '<Cmd>VMSearch<CR>')
 
+for _, lhs in ipairs({
+    'VM-Find-Under', 'VM-Find-Subword-Under', 'VM-Start-Regex-Search', 'VM-Select-Cursor-Down',
+    'VM-Select-Cursor-Up', 'VM-Visual-All', 'VM-Select-All', 'VM-Add-Cursor-At-Pos',
+    'VM-Visual-Cursors'
+}) do
+    map('', string.format('<Plug>(%s)', lhs), string.format(
+        [[<Cmd>lua require('packer.load')({'%s'}, {keys = '<lt>Plug>(%s)'}, _G.packer_plugins)<CR>]],
+        'vim-visual-multi', lhs))
+end
+cmd([[com! VMSearch pa vim-visual-multi<Bar>VMSearch]])
+
 -- highlight syntax
 api.nvim_exec([[
     aug LuaHighlight
@@ -473,6 +481,7 @@ map('n', '<C-x>', '<Plug>CyclePrev', {})
 map('v', '<C-x>', '<Plug>CyclePrev', {})
 
 -- mbbill/undotree
+g.undotree_WindowLayout = 3
 map('n', '<M-u>', '<Cmd>UndotreeToggle<CR>')
 cmd([[com! -nargs=0 UndotreeToggle lua require('plugs.undotree').toggle()]])
 
@@ -499,17 +508,17 @@ map('n', '<Leader>gg', '<Cmd>tab Git<CR>')
 map('n', '<Leader>gc', ':Git commit<Space>', {silent = false})
 map('n', '<Leader>gC', ':Git commit --amend<Space>', {silent = false})
 map('n', '<Leader>ge', '<Cmd>Gedit<CR>')
-map('n', '<Leader>gb', '<Cmd>Git blame -w <Bar>wincmd p<CR>')
+map('n', '<Leader>gb', '<Cmd>Git blame -w<Bar>wincmd p<CR>')
 map('n', '<Leader>gw', [[<Cmd>lua require('kutils').follow_symlink()<CR><Cmd>Gwrite<CR>]])
 map('n', '<Leader>gr',
-    [[<Cmd>lua require('kutils').follow_symlink()<CR><Cmd>keepalt Gread <Bar> up!<CR>]])
+    [[<Cmd>lua require('kutils').follow_symlink()<CR><Cmd>keepalt Gread<Bar>up!<CR>]])
 map('n', '<Leader>gd', ':Gdiffsplit!<Space>', {silent = false})
 map('n', '<Leader>gt', ':Git difftool -y<Space>', {silent = false})
 
 api.nvim_exec([[
     aug FugitiveCustom
         au!
-        au User FugitiveIndex nmap <silent><buffer> st :Gtabedit <Plug><cfile> <Bar>Gdiffsplit!<CR>
+        au User FugitiveIndex nmap <silent><buffer> st :Gtabedit <Plug><cfile><Bar>Gdiffsplit!<CR>
     aug end
 ]], true)
 
@@ -707,6 +716,13 @@ api.nvim_exec([[
     aug END
 ]], false)
 
+api.nvim_exec([[
+    aug TermFix
+        au!
+        au TermEnter * call clearmatches()
+    aug END
+]], false)
+
 cmd([[com! Jumps lua require('bultin').jumps2qf()]])
 
 map('n', '<Leader>jj', '<Cmd>Jumps<CR>')
@@ -717,16 +733,17 @@ vim.schedule(function()
         require('plugs.fold')
     end, 50)
     vim.defer_fn(function()
-        cmd('packadd vim-matchup')
+        cmd('pa vim-matchup')
         fn['matchup#loader#init_buffer']()
+        cmd('pa vim-hexokinase')
         cmd('HexokinaseTurnOn')
     end, 200)
     vim.defer_fn(function()
-        cmd('packadd vim-gitgutter')
+        cmd('pa vim-gitgutter')
     end, 400)
     vim.defer_fn(function()
-        cmd('packadd coc.nvim')
-        cmd('packadd tmux-complete.vim')
-        cmd('packadd vim-lsp-cxx-highlight')
+        cmd('pa coc.nvim')
+        cmd('pa tmux-complete.vim')
+        cmd('pa vim-lsp-cxx-highlight')
     end, 500)
 end)

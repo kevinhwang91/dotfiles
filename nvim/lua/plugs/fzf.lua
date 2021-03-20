@@ -23,8 +23,8 @@ local function init()
     ]], false)
 
     vim.g.loaded_fzf = nil
-    cmd('packadd fzf')
-    cmd('packadd fzf.vim')
+    cmd('pa fzf')
+    cmd('pa fzf.vim')
     M.resize_preview_layout()
 end
 
