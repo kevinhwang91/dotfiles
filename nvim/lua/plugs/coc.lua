@@ -21,6 +21,8 @@ local function init()
         au User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
         au VimLeavePre * if get(g:, 'coc_process_pid', 0) | call system('kill -9 -- -' . g:coc_process_pid) | endif
         au InsertCharPre * lua require('plugs.coc').enable_ultisnips()
+        au FileType vim xmap if <Plug>(coc-funcobj-i) | omap if <Plug>(coc-funcobj-i)
+        au FileType vim xmap af <Plug>(coc-funcobj-a) | omap af <Plug>(coc-funcobj-a)
     aug END]], false)
 
     cmd('hi link CocHighlightText CurrentWord')

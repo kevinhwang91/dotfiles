@@ -31,6 +31,10 @@ return require('packer').startup({
 
         use {'kevinhwang91/nvim-hlslens', opt = false}
 
+        use {'rhysd/clever-f.vim', opt = false}
+
+        use {'antoinemadec/FixCursorHold.nvim', opt = false}
+
         use {'junegunn/fzf.vim', requires = {{'junegunn/fzf', run = './install --bin'}}}
 
         use {'t9md/vim-choosewin', cmd = 'ChooseWin'}

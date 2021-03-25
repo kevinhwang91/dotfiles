@@ -108,6 +108,10 @@ map('x', 'q', '')
 map('n', 'Q', '')
 map('n', '-', '"_')
 map('x', '-', '"_')
+map('n', 'y', [[v:lua._G.yank()]], {noremap = true, expr = true})
+map('x', 'y', [[v:lua._G.yank()]], {noremap = true, expr = true})
+map('n', 'v', 'm`v')
+map('n', 'V', 'm`V')
 map('n', '<Leader>2;', '@:')
 map('x', '<Leader>2;', '@:')
 map('n', 'qq', '<Cmd>q<CR>')
@@ -206,10 +210,14 @@ map('x', 'zZ', [[<Cmd>lua require('kutils').zz()<CR>]])
 map('n', 'z[', [[<Cmd>lua require('kutils').nav_fold(false, vim.v.count1)<CR>]])
 map('n', 'z]', [[<Cmd>lua require('kutils').nav_fold(true, vim.v.count1)<CR>]])
 
-map('x', 'iz', [[:<C-U>norm [zv]zg_<CR>]])
+map('x', 'iz', [[:<C-U>keepj norm [zv]zg_<CR>]])
 map('o', 'iz', [[:norm viz<CR>]])
 
 -- https://github.com/neovim/neovim/issues/13862
+function _G.yank()
+    return require('yank').wrap()
+end
+
 function _G.prefix_timeout(prefix)
     local char = fn.getchar(0)
     if type(char) == 'number' then
@@ -285,6 +293,12 @@ api.nvim_exec([[
     aug END
 ]], false)
 
+-- rhysd/clever-f.vim
+g.clever_f_across_no_line = 1
+g.clever_f_timeout_ms = 1
+map('', ';', '<Plug>(clever-f-repeat-forward)', {})
+map('', ',', '<Plug>(clever-f-repeat-back)', {})
+
 -- kevinhwang91/rnvimr
 g.rnvimr_enable_ex = 1
 g.rnvimr_enable_bw = 1
@@ -329,7 +343,7 @@ g.grepper = {
 --     vim.o.grepformat = [[%f:%l:%c:%m,%f:%l:%m]]
 -- end
 map('n', '<Leader>rg', [[<Cmd>Grepper -tool rg<CR>]])
-map('n', 'gs', '<Plug>(GrepperOperator)', {})
+map('n', 'gs', [[<Cmd>lua require('yank').set_wv()<CR><Plug>(GrepperOperator)]], {})
 map('x', 'gs', '<Plug>(GrepperOperator)', {})
 api.nvim_exec([[
     aug Grepper
@@ -496,7 +510,7 @@ g.nremap = {
     d2o = 's2o',
     d3o = 's3o',
     dd = 'ss',
-    s = 'S',
+    s = '<C-s>',
     u = '<C-u>',
     O = 'T',
     ['<C-W>gf'] = 'gF',
@@ -508,7 +522,7 @@ map('n', '<Leader>gg', '<Cmd>tab Git<CR>')
 map('n', '<Leader>gc', ':Git commit<Space>', {silent = false})
 map('n', '<Leader>gC', ':Git commit --amend<Space>', {silent = false})
 map('n', '<Leader>ge', '<Cmd>Gedit<CR>')
-map('n', '<Leader>gb', '<Cmd>Git blame -w<Bar>wincmd p<CR>')
+map('n', '<Leader>gb', '<Cmd>Git blame -w<Bar>winc p<CR>')
 map('n', '<Leader>gw', [[<Cmd>lua require('kutils').follow_symlink()<CR><Cmd>Gwrite<CR>]])
 map('n', '<Leader>gr',
     [[<Cmd>lua require('kutils').follow_symlink()<CR><Cmd>keepalt Gread<Bar>up!<CR>]])

@@ -7,32 +7,34 @@ nmap <buffer> o <Plug>(FlogVSplitCommitRight)
 nmap <buffer> ]R <Plug>(FlogVNextRefRight)
 nmap <buffer> [R <Plug>(FlogVPrevRefRight)
 nnoremap <buffer><silent> <CR> <Cmd>bel Flogsplitcommit<CR>
-nnoremap <buffer><silent> <C-n> <Cmd>call flog#next_commit() <Bar> belowright Flogsplitcommit<CR>
-nnoremap <buffer><silent> <C-p> <Cmd>call flog#previous_commit() <Bar> belowright Flogsplitcommit<CR>
-nnoremap <buffer><silent> ]r <Cmd>call flog#next_ref() <Bar> belowright Flogsplitcommit<CR>
-nnoremap <buffer><silent> [r <Cmd>call flog#previous_ref() <Bar> belowright Flogsplitcommit<CR>
+nnoremap <buffer><silent> <C-n> <Cmd>call flog#next_commit()<Bar>belowright Flogsplitcommit<CR>
+nnoremap <buffer><silent> <C-p> <Cmd>call flog#previous_commit()<Bar>belowright Flogsplitcommit<CR>
+nnoremap <buffer><silent> ]r <Cmd>call flog#next_ref()<Bar>belowright Flogsplitcommit<CR>
+nnoremap <buffer><silent> [r <Cmd>call flog#previous_ref()<Bar>belowright Flogsplitcommit<CR>
 nnoremap <buffer> rl :Floggit reset <C-r>=flog#get_commit_at_line().short_commit_hash<CR>
 nnoremap <buffer> rh :Floggit reset --hard <C-r>=flog#get_commit_at_line().short_commit_hash<CR>
 nnoremap <buffer> <Leader>gt :Floggit difftool -y <C-r>=flog#get_commit_at_line().short_commit_hash<CR>
 xnoremap <buffer> <Leader>gt :Floggit difftool -y<Space>
+nnoremap <buffer> <Leader>gr :Flogsetargs -raw-args=<C-r>=flog#get_commit_at_line().short_commit_hash<CR>
+nnoremap <buffer> <Leader>gj :Flogjump<Space>
 
 function s:scroll(direction) abort
     let winnr = winnr('$')
     if winnr < 2
         if a:direction
-            execute "norm! \<C-f>"
+            exe "norm! \<C-f>"
         else
-            execute "norm! \<C-b>"
+            exe "norm! \<C-b>"
         endif
         return
     endif
-    noa wincmd p
+    noa winc p
     if a:direction
-        execute "norm! \<C-d>"
+        exe "norm! \<C-d>"
     else
-        execute "norm! \<C-u>"
+        exe "norm! \<C-u>"
     endif
-    noa wincmd p
+    noa winc p
 endfunction
 
 nnoremap <buffer><silent> <C-f> <Cmd>call <SID>scroll(1)<CR>
