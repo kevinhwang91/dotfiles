@@ -242,6 +242,8 @@ api.nvim_exec([[
 -- junegunn/fzf.vim
 -- `pacman -S fzf` will force nvim load plugin in /usr/share/vim/vimfiles/plugin/fzf.vim
 vim.g.loaded_fzf = true
+vim.env.FZF_DEFAULT_OPTS = vim.env.FZF_DEFAULT_OPTS .. ' --reverse --info=inline --border'
+vim.env.BAT_STYLE = 'numbers'
 map('n', '<Leader>ft', '<Cmd>BTags<CR>')
 map('n', '<Leader>fo', '<Cmd>Tags<CR>')
 map('n', '<Leader>fc', '<Cmd>BCommits<CR>')
@@ -281,6 +283,13 @@ vim.api.nvim_exec([[
 
 pcall(cmd, 'colorscheme one')
 
+-- kevinhwang91/nvim-bqf
+require('bqf').setup({
+    auto_enable = true,
+    func_map = {split = '<C-s>'},
+    filter = {fzf = {action_for = {['ctrl-s'] = 'split'}}}
+})
+
 -- kevinhwang91/nvim-hlslens
 map('n', 'n', [[<Cmd>execute('norm! ' . v:count1 . 'n')<CR><Cmd>lua require('hlslens').start()<CR>]])
 map('n', 'N', [[<Cmd>execute('norm! ' . v:count1 . 'N')<CR><Cmd>lua require('hlslens').start()<CR>]])
@@ -305,10 +314,19 @@ g.rnvimr_enable_bw = 1
 g.rnvimr_hide_gitignore = 1
 g.rnvimr_border_attr = {fg = 3}
 g.rnvimr_ranger_cmd = 'ranger'
+g.rnvimr_action = {
+    ['<C-t>'] = 'NvimEdit tabedit',
+    ['<C-s>'] = 'NvimEdit split',
+    ['<C-v>'] = 'NvimEdit vsplit',
+    ['<C-o>'] = 'NvimEdit drop',
+    gw = 'JumpNvimCwd',
+    yw = 'EmitRangerCwd'
+}
 g.rnvimr_ranger_views = {
     {minwidth = 90, ratio = {}}, {minwidth = 50, maxwidth = 89, ratio = {1, 1}},
     {maxwidth = 49, ratio = {1}}
 }
+
 cmd('hi link RnvimrNormal CursorLine')
 map('t', '<M-i>', [[<C-\><C-n><Cmd>RnvimrResize<CR>]])
 map('t', '<M-o>', [[<C-\><C-n><Cmd>RnvimrToggle<CR>]])

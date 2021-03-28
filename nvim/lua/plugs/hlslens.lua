@@ -3,18 +3,24 @@ local hlslens = require('hlslens')
 local hlslens_started = false
 local line_lens_bak
 
-local override_line_lens = function(lnum, loc, idx, r_idx, count, hls_ns)
+local override_line_lens = function(pos_list, nearest, idx, r_idx, hls_ns)
     local _ = r_idx
+    local lnum = pos_list[idx][1]
+    local count = #pos_list
+
     local text, chunks
-    if loc ~= 'c' then
-        text = string.format('[%d]', idx)
-        chunks = {{' ', 'Ignore'}, {text, 'HlSearchLens'}}
-    else
+    if nearest then
         text = string.format('[%d/%d]', idx, count)
         chunks = {{' ', 'Ignore'}, {text, 'HlSearchLensCur'}}
+    else
+        text = string.format('[%d]', idx)
+        chunks = {{' ', 'Ignore'}, {text, 'HlSearchLens'}}
     end
-    vim.api.nvim_buf_clear_namespace(0, -1, lnum - 1, lnum)
-    vim.api.nvim_buf_set_extmark(0, hls_ns, lnum - 1, -1, {virt_text = chunks})
+    vim.api.nvim_buf_set_extmark(0, hls_ns, lnum - 1, -1, {
+        virt_text = chunks,
+        virt_text_pos = 'overlay',
+        virt_text_hide = true
+    })
 end
 
 function M.vmlens_start()

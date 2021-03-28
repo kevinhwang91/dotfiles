@@ -6,8 +6,7 @@ local cmd = vim.cmd
 local mru = require('mru')
 
 local function init()
-    vim.env.FZF_DEFAULT_OPTS = vim.env.FZF_DEFAULT_OPTS .. ' --reverse --info=inline --border'
-    vim.env.BAT_STYLE = 'numbers'
+    vim.g.fzf_action = {['ctrl-t'] = 'tabedit', ['ctrl-s'] = 'split', ['ctrl-v'] = 'vsplit'}
     vim.g.fzf_layout = {window = {width = 0.7, height = 0.7}}
     api.nvim_exec([[
         function! FzfMruFiles(name, opts) abort

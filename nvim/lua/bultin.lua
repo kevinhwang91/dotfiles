@@ -35,15 +35,15 @@ function M.split_lastbuf(vertical)
     local info_str = fn.execute(
         [[echon map(getbufinfo({'buflisted':1}),'{"bufnr": v:val.bufnr, "lastused": v:val.lastused}')]])
     local buf_info = fn.eval(info_str)
-    local last_buf_info = {}
+    local last_buf_info
     for _, info in ipairs(buf_info) do
         if fn.bufwinnr(info.bufnr) == -1 then
-            if not last_buf_info.lastbuf or last_buf_info.lastbuf < info.lastused then
+            if not last_buf_info or last_buf_info.lastused < info.lastused then
                 last_buf_info = info
             end
         end
     end
-    cmd(sp .. ' sb ' .. (last_buf_info.bufnr or ''))
+    cmd(sp .. ' sb ' .. (last_buf_info and last_buf_info.bufnr or ''))
 end
 
 return M
