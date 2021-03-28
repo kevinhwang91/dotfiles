@@ -1,0 +1,27 @@
+emulate -L zsh
+
+setopt pipefail
+
+if [[ -z $(command -v z) ]]; then
+    return
+fi
+
+local fzf_bind_opts
+
+local fzf_preview_cmd='
+t={} && t=${t/#\~/$HOME}
+(exa --color=always -T -L 1 $t ||
+    tree -C -L 1 $t ||
+    echo $t is a directory.) 2>/dev/null
+'
+
+if (( $+commands[xsel] )); then
+    fzf_bind_opts='--bind=ctrl-y:execute-silent(echo -n {} | xsel -i -b)'
+elif (( $+commands[xclip] )); then
+    fzf_bind_opts='--bind=ctrl-y:execute-silent(echo -n {} | xclip -i -selection clipboard)'
+fi
+local fzf_opts="--height=60% --tac --tiebreak=index --preview-window=right:50% \
+--bind=alt-k:preview-up,alt-j:preview-down $fzf_bind_opts"
+local dir=$(z -l -t | sed -e 's/^-[0-9]* *//' -e "s|^$HOME|~|" \
+    | $FZF_CMD ${(z)fzf_opts} --preview=$fzf_preview_cmd)
+print ${dir/#\~/$HOME}

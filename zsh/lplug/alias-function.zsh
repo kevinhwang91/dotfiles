@@ -202,13 +202,13 @@ if (( $+commands[nvim] )); then
 
     alias ng='_ng'
     _ng() {
-        git status >/dev/null && nvim +Git +'wincmd o' +'bwipeout #'
+        git status >/dev/null && nvim +Git +'winc o' +'bw 1'
     }
 
     alias ngl='_ngl'
     compdef __ngl_compdef _ngl
     _ngl() {
-        git status >/dev/null && nvim +"Flog -raw-args=$*" +'bwipeout 1'
+        git status >/dev/null && nvim +"Flog -raw-args=$*" +'bw 1'
     }
     __ngl_compdef() {
         (( $+functions[_git-log] )) || _git
@@ -218,7 +218,7 @@ if (( $+commands[nvim] )); then
     alias ngdt='_ngdt'
     compdef __ngdt_compdef _ngdt
     _ngdt() {
-        git status >/dev/null && nvim +"Git difftool -y $*" +'bwipeout 1'
+        git status >/dev/null && nvim +"Git difftool -y $*" +'bw 1'
     }
     __ngdt_compdef() {
         (( $+functions[_git-difftool] )) || _git
@@ -229,7 +229,7 @@ if (( $+commands[nvim] )); then
         alias ngdb='_ngdb'
         compdef __ngdb_compdef _ngdb
         _ngdb() {
-            nvim +"GdbStart gdb $*" +'bwipeout 1'
+            nvim +"GdbStart gdb $*" +'bw 1'
         }
         __ngdb_compdef() {
             _gdb
@@ -239,7 +239,7 @@ if (( $+commands[nvim] )); then
     if (( $+commands[python] )); then
         alias npdb='_npdb'
         _npdb() {
-            nvim +"GdbStartPDB python -m pdb $*" +'bwipeout 1'
+            nvim +"GdbStartPDB python -m pdb $*" +'bw 1'
         }
     fi
 fi

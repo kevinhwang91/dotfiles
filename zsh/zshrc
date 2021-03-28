@@ -71,6 +71,7 @@ fi
 if (( $+commands[nvim] )); then
     export EDITOR=nvim
     export MANPAGER='nvim +Man!'
+    export DIFFPROG='nvim -d'
 fi
 
 # bat

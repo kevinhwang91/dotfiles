@@ -20,7 +20,7 @@ while getopts ':dl:s:' opt; do
 done
 
 local fzf_opts="--height=60% --reverse -m --tiebreak=end \
---preview-window=right:60% \
+--preview-window=right:50% \
 --bind=alt-k:preview-up,alt-j:preview-down"
 
 if (( $+commands[fd] )); then

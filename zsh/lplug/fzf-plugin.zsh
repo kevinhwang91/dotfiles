@@ -52,7 +52,7 @@ fzf-cd-widget() {
     fi
 }
 zle -N fzf-cd-widget
-bindkey '\ec' fzf-cd-widget
+bindkey '^S' fzf-cd-widget
 
 fzf-history-widget() {
     local num=$(fhistory $LBUFFER)
@@ -67,7 +67,7 @@ zle -N fzf-history-widget
 bindkey '^R' fzf-history-widget
 
 fzf-z-cd-widget() {
-    local dir=$(fzi)
+    local dir=$(fzt)
     if [[ -z $dir ]]; then
         zle redisplay
         return 0
@@ -79,20 +79,6 @@ fzf-z-cd-widget() {
 }
 zle -N fzf-z-cd-widget
 bindkey '^G' fzf-z-cd-widget
-
-fzf-z-stack-widget() {
-    local dir=$(fzs)
-    if [[ -z $dir ]]; then
-        zle redisplay
-        return 0
-    fi
-    cd $dir
-    local ret=$?
-    zle fzf-redraw-prompt
-    return $ret
-}
-zle -N fzf-z-stack-widget
-bindkey '^S' fzf-z-stack-widget
 
 zle -N fzf-completion-widget
 bindkey '^I' fzf-completion-widget
