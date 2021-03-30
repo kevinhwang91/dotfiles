@@ -34,6 +34,7 @@
 [delta]
     line-numbers = true
     syntax-theme = TwoDark
+    navigate = true
     width = 1
     minus-style = syntax "#450a15"
     minus-emph-style = syntax "#600818"
