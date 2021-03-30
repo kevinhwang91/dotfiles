@@ -63,11 +63,7 @@ return require('packer').startup({
             keys = {'<Plug>(Exchange)', '<Plug>(ExchangeClear)', '<Plug>(ExchangeLine)'}
         }
 
-        use {
-            'Krasjet/auto-pairs',
-            event = 'InsertEnter *',
-            config = [[vim.fn['AutoPairsTryInit']()]]
-        }
+        use {'Krasjet/auto-pairs', opt = false}
 
         use {'mg979/vim-visual-multi'}
 

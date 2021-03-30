@@ -21,14 +21,6 @@ local function init()
     M.defer_load()
 end
 
-local function gutter_size()
-    local lnum, col = unpack(api.nvim_win_get_cursor(0))
-    api.nvim_win_set_cursor(0, {lnum, 0})
-    local size = fn.wincol() - 1
-    api.nvim_win_set_cursor(0, {lnum, col})
-    return size
-end
-
 function M.do_fold()
     local ret = false
     local fsize
@@ -95,8 +87,8 @@ function M.foldtext()
     else
         line = fs_line:gsub('\t', string.rep(' ', vim.bo.tabstop))
     end
-    local g_size = gutter_size()
-    local width = api.nvim_win_get_width(0) - g_size
+    local scl_size = fn.screenpos(0, api.nvim_win_get_cursor(0)[1], 1).curscol - fn.win_screenpos(0)[2]
+    local width = api.nvim_win_get_width(0) - scl_size
     local fold_info = string.format(' %d lines %s', 1 + vim.v.foldend - vim.v.foldstart,
         string.rep(' + ', vim.v.foldlevel))
     local spaces = string.rep(' ', width - fn.strwidth(fold_info .. line))

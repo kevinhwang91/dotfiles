@@ -3,24 +3,20 @@ local hlslens = require('hlslens')
 local hlslens_started = false
 local line_lens_bak
 
-local override_line_lens = function(pos_list, nearest, idx, r_idx, hls_ns)
+local override_line_lens = function(render, pos_list, nearest, idx, r_idx)
     local _ = r_idx
-    local lnum = pos_list[idx][1]
-    local count = #pos_list
+    local lnum, col = unpack(pos_list[idx])
 
     local text, chunks
     if nearest then
-        text = string.format('[%d/%d]', idx, count)
-        chunks = {{' ', 'Ignore'}, {text, 'HlSearchLensCur'}}
+        text = string.format('[%d/%d]', idx, #pos_list)
+        chunks = {{'  ', 'Normal'}, {text, 'HlSearchLensCur'}}
+        render.set_virt_or_float(0, lnum - 1, col - 1, chunks)
     else
         text = string.format('[%d]', idx)
-        chunks = {{' ', 'Ignore'}, {text, 'HlSearchLens'}}
+        chunks = {{'  ', 'Normal'}, {text, 'HlSearchLens'}}
+        render.set_virt(0, lnum - 1, -1, chunks)
     end
-    vim.api.nvim_buf_set_extmark(0, hls_ns, lnum - 1, -1, {
-        virt_text = chunks,
-        virt_text_pos = 'overlay',
-        virt_text_hide = true
-    })
 end
 
 function M.vmlens_start()
@@ -28,7 +24,7 @@ function M.vmlens_start()
     if not hlslens then
         return
     end
-    local config = hlslens.get_config()
+    local config = hlslens.config()
     line_lens_bak = config.override_line_lens
     config.override_line_lens = override_line_lens
     hlslens_started = config.started
@@ -43,7 +39,7 @@ function M.vmlens_exit()
     if not hlslens then
         return
     end
-    local config = hlslens.get_config()
+    local config = hlslens.config()
     config.override_line_lens = line_lens_bak
     hlslens.disable()
     if hlslens_started then

@@ -172,6 +172,8 @@ map('n', '<Leader>i', '<Cmd>sil! norm! `^<CR>')
 
 map('n', '<M-j>', '<Cmd>m +1<CR>')
 map('n', '<M-k>', '<Cmd>m -2<CR>')
+map('i', '<M-j>', '<C-o><Cmd>m +1<CR>')
+map('i', '<M-k>', '<C-o><Cmd>m -2<CR>')
 map('x', '<M-j>', [[:m '>+1<CR>gv=gv]])
 map('x', '<M-k>', [[:m '<-2<CR>gv=gv]])
 map('n', 'yd', [[<Cmd>call setreg(v:register, expand('%:p:h'))<CR>:echo expand('%:p:h')<CR>]])
@@ -272,6 +274,7 @@ else
     cmd([[com! PackerSync lua require('plugs.packer').sync()]])
     cmd([[com! PackerClean lua require('plugs.packer').clean()]])
     cmd([[com! PackerCompile lua require('plugs.packer').compile()]])
+    cmd([[com! PackerStatus lua require('plugs.packer').status()]])
 end
 
 vim.api.nvim_exec([[
