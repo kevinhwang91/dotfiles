@@ -13,7 +13,7 @@ class FzfSelect(Command):
     """
 
     def execute(self):
-        fzf_cmd ='fzf +m --height=100% --layout=default --info=default'
+        fzf_cmd = 'fzf +m --height=100% --layout=default --info=default'
         if self.quantifier:
             # match only directories
             if shutil.which('fd'):
@@ -31,10 +31,9 @@ class FzfSelect(Command):
                 -o -fstype 'dev' -o -fstype 'proc' \) -prune \
                 -o -print 2> /dev/null | cut -b3- | " + fzf_cmd
         fzf = self.fm.execute_command(
-            command, universal_newlines=True, stdout=subprocess.PIPE)
-        stdout = fzf.communicate()[0]
+            command, text=True, stdout=subprocess.PIPE)
         if fzf.returncode == 0:
-            fzf_file = os.path.abspath(stdout.rstrip('\n'))
+            fzf_file = os.path.abspath(fzf.stdout.readline().rstrip('\n'))
             if os.path.isdir(fzf_file):
                 self.fm.cd(fzf_file)
             else:

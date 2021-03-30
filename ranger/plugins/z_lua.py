@@ -26,16 +26,8 @@ class Z(ranger.api.commands.Command):
         if not arg1:
             return
         mode = None
-        fzf_enable = False
-        fzf_cmd = ['fzf', '--height=100%', '--layout=default', '--info=default']
-        if arg1 == '-s':
-            mode = '--'
-            fzf_enable = True
-        elif arg1 == '-g':
-            mode = '-l'
-            fzf_cmd += ['-n2..,..', '--tac', '+s', '-e']
-            fzf_enable = True
-        elif arg1 in ('--', '-l'):
+        fzf_cmd = ['fzf', '--height=100%', '--layout=default', '--info=default', '--tac']
+        if arg1 in ('--', '-l', '-t'):
             mode = arg1
         cmd = ['z.lua']
         import subprocess
@@ -43,16 +35,26 @@ class Z(ranger.api.commands.Command):
             cmd += [mode]
             if mode == '--':
                 cmd += ['-e']
+            elif mode == '-t':
+                cmd += ['-l']
             else:
                 cmd += self.args[2:]
-            with subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT) as src_pro:
-                if fzf_enable:
+            with subprocess.Popen(cmd, text=True, stdout=subprocess.PIPE,
+                                  stderr=subprocess.STDOUT) as src_pro:
+                if mode == '-t':
                     sink_pro = self.fm.execute_command(
-                        fzf_cmd,
-                        universal_newlines=True, stdin=src_pro.stdout, stdout=subprocess.PIPE)
-                    stdout = sink_pro.communicate()[0]
+                        fzf_cmd, text=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                        wait=False)
                     import re
-                    path = re.sub(r'^\s*[0-9,.]*\s*', '', stdout).rstrip('\n')
+                    home_pat = '^' + os.getenv('HOME')
+                    for line in src_pro.stdout.readlines():
+                        path = line.split(None, 1)[1]
+                        sink_pro.stdin.write(re.sub(home_pat, '~', path))
+                        sink_pro.stdin.flush()
+                    sink_pro.stdin.close()
+                    sink_pro.wait()
+                    path = sink_pro.stdout.readline().rstrip('\n')
+                    path = os.path.expanduser(path)
                     if path and os.path.exists(path):
                         self.fm.cd(path)
                 else:
