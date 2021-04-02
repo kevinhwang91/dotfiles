@@ -12,12 +12,12 @@ local function set_win_rnu(val)
 
     local cur_winid = api.nvim_get_current_win()
     for _, winid in ipairs(api.nvim_tabpage_list_wins(0)) do
-        if cur_winid == winid and vim.wo[cur_winid].number then
-            if vim.bo.buftype ~= 'quickfix' then
-                vim.wo[cur_winid].relativenumber = val
+        if cur_winid == winid and vim.wo[cur_winid].nu then
+            if vim.bo.bt ~= 'quickfix' then
+                vim.wo[cur_winid].rnu = val
             end
-        elseif api.nvim_win_get_config(0).relative == '' and vim.wo[winid].number then
-            vim.wo[winid].relativenumber = false
+        elseif api.nvim_win_get_config(0).relative == '' and vim.wo[winid].nu then
+            vim.wo[winid].rnu = false
         end
     end
 end
@@ -48,6 +48,15 @@ end
 
 function M.win_enter()
     set_rnu()
+end
+
+function M.scmd_enter()
+    set_win_rnu(false)
+    cmd('redraws')
+end
+
+function M.scmd_leave()
+    set_win_rnu(true)
 end
 
 return M

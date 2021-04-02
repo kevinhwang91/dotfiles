@@ -30,8 +30,8 @@ local function create()
         col = 0,
         style = 'minimal'
     })
-    vim.wo[shadow_winid].winhighlight = 'Normal:Normal'
-    vim.wo[shadow_winid].winblend = shadow_winblend
+    vim.wo[shadow_winid].winhl = 'Normal:Normal'
+    vim.wo[shadow_winid].winbl = shadow_winblend
     return true
 end
 

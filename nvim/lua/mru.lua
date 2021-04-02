@@ -3,12 +3,17 @@ local api = vim.api
 local fn = vim.fn
 local cmd = vim.cmd
 
-local disk_file = vim.env.HOME .. '/.mru_file'
-local tmp_file = '/tmp/' .. vim.env.USER .. '_mru_file'
-local max = 1000
-local count = 0
+local disk_file
+local tmp_file
+local max
+local count
 
-local function init()
+local function setup()
+    disk_file = vim.env.HOME .. '/.mru_file'
+    tmp_file = '/tmp/' .. vim.env.USER .. '_mru_file'
+    max = 1000
+    count = 0
+
     if fn.filereadable(tmp_file) == 0 then
         M.write2ram()
     end
@@ -111,6 +116,6 @@ function M.update(bufnr)
     end
 end
 
-init()
+setup()
 
 return M

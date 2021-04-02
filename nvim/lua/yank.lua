@@ -4,7 +4,8 @@ local fn = vim.fn
 
 local last_wv
 
-local function init()
+-- TODO, with some issues, I can't find it out recently
+local function setup()
     api.nvim_exec([[
         aug TextYank
             au!
@@ -34,6 +35,6 @@ function M.restore()
     last_wv = nil
 end
 
-init()
+setup()
 
 return M

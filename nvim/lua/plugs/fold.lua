@@ -5,10 +5,12 @@ local api = vim.api
 
 local parsers = require('nvim-treesitter.parsers')
 
-local bl_ft = {'man', 'help', 'markdown'}
-local anyfold_prefer_ft = {'python'}
+local bl_ft
+local anyfold_prefer_ft
 
-local function init()
+local function setup()
+    bl_ft = {'man', 'help', 'markdown'}
+    anyfold_prefer_ft = {'python'}
     api.nvim_exec([[
         aug FoldLoad
             au!
@@ -87,7 +89,8 @@ function M.foldtext()
     else
         line = fs_line:gsub('\t', string.rep(' ', vim.bo.tabstop))
     end
-    local scl_size = fn.screenpos(0, api.nvim_win_get_cursor(0)[1], 1).curscol - fn.win_screenpos(0)[2]
+    local scl_size = fn.screenpos(0, api.nvim_win_get_cursor(0)[1], 1).curscol -
+                         fn.win_screenpos(0)[2]
     local width = api.nvim_win_get_width(0) - scl_size
     local fold_info = string.format(' %d lines %s', 1 + vim.v.foldend - vim.v.foldstart,
         string.rep(' + ', vim.v.foldlevel))
@@ -95,6 +98,6 @@ function M.foldtext()
     return line .. spaces .. fold_info
 end
 
-init()
+setup()
 
 return M

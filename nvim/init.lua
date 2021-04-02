@@ -689,6 +689,7 @@ g.coc_global_extensions = {
     'coc-dictionary', 'coc-markdownlint', 'coc-snippets', 'coc-word'
 }
 g.coc_enable_locationlist = 0
+map('i', '<CR>', [[pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"]], {noremap = true, expr = true})
 cmd([[au User CocNvimInit ++once lua require('plugs.coc')]])
 
 -- kkoomen/vim-doge
@@ -734,6 +735,8 @@ api.nvim_exec([[
         au FocusLost * lua require('rnu').focus(false)
         au FocusGained * lua require('rnu').focus(true)
         au WinEnter * lua require('rnu').win_enter()
+        au CmdlineEnter [/\?] lua require('rnu').scmd_enter()
+        au CmdlineLeave [/\?] lua require('rnu').scmd_leave()
     aug END
 ]], false)
 

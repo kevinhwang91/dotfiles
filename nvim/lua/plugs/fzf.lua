@@ -5,7 +5,7 @@ local cmd = vim.cmd
 
 local mru = require('mru')
 
-local function init()
+local function setup()
     vim.g.fzf_action = {['ctrl-t'] = 'tabedit', ['ctrl-s'] = 'split', ['ctrl-v'] = 'vsplit'}
     vim.g.fzf_layout = {window = {width = 0.7, height = 0.7}}
     api.nvim_exec([[
@@ -61,6 +61,6 @@ function M.resize_preview_layout()
     end)
 end
 
-init()
+setup()
 
 return M

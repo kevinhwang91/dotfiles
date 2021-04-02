@@ -1,5 +1,6 @@
 local M = {}
 local hlslens = require('hlslens')
+local config = require('hlslens.config')
 local hlslens_started = false
 local line_lens_bak
 
@@ -24,7 +25,6 @@ function M.vmlens_start()
     if not hlslens then
         return
     end
-    local config = hlslens.config()
     line_lens_bak = config.override_line_lens
     config.override_line_lens = override_line_lens
     hlslens_started = config.started
@@ -39,7 +39,6 @@ function M.vmlens_exit()
     if not hlslens then
         return
     end
-    local config = hlslens.config()
     config.override_line_lens = line_lens_bak
     hlslens.disable()
     if hlslens_started then

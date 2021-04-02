@@ -2,7 +2,7 @@ local M = {}
 local fn = vim.fn
 local api = vim.api
 
-local function init()
+local function setup()
     _G.statusline = M.statusline
     vim.o.statusline = '%!v:lua.statusline()'
 
@@ -232,6 +232,6 @@ function M.tabline()
     return table.concat(tl)
 end
 
-init()
+setup()
 
 return M

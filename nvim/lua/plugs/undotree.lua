@@ -3,7 +3,7 @@ local cmd = vim.cmd
 local fn = vim.fn
 local api = vim.api
 
-local function init()
+local function setup()
     vim.g.undotree_SplitWidth = 45
     vim.g.undotree_SetFocusWhenToggle = 1
     api.nvim_exec([[
@@ -33,6 +33,6 @@ function M.clean_undo()
     end
 end
 
-init()
+setup()
 
 return M

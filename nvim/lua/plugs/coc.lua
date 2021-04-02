@@ -5,7 +5,7 @@ local cmd = vim.cmd
 
 local map = require('remap').map
 
-local function init()
+local function setup()
     -- https://github.com/neoclide/coc.nvim/issues/2853
     fn['coc#config']('snippets', {ultisnips = {enable = true}})
     fn['CocActionAsync']('deactivateExtension', 'coc-snippets')
@@ -27,18 +27,19 @@ local function init()
 
     cmd('hi link CocHighlightText CurrentWord')
 
-    local map_opt = {noremap = true, silent = true, expr = true}
-    map('i', '<C-space>', 'coc#refresh()', map_opt)
-    map('i', '<CR>', [[pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"]], map_opt)
-
-    map('n', '<C-f>', [[coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"]], map_opt)
-    map('n', '<C-b>', [[coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"]], map_opt)
-    map('v', '<C-f>', [[coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"]], map_opt)
-    map('v', '<C-b>', [[coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"]], map_opt)
+    map('i', '<C-space>', 'coc#refresh()', {noremap = true, expr = true})
+    map('n', '<C-f>', [[coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"]],
+        {noremap = true, expr = true})
+    map('n', '<C-b>', [[coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"]],
+        {noremap = true, expr = true})
+    map('v', '<C-f>', [[coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"]],
+        {noremap = true, expr = true})
+    map('v', '<C-b>', [[coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"]],
+        {noremap = true, expr = true})
     map('i', '<C-f>', [[coc#float#has_scroll() ? "\<C-r>=coc#float#scroll(1)\<cr>" : "\<Right>"]],
-        map_opt)
+        {noremap = true, expr = true})
     map('i', '<C-b>', [[coc#float#has_scroll() ? "\<C-r>=coc#float#scroll(0)\<cr>" : "\<Left>"]],
-        map_opt)
+        {noremap = true, expr = true})
 
     map('n', '[d', '<Plug>(coc-diagnostic-prev)', {})
     map('n', ']d', '<Plug>(coc-diagnostic-next)', {})
@@ -179,6 +180,6 @@ function M.hl_fallback()
     vim.w.coc_matchids_fb = fn.matchadd('CocHighlightText', get_cur_word(), -1)
 end
 
-init()
+setup()
 
 return M

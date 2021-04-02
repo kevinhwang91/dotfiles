@@ -1,7 +1,7 @@
 local M = {}
 local cmd = vim.cmd
 
-local function init()
+local function setup()
     cmd('pa nvim-treesitter')
     cmd('pa nvim-treesitter-textobjects')
     require('nvim-treesitter.configs').setup({
@@ -36,6 +36,6 @@ local function init()
     })
 end
 
-init()
+setup()
 
 return M
