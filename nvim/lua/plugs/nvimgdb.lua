@@ -3,7 +3,6 @@ local api = vim.api
 local fn = vim.fn
 local cmd = vim.cmd
 
-local map = require('remap').map
 local bmap, bunmap = function(...)
     require('remap').bmap(0, unpack({...}))
 end, function(mode, lhs)
@@ -11,17 +10,6 @@ end, function(mode, lhs)
 end
 
 function M.manual_init(args)
-    vim.g.nvimgdb_disable_start_keymaps = 1
-    vim.g.nvimgdb_config_override = {
-        codewin_command = 'vnew',
-        sign_breakpoint_priority = 99,
-        set_keymaps = 'GdbSetKeymaps',
-        unset_keymaps = 'GdbUnsetKeymaps',
-        set_tkeymaps = 'GdbSetTKeymaps'
-    }
-    map('n', '<Leader>dd', ':GdbStart gdb -q<Space>')
-    map('n', '<Leader>dp', ':GdbStartPDB python -m pdb<Space>')
-
     api.nvim_exec([[
         aug NvimGdb
             au User NvimGdbStart lua require('plugs.nvimgdb').start()

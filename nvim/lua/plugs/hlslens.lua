@@ -12,7 +12,7 @@ local override_line_lens = function(render, pos_list, nearest, idx, r_idx)
     if nearest then
         text = string.format('[%d/%d]', idx, #pos_list)
         chunks = {{'  ', 'Normal'}, {text, 'HlSearchLensCur'}}
-        render.set_virt_or_float(0, lnum - 1, col - 1, chunks)
+        render.set_virt_nearest(0, lnum - 1, col - 1, chunks)
     else
         text = string.format('[%d]', idx)
         chunks = {{'  ', 'Normal'}, {text, 'HlSearchLens'}}
@@ -42,6 +42,7 @@ function M.vmlens_exit()
     config.override_line_lens = line_lens_bak
     hlslens.disable()
     if hlslens_started then
+        hlslens.enable()
         hlslens.start()
     end
 end

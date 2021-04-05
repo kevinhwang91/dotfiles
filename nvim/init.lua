@@ -48,7 +48,7 @@ o.titlestring = '%(%m%)%(%{expand(\"%:~\")}%)'
 o.history = 3000
 o.lazyredraw = true
 o.inccommand = 'nosplit'
-o.shortmess = o.shortmess .. 'aIc'
+o.shortmess = o.shortmess .. 'acIS'
 o.confirm = true
 o.jumpoptions = 'stack'
 o.diffopt = o.diffopt .. ',vertical'
@@ -166,6 +166,8 @@ map('n', [[g`]], [[g']])
 map('x', [[g`]], [[g']])
 map('n', [[m']], [[m`]])
 map('x', [[m']], [[m`]])
+map('n', [[m`]], [[m']])
+map('x', [[m`]], [[m']])
 
 map('n', [['0]], [[<Cmd>norm! `0<CR><Cmd>sil! CleanEmptyBuf<CR>]])
 map('n', '<Leader>i', '<Cmd>sil! norm! `^<CR>')
@@ -187,12 +189,12 @@ map('n', ']', [[v:lua._G.prefix_timeout(']')]], {noremap = true, expr = true})
 map('x', ']', [[v:lua._G.prefix_timeout(']')]], {noremap = true, expr = true})
 map('n', '[b', '<Cmd>bp<CR>')
 map('n', ']b', '<Cmd>bn<CR>')
-map('n', '[q', [[<Cmd>execute(v:count1 . 'cprevious')<CR>]])
-map('n', ']q', [[<Cmd>execute(v:count1 . 'cnext')<CR>]])
+map('n', '[q', [[<Cmd>execute(v:count1 . 'cp')<CR>]])
+map('n', ']q', [[<Cmd>execute(v:count1 . 'cn')<CR>]])
 map('n', '[Q', '<Cmd>cfir<CR>')
 map('n', ']Q', '<Cmd>cla<CR>')
-map('n', '[s', [[<Cmd>execute(v:count1 . 'lprevious')<CR>]])
-map('n', ']s', [[<Cmd>execute(v:count1 . 'lnext')<CR>]])
+map('n', '[s', [[<Cmd>execute(v:count1 . 'lp')<CR>]])
+map('n', ']s', [[<Cmd>execute(v:count1 . 'lne')<CR>]])
 map('n', '[S', '<Cmd>lfir<CR>')
 map('n', ']S', '<Cmd>lla<CR>')
 map('n', '[z', '[z_')
@@ -235,6 +237,17 @@ g.loaded_remote_plugins = fn.stdpath('data') .. '/rplugin.vim'
 cmd([[com! -Bar UpdateRemotePlugins call remote#host#UpdateRemotePlugins()]])
 
 -- sakhnik/nvim-gdb
+g.nvimgdb_disable_start_keymaps = 1
+g.nvimgdb_config_override = {
+    codewin_command = 'vnew',
+    sign_breakpoint_priority = 99,
+    set_keymaps = 'GdbSetKeymaps',
+    unset_keymaps = 'GdbUnsetKeymaps',
+    set_tkeymaps = 'GdbSetTKeymaps'
+}
+map('n', '<Leader>dd', ':GdbStart gdb -q<Space>', {silent = false})
+map('n', '<Leader>dp', ':GdbStartPDB python -m pdb<Space>', {silent = false})
+
 api.nvim_exec([[
     function! GdbInit(...)
         call v:lua.require('plugs.nvimgdb').manual_init(a:000)
@@ -293,6 +306,14 @@ require('bqf').setup({
     filter = {fzf = {action_for = {['ctrl-s'] = 'split'}}}
 })
 
+require('hlslens').setup({
+    auto_enable = true,
+    calm_down = false,
+    nearest_only = false,
+    nearest_float = 'always',
+    override_line_lens = nil
+})
+
 -- kevinhwang91/nvim-hlslens
 map('n', 'n', [[<Cmd>execute('norm! ' . v:count1 . 'n')<CR><Cmd>lua require('hlslens').start()<CR>]])
 map('n', 'N', [[<Cmd>execute('norm! ' . v:count1 . 'N')<CR><Cmd>lua require('hlslens').start()<CR>]])
@@ -321,7 +342,7 @@ g.rnvimr_action = {
     ['<C-t>'] = 'NvimEdit tabedit',
     ['<C-s>'] = 'NvimEdit split',
     ['<C-v>'] = 'NvimEdit vsplit',
-    ['<C-o>'] = 'NvimEdit drop',
+    ['<C-o>'] = 'NvimEdit drop true',
     gw = 'JumpNvimCwd',
     yw = 'EmitRangerCwd'
 }
@@ -785,3 +806,6 @@ vim.schedule(function()
         cmd('pa vim-lsp-cxx-highlight')
     end, 500)
 end)
+
+
+
