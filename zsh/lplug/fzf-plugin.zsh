@@ -2,9 +2,11 @@ if (( ! $+commands[fzf] )) || [[ ! $- =~ i ]]; then
     return
 fi
 
-FZF_DEFAULT_OPTS="--height=60% --color=fg:-1,bg:-1,hl:#c3d82c,fg+:15,bg+:#383c4a,hl+:#c3d82c \
+FZF_DEFAULT_OPTS="--preview-window=border-left --height=60% \
+--color=fg:-1,bg:-1,hl:#c3d82c,fg+:15,bg+:#383c4a,hl+:#c3d82c \
 --color=gutter:-1,info:2,prompt:12,pointer:1,marker:3,spinner:12,header:12,border:#b3c0ce \
---bind=alt-,:first,alt-.:last,change:first,ctrl-r:toggle-all,alt-p:toggle-preview"
+--bind=alt-,:first,alt-.:last,change:first,ctrl-r:toggle-all,\
+alt-k:preview-up,alt-j:preview-down,alt-p:toggle-preview"
 
 if (( $+commands[xsel] )); then
     FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS,ctrl-y:'execute-silent(echo {} | xsel -i -b)'"

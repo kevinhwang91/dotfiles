@@ -20,8 +20,7 @@ if (( $+commands[xsel] )); then
 elif (( $+commands[xclip] )); then
     fzf_bind_opts='--bind=ctrl-y:execute-silent(echo -n {} | xclip -i -selection clipboard)'
 fi
-local fzf_opts="--height=60% --tac --tiebreak=index --preview-window=right:50% \
---bind=alt-k:preview-up,alt-j:preview-down $fzf_bind_opts"
+local fzf_opts="--height=60% --tac --tiebreak=index $fzf_bind_opts"
 local dir=$(z -l -t | sed -e 's/^-[0-9]* *//' -e "s|^$HOME|~|" \
     | $FZF_CMD ${(z)fzf_opts} --preview=$fzf_preview_cmd)
 print ${dir/#\~/$HOME}

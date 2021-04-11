@@ -62,7 +62,6 @@ class FrestoreCmd(RestoreCmd):
         fzf_pro = subprocess.Popen(
             [fzf_cmd, '--header=  Which files to restore?', '-d', '\t', '--with-nth=1',
              '--height=60%', '--reverse', '-m', '--ansi', '--preview-window', ':hidden',
-             '--bind', 'alt-k:preview-up,alt-j:preview-down,alt-p:toggle-preview',
              '--preview', fzf_preview_cmd],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,

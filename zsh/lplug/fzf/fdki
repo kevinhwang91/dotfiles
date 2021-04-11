@@ -32,7 +32,7 @@ _fdki() {
 local fzf_opts="--header-lines=1 -m \
 ${commands[grcat]:+--ansi} --height=60% \
 --min-height=15 --tac --reverse \
---preview-window=down:2 $EXTRA_OPTS"
+--preview-window=down:2,border-top $EXTRA_OPTS"
 
 local fzf_preview_cmd="docker inspect --format='\
 {{printf \"Entrypoint: %s\n\" (join .Config.Entrypoint \" \")}}\

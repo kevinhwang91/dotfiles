@@ -19,9 +19,7 @@ while getopts ':dl:s:' opt; do
     esac
 done
 
-local fzf_opts="--height=60% --reverse -m --tiebreak=end \
---preview-window=right:50% \
---bind=alt-k:preview-up,alt-j:preview-down"
+local fzf_opts="--height=60% --reverse -m --tiebreak=end"
 
 if (( $+commands[fd] )); then
     local cmd="command fd -L . $s_path --min-depth 1 ${level:+--max-depth $level} -H -E '.git*'"

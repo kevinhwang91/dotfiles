@@ -20,7 +20,7 @@ _fps() {
 local fzf_opts="--header-lines=1 -m \
 ${commands[grcat]:+--ansi} --height=60% \
 --min-height=15 --tac --reverse \
---preview-window=down:2"
+--preview-window=down:2,border-top"
 
 local nlwp='nlwp'
 if [[ $OSTYPE == darwin* ]]; then

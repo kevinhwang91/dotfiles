@@ -38,7 +38,7 @@ local function mru_source()
 end
 
 function M.mru()
-    local preview_args = vim.g.fzf_preview_window or {'right', 'ctrl-/'}
+    local preview_args = vim.g.fzf_preview_window or {'right:50%, border-left', 'ctrl-/'}
     local opts = #preview_args == 0 and {'hidden'} or preview_args
     opts = fn['fzf#vim#with_preview'](unpack(opts))
     vim.list_extend(opts.options, {'--prompt', 'MRU> ', '--tiebreak', 'index'})
@@ -50,10 +50,10 @@ function M.resize_preview_layout()
     pcall(function()
         local layout = vim.g.fzf_layout.window
         if vim.o.columns * layout.width[false] - 2 > 100 then
-            vim.g.fzf_preview_window = {'right:50%'}
+            vim.g.fzf_preview_window = {'right:50%,border-left'}
         else
             if vim.o.lines * layout.height[false] - 2 > 25 then
-                vim.g.fzf_preview_window = {'down:50%'}
+                vim.g.fzf_preview_window = {'down:50%,border-top'}
             else
                 vim.g.fzf_preview_window = {}
             end
