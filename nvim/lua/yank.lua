@@ -3,8 +3,9 @@ local api = vim.api
 local fn = vim.fn
 
 local last_wv
+local winid
 
--- TODO, with some issues, I can't find it out recently
+-- TODO, under test
 local function setup()
     api.nvim_exec([[
         aug TextYank
@@ -15,24 +16,26 @@ local function setup()
 end
 
 function M.wrap()
-    local m = api.nvim_get_mode().mode
-    if m == 'n' then
-        last_wv = fn.winsaveview()
+    if api.nvim_get_mode().mode == 'n' then
+        M.set_wv()
     else
         last_wv = nil
+        winid = nil
     end
     return 'y'
 end
 
 function M.set_wv()
     last_wv = fn.winsaveview()
+    winid = api.nvim_get_current_win()
 end
 
 function M.restore()
-    if vim.v.event.operator == 'y' and last_wv then
+    if vim.v.event.operator == 'y' and last_wv and api.nvim_get_current_win() == winid then
         fn.winrestview(last_wv)
     end
     last_wv = nil
+    winid = nil
 end
 
 setup()

@@ -25,6 +25,9 @@
 					},
 					"completion": {
 						"keywordSnippet": "Enable"
+					},
+					"telemetry": {
+						"enable": false
 					}
 				}
 			}

@@ -52,7 +52,7 @@ o.shortmess = o.shortmess .. 'acIS'
 o.confirm = true
 o.jumpoptions = 'stack'
 o.diffopt = o.diffopt .. ',vertical'
-o.shada = [[!,'20,<50,s10,/100,@1000,h]]
+o.shada = [[!,'10,<50,s10,/100,@1000,h]]
 
 -- undo
 bo.undofile = true
@@ -273,7 +273,7 @@ api.nvim_exec([[
     aug Fzf
         au!
         au FuncUndefined fzf#* lua require('plugs.fzf')
-        au CmdUndefined FZF,BTags,BCommits,History,GFiles,Marks,Buffers lua require('plugs.fzf')
+        au CmdUndefined FZF,BTags,BCommits,History,GFiles,Marks,Buffers,Rg lua require('plugs.fzf')
     aug END
     com! -nargs=* -bar -bang Maps call fzf#vim#maps(<q-args>, <bang>0)
     com! -bar -bang Helptags call fzf#vim#helptags(<bang>0)
@@ -308,23 +308,18 @@ require('bqf').setup({
 
 require('hlslens').setup({
     auto_enable = true,
+    enable_incsearch = true,
     calm_down = false,
     nearest_only = false,
-    nearest_float = 'always',
+    nearest_float_when = 'auto',
+    float_shadow_blend = 50,
+    virt_priority = 100,
     override_line_lens = nil
 })
 
 -- kevinhwang91/nvim-hlslens
 map('n', 'n', [[<Cmd>execute('norm! ' . v:count1 . 'n')<CR><Cmd>lua require('hlslens').start()<CR>]])
 map('n', 'N', [[<Cmd>execute('norm! ' . v:count1 . 'N')<CR><Cmd>lua require('hlslens').start()<CR>]])
-
-api.nvim_exec([[
-    aug VMlens
-        au!
-        au User visual_multi_start lua require('plugs.hlslens').vmlens_start()
-        au User visual_multi_exit lua require('plugs.hlslens').vmlens_exit()
-    aug END
-]], false)
 
 -- rhysd/clever-f.vim
 g.clever_f_across_no_line = 1
@@ -498,6 +493,14 @@ for _, lhs in ipairs({
         'vim-visual-multi', lhs))
 end
 cmd([[com! VMSearch pa vim-visual-multi<Bar>VMSearch]])
+
+api.nvim_exec([[
+    aug VMlens
+        au!
+        au User visual_multi_start lua require('plugs.vmlens').start()
+        au User visual_multi_exit lua require('plugs.vmlens').exit()
+    aug END
+]], false)
 
 -- highlight syntax
 api.nvim_exec([[
