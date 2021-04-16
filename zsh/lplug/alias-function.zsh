@@ -202,13 +202,13 @@ if (( $+commands[nvim] )); then
 
     alias ng='_ng'
     _ng() {
-        git status >/dev/null && nvim +Git +'winc o' +'bw 1'
+        git rev-parse >/dev/null 2>&1 && nvim +Git +'winc o' +'bw 1'
     }
 
     alias ngl='_ngl'
     compdef __ngl_compdef _ngl
     _ngl() {
-        git status >/dev/null && nvim +"Flog -raw-args=$*" +'bw 1'
+        git rev-parse >/dev/null 2>&1 && nvim +"Flog -raw-args=$*" +'bw 1'
     }
     __ngl_compdef() {
         (( $+functions[_git-log] )) || _git
@@ -218,7 +218,7 @@ if (( $+commands[nvim] )); then
     alias ngdt='_ngdt'
     compdef __ngdt_compdef _ngdt
     _ngdt() {
-        git status >/dev/null && nvim +"Git difftool -y $*" +'bw 1'
+        git rev-parse >/dev/null 2>&1 && nvim +"Git difftool -y $*" +'bw 1'
     }
     __ngdt_compdef() {
         (( $+functions[_git-difftool] )) || _git

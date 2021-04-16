@@ -28,7 +28,7 @@ if [[ $TMUX_SESSION == 'floating' ]]; then
                 unset TMUX_SESSION
             fi
         else
-            tmux display "$TMUX_SESSION task has done."
+            tmux display -N -d 1000 "$TMUX_SESSION task has done."
         fi
     }
 

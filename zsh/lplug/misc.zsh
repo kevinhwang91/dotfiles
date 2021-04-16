@@ -8,6 +8,14 @@ setopt multios
 setopt long_list_jobs
 unsetopt nomatch
 
+# glob
+# ERE syntax     zsh extended glob
+# (foo)*         (foo)#
+# (foo)+         (foo)##
+# (foo)?         (|foo)
+# (foo|bar)      (foo|bar)
+setopt extendedglob
+
 # edit command using EDITOR
 autoload -U edit-command-line
 zle -N edit-command-line
