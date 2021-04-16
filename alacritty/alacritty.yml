@@ -199,7 +199,7 @@ colors:
   # affected cell, or hexadecimal colors like #ff00ff.
   cursor:
     text: '#000000'
-    cursor: '#528bff'
+    cursor: '#517cff'
 
   # Vi mode cursor colors
   #
