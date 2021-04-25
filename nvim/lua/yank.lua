@@ -4,6 +4,7 @@ local fn = vim.fn
 
 local last_wv
 local winid
+local bufnr
 
 -- TODO, under test
 local function setup()
@@ -19,8 +20,7 @@ function M.wrap()
     if api.nvim_get_mode().mode == 'n' then
         M.set_wv()
     else
-        last_wv = nil
-        winid = nil
+        M.clear_wv()
     end
     return 'y'
 end
@@ -28,14 +28,21 @@ end
 function M.set_wv()
     last_wv = fn.winsaveview()
     winid = api.nvim_get_current_win()
+    bufnr = api.nvim_get_current_buf()
+end
+
+function M.clear_wv()
+    last_wv = nil
+    winid = nil
+    bufnr = nil
 end
 
 function M.restore()
-    if vim.v.event.operator == 'y' and last_wv and api.nvim_get_current_win() == winid then
+    if vim.v.event.operator == 'y' and last_wv and api.nvim_get_current_win() == winid and
+        api.nvim_get_current_buf() == bufnr then
         fn.winrestview(last_wv)
     end
-    last_wv = nil
-    winid = nil
+    M.clear_wv()
 end
 
 setup()

@@ -26,8 +26,9 @@ end
 function M.do_fold()
     local ret = false
     local fsize
+    local bufname = api.nvim_buf_get_name(0)
     if vim.tbl_contains(anyfold_prefer_ft, vim.bo.filetype) then
-        fsize = fn.getfsize(fn.bufname('%'))
+        fsize = fn.getfsize(bufname)
         if 0 < fsize and fsize < 524288 then
             cmd('AnyFoldActivate')
             ret = true
@@ -38,7 +39,7 @@ function M.do_fold()
             vim.wo.foldmethod = 'expr'
             vim.wo.foldexpr = 'nvim_treesitter#foldexpr()'
         elseif not fsize then
-            fsize = fn.getfsize(fn.bufname('%'))
+            fsize = fn.getfsize(bufname)
             if 0 < fsize and fsize < 524288 then
                 cmd('AnyFoldActivate')
             end
@@ -54,12 +55,14 @@ function M.defer_load()
     if vim.b.loaded_fold or vim.wo.foldmethod == 'diff' then
         return
     end
-    if vim.bo.buftype == 'terminal' or vim.bo.buftype == 'quickfix' then
+    local bt = vim.bo.bt
+    if bt == 'terminal' or bt == 'quickfix' then
         return
     end
     if vim.tbl_contains(bl_ft, vim.bo.filetype) then
         return
     end
+    vim.wo.foldmethod = 'manual'
     local bufnr = tonumber(fn.expand('<abuf>')) or api.nvim_get_current_buf()
     vim.defer_fn(function()
         if vim.b.loaded_fold or vim.wo.foldmethod == 'diff' then

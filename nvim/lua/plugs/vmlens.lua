@@ -1,7 +1,7 @@
 local M = {}
 local hlslens = require('hlslens')
 local config
-local lens_bakup
+local lens_backup
 
 local override_lens = function(render, plist, nearest, idx, r_idx)
     local _ = r_idx
@@ -22,7 +22,7 @@ function M.start()
     vim.api.nvim_buf_set_keymap(0, 'n', 'n', '<C-n>', {silent = true})
     if hlslens then
         config = require('hlslens.config')
-        lens_bakup = config.override_lens
+        lens_backup = config.override_lens
         config.override_lens = override_lens
         hlslens.start()
     end
@@ -31,7 +31,7 @@ end
 function M.exit()
     vim.api.nvim_buf_del_keymap(0, 'n', 'n')
     if hlslens then
-        config.override_lens = lens_bakup
+        config.override_lens = lens_backup
         hlslens.start()
     end
 end

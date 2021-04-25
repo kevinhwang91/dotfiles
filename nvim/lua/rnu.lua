@@ -1,12 +1,13 @@
 local M = {}
 local api = vim.api
 local cmd = vim.cmd
+local fn = vim.fn
 
 local delay = 50
 local focus_lock = 1
 
 local function set_win_rnu(val)
-    if api.nvim_win_get_config(0).relative ~= '' then
+    if fn.win_gettype() ~= 'popup' then
         return
     end
 
@@ -16,7 +17,7 @@ local function set_win_rnu(val)
             if vim.bo.bt ~= 'quickfix' then
                 vim.wo[cur_winid].rnu = val
             end
-        elseif api.nvim_win_get_config(0).relative == '' and vim.wo[winid].nu then
+        elseif fn.win_gettype() ~= 'popup' and vim.wo[winid].nu then
             vim.wo[winid].rnu = false
         end
     end

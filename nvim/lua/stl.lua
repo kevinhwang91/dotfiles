@@ -32,7 +32,7 @@ local mode_map = setmetatable({
 
 local function readonly(bufnr)
     if vim.bo[bufnr].readonly then
-        return fn.filereadable(fn.bufname(bufnr or '%')) == 1 and '' or ''
+        return fn.filereadable(api.nvim_buf_get_name(bufnr or 0)) == 1 and '' or ''
     end
     return nil
 end
@@ -48,7 +48,7 @@ local function quickfix()
 end
 
 local function filename()
-    local bufname = fn.bufname('%')
+    local bufname = api.nvim_buf_get_name(0)
     if not vim.b.fugitive_fname then
         if bufname:match('^fugitive:') and fn.exists('*FugitiveReal') == 1 then
             vim.b.fugitive_fname = fn.fnamemodify(fn['FugitiveReal'](bufname), ':t') .. ' '
@@ -80,7 +80,7 @@ local fugitive = (function()
     local last_branch = {nil, nil}
 
     return function()
-        local bufname = fn.expand('%')
+        local bufname = api.nvim_buf_get_name(0)
         if bufname == '' or fn.exists('*FugitiveExtractGitDir') == 0 then
             return nil
         end
@@ -218,7 +218,7 @@ function M.tabline()
         local name
         local bufnr = fn.winbufnr(api.nvim_tabpage_get_win(tp))
         if vim.bo[bufnr].modifiable then
-            name = fn.fnamemodify(fn.bufname(bufnr), ':t')
+            name = fn.expand('%:t')
         else
             name = vim.bo[bufnr].filetype
         end

@@ -6,7 +6,7 @@ local g = vim.g
 local o, wo, bo = vim.o, vim.wo, vim.bo
 local map = require('remap').map
 
-cmd('sy enable')
+cmd('syntax enable')
 wo.number = true
 wo.relativenumber = true
 wo.cursorline = true
@@ -51,7 +51,7 @@ o.inccommand = 'nosplit'
 o.shortmess = o.shortmess .. 'acIS'
 o.confirm = true
 o.jumpoptions = 'stack'
-o.diffopt = o.diffopt .. ',vertical'
+o.diffopt = o.diffopt .. ',vertical,internal,algorithm:patience'
 o.shada = [[!,'10,<50,s10,/100,@1000,h]]
 
 -- undo
@@ -109,7 +109,7 @@ map('n', 'Q', '')
 map('n', '-', '"_')
 map('x', '-', '"_')
 map('n', 'y', [[v:lua._G.yank()]], {noremap = true, expr = true})
-map('x', 'y', [[v:lua._G.yank()]], {noremap = true, expr = true})
+map('n', 'Y', 'y$')
 map('n', 'v', 'm`v')
 map('n', 'V', 'm`V')
 map('n', '<Leader>2;', '@:')
@@ -313,8 +313,7 @@ require('hlslens').setup({
     nearest_only = false,
     nearest_float_when = 'auto',
     float_shadow_blend = 50,
-    virt_priority = 100,
-    override_line_lens = nil
+    virt_priority = 100
 })
 
 -- kevinhwang91/nvim-hlslens
@@ -385,11 +384,12 @@ map('x', 'gs', '<Plug>(GrepperOperator)', {})
 api.nvim_exec([[
     aug Grepper
         au!
-        au User Grepper call setqflist([], 'r', {'context': {'bqf': {'pattern_hl': histget('/')}}}) | bo cope
+        au User Grepper call setqflist([], 'r', {'context': {'bqf': {'pattern_hl': getreg('/')}}}) | bo cope
     aug END
 ]], false)
 
 -- andymass/vim-matchup
+g.matchup_surround_enabled = 1
 g.matchup_matchparen_timeout = 100
 g.matchup_matchparen_deferred = 1
 g.matchup_matchparen_deferred_show_delay = 150
@@ -419,6 +419,8 @@ map('x', 'a5', '<Plug>(matchup-a%)', {})
 map('o', 'a5', '<Plug>(matchup-a%)', {})
 map('x', 'i5', '<Plug>(matchup-i%)', {})
 map('o', 'i5', '<Plug>(matchup-i%)', {})
+map('n', 'cs5', '<plug>(matchup-cs%)', {})
+map('n', 'sd5', '<plug>(matchup-ds%)', {})
 
 -- haya14busa/vim-asterisk
 g['asterisk#keeppos'] = 0
@@ -558,6 +560,8 @@ g.nremap = {
     s = '<C-s>',
     u = '<C-u>',
     O = 'T',
+    ['*'] = '',
+    ['#'] = '',
     ['<C-W>gf'] = 'gF',
     ['[m'] = '[f',
     [']m'] = ']f'
@@ -772,13 +776,6 @@ api.nvim_exec([[
 ]], false)
 
 api.nvim_exec([[
-    aug FileDetect
-        au!
-        au BufNewFile,BufRead *.xkb setf xkb
-    aug END
-]], false)
-
-api.nvim_exec([[
     aug TermFix
         au!
         au TermEnter * call clearmatches()
@@ -804,11 +801,13 @@ vim.schedule(function()
         cmd('pa vim-gitgutter')
     end, 400)
     vim.defer_fn(function()
-        cmd('pa coc.nvim')
         cmd('pa tmux-complete.vim')
-        cmd('pa vim-lsp-cxx-highlight')
+        cmd('pa coc.nvim')
     end, 500)
 end)
 
-
-
+-- api.nvim_exec([[
+-- au WinLeave * echom 'leave: ' . nvim_get_current_win()
+-- au WinEnter * echom 'enter: ' . nvim_get_current_win()
+-- au CursorMoved * echom 'cursormove: ' . nvim_get_current_win()
+-- ]], false)

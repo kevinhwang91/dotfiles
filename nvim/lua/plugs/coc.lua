@@ -25,6 +25,16 @@ local function setup()
         au FileType vim xmap af <Plug>(coc-funcobj-a) | omap af <Plug>(coc-funcobj-a)
     aug END]], false)
 
+    local cxx_ft = {'c', 'cpp', 'objc', 'objcpp', 'cc', 'cuda'}
+    local cur_ft = vim.bo.ft
+    if vim.tbl_contains(cxx_ft, cur_ft) then
+        cmd('pa vim-lsp-cxx-highlight')
+        vim.bo.ft = cur_ft
+    else
+        cmd(string.format([[au Coc FileType %s ++once pa vim-lsp-cxx-highlight]],
+            table.concat(cxx_ft, ',')))
+    end
+
     cmd('hi link CocHighlightText CurrentWord')
 
     map('i', '<C-space>', 'coc#refresh()', {noremap = true, expr = true})

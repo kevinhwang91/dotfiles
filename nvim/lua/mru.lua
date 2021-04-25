@@ -87,7 +87,7 @@ end
 
 function M.update(bufnr)
     bufnr = bufnr == 0 and api.nvim_get_current_buf() or tonumber(bufnr)
-    local bufname = fn.bufname(bufnr)
+    local bufname = api.nvim_buf_get_name(bufnr)
     local filename = fn.fnamemodify(bufname, ':p')
     if bufname == '' or vim.bo[bufnr].buftype ~= '' or fn.filereadable(filename) == 0 then
         return

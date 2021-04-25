@@ -138,5 +138,8 @@ return require('packer').startup({
         use {'nvim-treesitter/nvim-treesitter', run = ':TSUpdate'}
 
         use {'nvim-treesitter/nvim-treesitter-textobjects'}
+
+        -- keep learning :)
+        use {'nvim-lua/plenary.nvim'}
     end
 })
