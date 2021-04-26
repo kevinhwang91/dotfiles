@@ -7,7 +7,7 @@ local delay = 50
 local focus_lock = 1
 
 local function set_win_rnu(val)
-    if fn.win_gettype() ~= 'popup' then
+    if fn.win_gettype() == 'popup' then
         return
     end
 

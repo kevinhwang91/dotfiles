@@ -27,7 +27,7 @@ return require('packer').startup({
 
         use {'kevinhwang91/rnvimr', opt = false}
 
-        use {'kevinhwang91/nvim-bqf', opt = false}
+        use {'kevinhwang91/nvim-bqf', opt = false, branch = 'optimize-magicwin'}
 
         use {'kevinhwang91/nvim-hlslens', opt = false}
 

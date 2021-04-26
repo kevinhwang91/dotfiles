@@ -306,6 +306,7 @@ require('bqf').setup({
     filter = {fzf = {action_for = {['ctrl-s'] = 'split'}}}
 })
 
+-- kevinhwang91/nvim-hlslens
 require('hlslens').setup({
     auto_enable = true,
     enable_incsearch = true,
@@ -315,8 +316,6 @@ require('hlslens').setup({
     float_shadow_blend = 50,
     virt_priority = 100
 })
-
--- kevinhwang91/nvim-hlslens
 map('n', 'n', [[<Cmd>execute('norm! ' . v:count1 . 'n')<CR><Cmd>lua require('hlslens').start()<CR>]])
 map('n', 'N', [[<Cmd>execute('norm! ' . v:count1 . 'N')<CR><Cmd>lua require('hlslens').start()<CR>]])
 
@@ -394,7 +393,7 @@ g.matchup_matchparen_timeout = 100
 g.matchup_matchparen_deferred = 1
 g.matchup_matchparen_deferred_show_delay = 150
 g.matchup_matchparen_deferred_hide_delay = 700
-g.matchup_matchparen_hi_surround_always = 1
+g.matchup_matchparen_hi_surround_always = 2
 g.matchup_matchparen_offscreen = {method = 'popup', highlight = 'CurrentWord'}
 g.matchup_delim_start_plaintext = 1
 g.matchup_motion_override_Npercent = 0
@@ -805,9 +804,3 @@ vim.schedule(function()
         cmd('pa coc.nvim')
     end, 500)
 end)
-
--- api.nvim_exec([[
--- au WinLeave * echom 'leave: ' . nvim_get_current_win()
--- au WinEnter * echom 'enter: ' . nvim_get_current_win()
--- au CursorMoved * echom 'cursormove: ' . nvim_get_current_win()
--- ]], false)
