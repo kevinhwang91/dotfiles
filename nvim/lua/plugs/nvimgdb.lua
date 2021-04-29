@@ -10,7 +10,7 @@ end, function(mode, lhs)
 end
 
 function M.manual_init(args)
-    api.nvim_exec([[
+    cmd([[
         aug NvimGdb
             au User NvimGdbStart lua require('plugs.nvimgdb').start()
         aug end
@@ -26,7 +26,7 @@ function M.manual_init(args)
         function! GdbSetTKeymaps()
             call v:lua.require('plugs.nvimgdb').set_tkeymaps()
         endfunction
-    ]], false)
+    ]])
 
     vim.schedule(function()
         cmd('delf! GdbInit')

@@ -21,10 +21,7 @@
 					},
 					"diagnostics": {
 						"enable": true,
-						"globals": ["hs", "vim", "it", "describe", "before_each", "after_each"]
-					},
-					"completion": {
-						"keywordSnippet": "Enable"
+						"globals": ["hs", "vim", "jit", "it", "describe", "before_each", "after_each"]
 					},
 					"telemetry": {
 						"enable": false

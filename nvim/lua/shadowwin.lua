@@ -1,5 +1,6 @@
 local M = {}
 local api = vim.api
+local cmd = vim.cmd
 local fn = vim.fn
 
 local shadow_winblend = 70
@@ -76,22 +77,22 @@ function M.toggle()
     end
     if api.nvim_win_get_config(cur_winid).relative == '' then
         if close() then
-            api.nvim_exec([[
+            cmd([[
                 aug ShadowWindow
                     au!
                     au WinEnter * lua require('shadowwin').toggle()
                 aug END
-            ]], false)
+            ]])
         end
     elseif not detect_other_wins(cur_winid) then
         if create() then
-            api.nvim_exec([[
+            cmd([[
                 aug ShadowWindow
                     au!
                     au VimResized * lua require('shadowwin').resize()
                     au WinEnter * lua vim.defer_fn(function() require('shadowwin').toggle() end, 50)
                 aug END
-            ]], false)
+            ]])
         end
     end
 end

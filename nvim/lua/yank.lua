@@ -1,5 +1,6 @@
 local M = {}
 local api = vim.api
+local cmd = vim.cmd
 local fn = vim.fn
 
 local last_wv
@@ -8,12 +9,12 @@ local bufnr
 
 -- TODO, under test
 local function setup()
-    api.nvim_exec([[
+    cmd([[
         aug TextYank
             au!
             au TextYankPost * lua require('yank').restore()
         aug END
-    ]], false)
+    ]])
 end
 
 function M.wrap()

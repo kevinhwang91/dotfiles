@@ -13,17 +13,18 @@ local function setup()
     fn['coc#config']('languageserver.lua.settings.Lua.workspace',
         {library = {[vim.env.VIMRUNTIME .. '/lua'] = true}})
 
-    api.nvim_exec([[
-    aug Coc
-        au!
-        au User CocLocationsChange ++nested lua require('plugs.coc').jump2loc()
-        au CursorHold * sil! call CocActionAsync('highlight', '', v:lua.require('plugs.coc').hl_fallback)
-        au User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
-        au VimLeavePre * if get(g:, 'coc_process_pid', 0) | call system('kill -9 -- -' . g:coc_process_pid) | endif
-        au InsertCharPre * lua require('plugs.coc').enable_ultisnips()
-        au FileType vim xmap if <Plug>(coc-funcobj-i) | omap if <Plug>(coc-funcobj-i)
-        au FileType vim xmap af <Plug>(coc-funcobj-a) | omap af <Plug>(coc-funcobj-a)
-    aug END]], false)
+    cmd([[
+        aug Coc
+            au!
+            au User CocLocationsChange ++nested lua require('plugs.coc').jump2loc()
+            au CursorHold * sil! call CocActionAsync('highlight', '', v:lua.require('plugs.coc').hl_fallback)
+            au User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
+            au VimLeavePre * if get(g:, 'coc_process_pid', 0) | call system('kill -9 -- -' . g:coc_process_pid) | endif
+            au InsertCharPre * lua require('plugs.coc').enable_ultisnips()
+            au FileType vim xmap if <Plug>(coc-funcobj-i) | omap if <Plug>(coc-funcobj-i)
+            au FileType vim xmap af <Plug>(coc-funcobj-a) | omap af <Plug>(coc-funcobj-a)
+        aug END
+    ]])
 
     local cxx_ft = {'c', 'cpp', 'objc', 'objcpp', 'cc', 'cuda'}
     local cur_ft = vim.bo.ft
@@ -31,8 +32,7 @@ local function setup()
         cmd('pa vim-lsp-cxx-highlight')
         vim.bo.ft = cur_ft
     else
-        cmd(string.format([[au Coc FileType %s ++once pa vim-lsp-cxx-highlight]],
-            table.concat(cxx_ft, ',')))
+        cmd(('au Coc FileType %s ++once pa vim-lsp-cxx-highlight'):format(table.concat(cxx_ft, ',')))
     end
 
     cmd('hi link CocHighlightText CurrentWord')
@@ -118,7 +118,7 @@ end
 
 function M.show_documentation()
     if vim.b.filetype == 'vim' or vim.b.filetype == 'help' then
-        cmd(string.format('h %s', fn.expand('<cword>')))
+        cmd(('h %s'):format(fn.expand('<cword>')))
     elseif api.nvim_exec([[echo CocAction('hasProvider', 'hover')]], true) == 'v:true' then
         fn['CocActionAsync']('doHover')
     else
@@ -130,7 +130,7 @@ function M.diagnostic()
     local diagnostics = fn['CocAction']('diagnosticList')
     local items, loc_ranges = {}, {}
     for _, d in ipairs(diagnostics) do
-        local text = string.format('[%s%s] %s', (d.source == '' and 'coc.nvim' or d.source),
+        local text = ('[%s%s] %s'):format((d.source == '' and 'coc.nvim' or d.source),
             (d.code == vim.NIL and '' or ' ' .. d.code), d.message:match('[^\n]+\n*'))
         local item = {filename = d.file, lnum = d.lnum, col = d.col, text = text, type = d.severity}
         table.insert(loc_ranges, d.location.range)
@@ -162,6 +162,14 @@ function M.jump2loc(locs)
     end
 end
 
+local function get_cur_word()
+    local lnum, col = unpack(api.nvim_win_get_cursor(0))
+    local line = api.nvim_buf_get_lines(0, lnum - 1, lnum, true)[1]
+    local word = fn.matchstr(line:sub(1, col + 1), '\\k*$') ..
+                     fn.matchstr(line:sub(col + 1, -1), '^\\k*'):sub(2, -1)
+    return ([[\<%s\>]]):format(word:gsub('[\\/]', '\\%1'))
+end
+
 -- CocHasProvider('documentHighlight') has probability of RPC failure
 -- Write the hardcode of filetype for fallback highlight
 local fb_bl_ft = {
@@ -169,25 +177,20 @@ local fb_bl_ft = {
     'javascript', 'css', 'html', 'xml'
 }
 
-local function get_cur_word()
-    local lnum, col = unpack(api.nvim_win_get_cursor(0))
-    local line = api.nvim_buf_get_lines(0, lnum - 1, lnum, true)[1]
-    local word = fn.matchstr(line:sub(1, col + 1), '\\k*$') ..
-                     fn.matchstr(line:sub(col + 1, -1), '^\\k*'):sub(2, -1)
-    return string.format([[\<%s\>]], word:gsub('[\\/]', '\\%1'))
-end
+local hl_fb_tbl = {}
 
 function M.hl_fallback()
-    if vim.bo.buftype == 'terminal' and api.nvim_get_mode() == 't' or
-        vim.tbl_contains(fb_bl_ft, vim.bo.filetype) then
+    if vim.tbl_contains(fb_bl_ft, vim.bo.filetype) or api.nvim_get_mode() == 't' and vim.bo.buftype ==
+        'terminal' then
         return
     end
 
-    if vim.w.coc_matchids_fb then
-        pcall(fn.matchdelete, vim.w.coc_matchids_fb)
-    end
+    local m_id, winid = unpack(hl_fb_tbl)
+    pcall(fn.matchdelete, m_id, winid)
 
-    vim.w.coc_matchids_fb = fn.matchadd('CocHighlightText', get_cur_word(), -1)
+    winid = api.nvim_get_current_win()
+    m_id = fn.matchadd('CocHighlightText', get_cur_word(), -1, -1, {window = winid})
+    hl_fb_tbl = {m_id, winid}
 end
 
 setup()

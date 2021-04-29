@@ -1,5 +1,5 @@
 local install_path = vim.fn.stdpath('data') .. '/site/pack/packer/opt/packer.nvim'
-if vim.fn.empty(vim.fn.glob(install_path)) == 1 then
+if vim.fn.glob(install_path) == '' then
     vim.cmd('!git clone https://github.com/wbthomason/packer.nvim ' .. install_path)
 end
 vim.cmd('pa packer.nvim')
@@ -16,11 +16,18 @@ return require('packer').startup({
                 for _, flag in ipairs({
                     'loaded_grepper', 'loaded_eregex', 'loaded_git_messenger', 'loaded_slime',
                     'loaded_nerd_comments', 'loaded_suda', 'vcoolor_loaded', 'loaded_choosewin',
-                    'loaded_cycle', 'loaded_doge', 'loaded_gh_line', 'loaded_hexokinase'
+                    'loaded_cycle', 'loaded_doge', 'loaded_gh_line', 'loaded_hexokinase',
+                    'loaded_flog'
                 }) do
                     if vim.g[flag] ~= nil then
                         vim.g[flag] = nil
                     end
+                end
+                if vim.g.loaded_visual_multi == 1 then
+                    vim.schedule(function()
+                        vim.fn['vm#plugs#permanent']()
+                    end)
+
                 end
             end
         }
@@ -65,7 +72,16 @@ return require('packer').startup({
 
         use {'Krasjet/auto-pairs', opt = false}
 
-        use {'mg979/vim-visual-multi'}
+        use {
+            'mg979/vim-visual-multi',
+            keys = {
+                '<Plug>(VM-Find-Under)', '<Plug>(VM-Find-Subword-Under)',
+                '<Plug>(VM-Start-Regex-Search)', '<Plug>(VM-Select-Cursor-Down)',
+                '<Plug>(VM-Select-Cursor-Up)', '<Plug>(VM-Visual-All)', '<Plug>(VM-Select-All)',
+                '<Plug>(VM-Add-Cursor-At-Pos)', '<Plug>(VM-Visual-Cursors)'
+            },
+            cmd = {'VMSearch'}
+        }
 
         use {'bootleq/vim-cycle', keys = {'<Plug>CyclePrev', '<Plug>CycleNext'}}
 

@@ -19,19 +19,19 @@ local function setup()
     end
     M.update(0)
 
-    api.nvim_exec([[
-    aug Mru
-        au!
-        au BufEnter,BufAdd * lua require('mru').update(vim.fn.expand('<abuf>', 1))
-        au VimLeavePre,VimSuspend * lua require('mru').write2disk()
-        au FocusLost * lua require('mru').write2disk()
-    aug END')
-    ]], false)
+    cmd([[
+        aug Mru
+            au!
+            au BufEnter,BufAdd * lua require('mru').update(vim.fn.expand('<abuf>', 1))
+            au VimLeavePre,VimSuspend * lua require('mru').write2disk()
+            au FocusLost * lua require('mru').write2disk()
+        aug END')
+    ]])
 
     -- https://github.com/neovim/neovim/pull/7670
     -- TODO Neovim + Tmux will fire FocusGained on startup
     if vim.env.TMUX then
-        cmd(string.format('au Mru FocusGained * ++once %s',
+        cmd(('au Mru FocusGained * ++once %s'):format(
             [[execute("au Mru FocusGained * lua require('mru').write2ram()")]]))
     else
         cmd([[au Mru FocusGained * lua require('mru').write2ram()]])

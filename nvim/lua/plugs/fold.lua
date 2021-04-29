@@ -11,12 +11,12 @@ local anyfold_prefer_ft
 local function setup()
     bl_ft = {'man', 'help', 'markdown'}
     anyfold_prefer_ft = {'python'}
-    api.nvim_exec([[
+    cmd([[
         aug FoldLoad
             au!
             au FileType * lua require('plugs.fold').defer_load()
         aug END
-    ]], false)
+    ]])
 
     cmd([[com! -nargs=0 Fold lua require('plugs.fold').do_fold()]])
     _G.foldtext = M.foldtext
@@ -72,32 +72,27 @@ function M.defer_load()
         if cur_bufnr == bufnr then
             M.do_fold()
         elseif api.nvim_buf_is_valid(bufnr) then
-            cmd(string.format('au FoldLoad BufEnter <buffer=%d> ++once %s', bufnr,
+            cmd(('au FoldLoad BufEnter <buffer=%d> ++once %s'):format(bufnr,
                 [[lua require('plugs.fold').do_fold()]]))
         end
     end, 1500)
 end
 
 function M.foldtext()
-    local fs = vim.v.foldstart
+    local fs, fe = vim.v.foldstart, vim.v.foldend
     local fs_line = api.nvim_buf_get_lines(0, fs - 1, fs, false)[1]
     while not fs_line:match('%w') do
         fs = fn.nextnonblank(fs + 1)
         fs_line = api.nvim_buf_get_lines(0, fs - 1, fs, false)[1]
     end
 
-    local line
-    if fs > vim.v.foldend then
-        line = api.nvim_buf_get_lines(0, vim.v.foldstart - 1, vim.v.foldstart, false)[1]
-    else
-        line = fs_line:gsub('\t', string.rep(' ', vim.bo.tabstop))
-    end
-    local scl_size = fn.screenpos(0, api.nvim_win_get_cursor(0)[1], 1).curscol -
-                         fn.win_screenpos(0)[2]
-    local width = api.nvim_win_get_width(0) - scl_size
-    local fold_info = string.format(' %d lines %s', 1 + vim.v.foldend - vim.v.foldstart,
-        string.rep(' + ', vim.v.foldlevel))
-    local spaces = string.rep(' ', width - fn.strwidth(fold_info .. line))
+    local pad = ' '
+    local line = fs_line:gsub('\t', pad:rep(vim.bo.tabstop))
+    local gutter_size = fn.screenpos(0, api.nvim_win_get_cursor(0)[1], 1).curscol -
+                            fn.win_screenpos(0)[2]
+    local width = api.nvim_win_get_width(0) - gutter_size
+    local fold_info = (' %d lines %s'):format(1 + fe - fs, (' + '):rep(vim.v.foldlevel))
+    local spaces = pad:rep(width - fn.strwidth(fold_info .. line))
     return line .. spaces .. fold_info
 end
 

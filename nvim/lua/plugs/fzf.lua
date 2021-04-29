@@ -1,5 +1,4 @@
 local M = {}
-local api = vim.api
 local fn = vim.fn
 local cmd = vim.cmd
 
@@ -8,18 +7,16 @@ local mru = require('mru')
 local function setup()
     vim.g.fzf_action = {['ctrl-t'] = 'tabedit', ['ctrl-s'] = 'split', ['ctrl-v'] = 'vsplit'}
     vim.g.fzf_layout = {window = {width = 0.7, height = 0.7}}
-    api.nvim_exec([[
+    cmd([[
         function! FzfMruFiles(name, opts) abort
             call fzf#run(fzf#wrap(a:name, a:opts, 0))
         endfunction
-    ]], false)
 
-    api.nvim_exec([[
         aug Fzf
             au!
             au VimResized * lua require('plugs.fzf').resize_preview_layout()
         aug END
-    ]], false)
+    ]])
 
     vim.g.loaded_fzf = nil
     cmd('pa fzf')

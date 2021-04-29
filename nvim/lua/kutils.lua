@@ -8,7 +8,7 @@ function M.follow_symlink(fname)
     if fn.getftype(fname) ~= 'link' then
         return
     end
-    cmd(string.format('keepalt file %s', fn.fnameescape(fn.resolve(fname))))
+    cmd(('keepalt file %s'):format(fn.fnameescape(fn.resolve(fname))))
 end
 
 function M.clean_empty_bufs()
@@ -39,7 +39,7 @@ end
 function M.zz()
     local lnum1, lcount = api.nvim_win_get_cursor(0)[1], api.nvim_buf_line_count(0)
     if lnum1 == lcount then
-        fn.execute(string.format('keepj norm! %dzb', lnum1))
+        fn.execute(('keepj norm! %dzb'):format(lnum1))
         return
     end
     cmd('norm! zvzz')
@@ -47,7 +47,7 @@ function M.zz()
     cmd('norm! L')
     local lnum2 = api.nvim_win_get_cursor(0)[1]
     if lnum2 + fn.getwinvar(0, '&scrolloff') >= lcount then
-        fn.execute(string.format('keepj norm! %dzb', lnum2))
+        fn.execute(('keepj norm! %dzb'):format(lnum2))
     end
     if lnum1 ~= lnum2 then
         cmd('keepj norm! ``')

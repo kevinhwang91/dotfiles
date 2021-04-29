@@ -1,6 +1,5 @@
 local cmd = vim.cmd
 local fn = vim.fn
-local api = vim.api
 
 local g = vim.g
 local o, wo, bo = vim.o, vim.wo, vim.bo
@@ -93,10 +92,10 @@ elseif fn.executable('osc52send') then
         paste = {['+'] = '', ['*'] = ''},
         cache_enabled = false
     }
-    api.nvim_exec([[
+    cmd([[
         let g:clipboard.paste['+'] = {-> [getreg('"', 1, 1), getregtype('"')]}
         let g:clipboard.paste['*'] = g:clipboard.paste['+']
-    ]], false)
+    ]])
 end
 
 -- map
@@ -248,11 +247,11 @@ g.nvimgdb_config_override = {
 map('n', '<Leader>dd', ':GdbStart gdb -q<Space>', {silent = false})
 map('n', '<Leader>dp', ':GdbStartPDB python -m pdb<Space>', {silent = false})
 
-api.nvim_exec([[
+cmd([[
     function! GdbInit(...)
         call v:lua.require('plugs.nvimgdb').manual_init(a:000)
     endfunction
-]], false)
+]])
 
 -- junegunn/fzf.vim
 -- `pacman -S fzf` will force nvim load plugin in /usr/share/vim/vimfiles/plugin/fzf.vim
@@ -269,33 +268,37 @@ map('n', '<Leader>fm', '<Cmd>Marks<CR>')
 map('n', '<Leader>ff', '<Cmd>FZF<CR>')
 map('n', '<Leader>fb', '<Cmd>Buffers<CR>')
 map('n', '<Leader>fr', [[<Cmd>lua require('plugs.fzf').mru()<CR>]])
-api.nvim_exec([[
+
+cmd([[
     aug Fzf
         au!
         au FuncUndefined fzf#* lua require('plugs.fzf')
         au CmdUndefined FZF,BTags,BCommits,History,GFiles,Marks,Buffers,Rg lua require('plugs.fzf')
     aug END
+
     com! -nargs=* -bar -bang Maps call fzf#vim#maps(<q-args>, <bang>0)
     com! -bar -bang Helptags call fzf#vim#helptags(<bang>0)
-]], false)
+]])
 
-if fn.empty(fn.glob(fn.stdpath('config') .. '/plugin/packer_compiled.vim')) == 1 then
+if fn.glob(fn.stdpath('config') .. '/plugin/packer_compiled.vim') == '' then
     require('plugs.packer').compile()
 else
-    cmd([[com! PackerInstall lua require('plugs.packer').install()]])
-    cmd([[com! PackerUpdate lua require('plugs.packer').update()]])
-    cmd([[com! PackerSync lua require('plugs.packer').sync()]])
-    cmd([[com! PackerClean lua require('plugs.packer').clean()]])
-    cmd([[com! PackerCompile lua require('plugs.packer').compile()]])
-    cmd([[com! PackerStatus lua require('plugs.packer').status()]])
+    cmd([[
+        com! PackerInstall lua require('plugs.packer').install()
+        com! PackerUpdate lua require('plugs.packer').update()
+        com! PackerSync lua require('plugs.packer').sync()
+        com! PackerClean lua require('plugs.packer').clean()
+        com! PackerCompile lua require('plugs.packer').compile()
+        com! PackerStatus lua require('plugs.packer').status()
+    ]])
 end
 
-vim.api.nvim_exec([[
+cmd([[
     aug Packer
         au!
         au BufWritePost */plugs/packer.lua call execute(['luafile ' . expand('<afile>'), 'PackerCompile'])
     aug END
-]], false)
+]])
 
 pcall(cmd, 'colorscheme one')
 
@@ -380,12 +383,12 @@ g.grepper = {
 map('n', '<Leader>rg', [[<Cmd>Grepper -tool rg<CR>]])
 map('n', 'gs', [[<Cmd>lua require('yank').set_wv()<CR><Plug>(GrepperOperator)]], {})
 map('x', 'gs', '<Plug>(GrepperOperator)', {})
-api.nvim_exec([[
+cmd([[
     aug Grepper
         au!
         au User Grepper call setqflist([], 'r', {'context': {'bqf': {'pattern_hl': getreg('/')}}}) | bo cope
     aug END
-]], false)
+]])
 
 -- andymass/vim-matchup
 g.matchup_surround_enabled = 1
@@ -482,42 +485,32 @@ map('x', '<Leader>A', '<Plug>(VM-Visual-All)', {})
 map('x', '<Leader>c', '<Plug>(VM-Visual-Cursors)', {})
 map('n', '<M-C-k>', '<Plug>(VM-Select-Cursor-Up)', {})
 map('n', '<M-C-j>', '<Plug>(VM-Select-Cursor-Down)', {})
-map('n', '<Leader>g/', '<Cmd>VMSearch<CR>')
+map('n', 'g/', '<Cmd>VMSearch<CR>')
 
-for _, lhs in ipairs({
-    'VM-Find-Under', 'VM-Find-Subword-Under', 'VM-Start-Regex-Search', 'VM-Select-Cursor-Down',
-    'VM-Select-Cursor-Up', 'VM-Visual-All', 'VM-Select-All', 'VM-Add-Cursor-At-Pos',
-    'VM-Visual-Cursors'
-}) do
-    map('', string.format('<Plug>(%s)', lhs), string.format(
-        [[<Cmd>lua require('packer.load')({'%s'}, {keys = '<lt>Plug>(%s)'}, _G.packer_plugins)<CR>]],
-        'vim-visual-multi', lhs))
-end
-cmd([[com! VMSearch pa vim-visual-multi<Bar>VMSearch]])
-
-api.nvim_exec([[
+cmd([[
     aug VMlens
         au!
         au User visual_multi_start lua require('plugs.vmlens').start()
         au User visual_multi_exit lua require('plugs.vmlens').exit()
     aug END
-]], false)
+]])
 
 -- highlight syntax
-api.nvim_exec([[
+cmd([[
     aug LuaHighlight
         au!
         au TextYankPost * lua if not vim.b.visual_multi then vim.highlight.on_yank({higroup='IncSearch', timeout=800}) end
     aug END
-]], false)
+]])
 
 -- bootleq/vim-cycle
 g.cycle_no_mappings = 1
 g.cycle_default_groups = {
     {{'true', 'false'}}, {{'enable', 'disable'}}, {{'yes', 'no'}}, {{'on', 'off'}}, {{'and', 'or'}},
     {{'up', 'down'}}, {{'left', 'right'}}, {{'top', 'bottom'}}, {{'before', 'after'}},
-    {{'width', 'height'}}, {{'push', 'pull'}}, {{'&&', '||'}}, {{'++', '--'}}, {{',', '，'}},
-    {{'.', '。'}}, {{'?', '？'}}, {{'是', '否'}}, {{'(:)', '（:）'}, 'sub_pairs'}, {
+    {{'width', 'height'}}, {{'push', 'pull'}}, {{'max', 'min'}}, {{'&&', '||'}}, {{'++', '--'}},
+    {{',', '，'}}, {{'.', '。'}}, {{'?', '？'}}, {{'是', '否'}},
+    {{'(:)', '（:）'}, 'sub_pairs'}, {
         {'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'}, 'hard_case',
         {name = 'Days'}
     }, {
@@ -577,12 +570,12 @@ map('n', '<Leader>gr',
 map('n', '<Leader>gd', ':Gdiffsplit!<Space>', {silent = false})
 map('n', '<Leader>gt', ':Git difftool -y<Space>', {silent = false})
 
-api.nvim_exec([[
+cmd([[
     aug FugitiveCustom
         au!
         au User FugitiveIndex nmap <silent><buffer> st :Gtabedit <Plug><cfile><Bar>Gdiffsplit!<CR>
     aug end
-]], true)
+]])
 
 -- ruanyl/vim-gh-line
 g.gh_line_blame_map_default = 0
@@ -657,7 +650,7 @@ g.neoformat_yaml_prettier = {
 g.neoformat_enabled_sql = {'sqlformatter'}
 g.neoformat_sql_sqlformatter = {exe = 'sql-formatter', stdin = 1}
 
-api.nvim_exec([[
+cmd([[
     aug GoFormat
         au!
         au FileType go setl noexpandtab
@@ -678,7 +671,7 @@ api.nvim_exec([[
         au FileType javascript,typescript,json setl noexpandtab
         au FileType yaml setl tabstop=2 shiftwidth=2
     aug end
-]], false)
+]])
 
 -- editorconfig/editorconfig-vim
 g.EditorConfig_exclude_patterns = {'fugitive://.*'}
@@ -747,16 +740,15 @@ map('n', '<Leader>pc', '<Cmd>VCoolor<CR>')
 -- kevinhwang91/suda.vim
 map('n', '<Leader>W', '<Cmd>SudaWrite<CR>')
 
--- remove ansi color
-cmd([[com! -range=% -nargs=0 RmAnsi <line1>,<line2>s/\%x1b\[[0-9;]*[Km]//g]])
+cmd([[
+    com! -range=% -nargs=0 RmAnsi <line1>,<line2>s/\%x1b\[[0-9;]*[Km]//g
+    com! -nargs=? -complete=buffer FollowSymlink lua require('kutils').follow_symlink(<f-args>)
+    com! -nargs=0 CleanDiffTab tabdo lua require('kutils').clean_diffed_tab()
+    com! -nargs=0 CleanEmptyBuf lua require('kutils').clean_empty_bufs()
+    com! Jumps lua require('bultin').jumps2qf()
+]])
 
-cmd([[com! -nargs=? -complete=buffer FollowSymlink lua require('kutils').follow_symlink(<f-args>)]])
-
-cmd([[com! -nargs=0 CleanEmptyBuf lua require('kutils').clean_empty_bufs()]])
-
-cmd([[com! -nargs=0 CleanDiffTab tabdo lua require('kutils').clean_diffed_tab()]])
-
-api.nvim_exec([[
+cmd([[
     aug RnuColumn
         au!
         au FocusLost * lua require('rnu').focus(false)
@@ -765,23 +757,17 @@ api.nvim_exec([[
         au CmdlineEnter [/\?] lua require('rnu').scmd_enter()
         au CmdlineLeave [/\?] lua require('rnu').scmd_leave()
     aug END
-]], false)
 
-api.nvim_exec([[
     aug ShadowWindow
         au!
         au WinEnter * lua require('shadowwin').toggle()
     aug END
-]], false)
 
-api.nvim_exec([[
     aug TermFix
         au!
         au TermEnter * call clearmatches()
     aug END
-]], false)
-
-cmd([[com! Jumps lua require('bultin').jumps2qf()]])
+]])
 
 map('n', '<Leader>jj', '<Cmd>Jumps<CR>')
 

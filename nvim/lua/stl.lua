@@ -44,7 +44,7 @@ local function quickfix()
     what = {nr = '$'}
     local nr = (qf_type == 'loc' and fn.getloclist(0, what) or fn.getqflist(what)).nr
     local prefix = qf_type == 'loc' and 'Location' or 'Quickfix'
-    return string.format('%s (%d/%d) [%d] %s', prefix, info.nr, nr, info.size, vim.w.quickfix_title)
+    return ('%s (%d/%d) [%d] %s'):format(prefix, info.nr, nr, info.size, vim.w.quickfix_title)
 end
 
 local function filename()
@@ -67,7 +67,7 @@ local function filename()
     else
         fname = fn.expand('%:t')
         if fn.expand('%:e') == '' or vim.bo.filetype == '' then
-            fname = string.format('%s (%s)', fname, vim.bo.filetype)
+            fname = ('%s (%s)'):format(fname, vim.bo.filetype)
         end
     end
     return '%#StatusLine' .. (vim.bo.modified and 'FileModified#' or 'FileName#') .. fname ..
@@ -94,7 +94,7 @@ local fugitive = (function()
             local info = fn['FugitiveParse']()[1]
             if info ~= '' then
                 local commit = vim.split(info, ':')[1]
-                branch = string.format('%s(%s)', branch, commit:sub(0, 6))
+                branch = ('%s(%s)'):format(branch, commit:sub(0, 6))
             end
             last_branch = {bufname, branch}
             tick = os.clock()
@@ -218,7 +218,7 @@ function M.tabline()
         local name
         local bufnr = fn.winbufnr(api.nvim_tabpage_get_win(tp))
         if vim.bo[bufnr].modifiable then
-            name = fn.expand('%:t')
+            name = fn.fnamemodify(api.nvim_buf_get_name(bufnr), ':t')
         else
             name = vim.bo[bufnr].filetype
         end

@@ -9,10 +9,10 @@ local override_lens = function(render, plist, nearest, idx, r_idx)
 
     local text, chunks
     if nearest then
-        text = string.format('[%d/%d]', idx, #plist)
+        text = ('[%d/%d]'):format(idx, #plist)
         chunks = {{' ', 'Ignore'}, {text, 'VM_Extend'}}
     else
-        text = string.format('[%d]', idx)
+        text = ('[%d]'):format(idx)
         chunks = {{' ', 'Ignore'}, {text, 'HlSearchLens'}}
     end
     render.set_virt(0, lnum - 1, col - 1, chunks, nearest)
