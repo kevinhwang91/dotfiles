@@ -76,7 +76,7 @@ end
 
 local fugitive = (function()
     local tick = 0
-    local threshold = 1
+    local threshold = 1000000000
     local last_branch = {nil, nil}
 
     return function()
@@ -86,7 +86,7 @@ local fugitive = (function()
         end
 
         local branch
-        if bufname ~= last_branch[1] or os.clock() - tick > threshold then
+        if bufname ~= last_branch[1] or vim.loop.hrtime() - tick > threshold then
             if not vim.b.git_dir or vim.b.git_dir == '' then
                 return nil
             end
@@ -97,7 +97,7 @@ local fugitive = (function()
                 branch = ('%s(%s)'):format(branch, commit:sub(0, 6))
             end
             last_branch = {bufname, branch}
-            tick = os.clock()
+            tick = vim.loop.hrtime()
         else
             branch = last_branch[2]
         end
@@ -154,21 +154,18 @@ local coc_diagnostic = (function()
     end
 end)()
 
-local fileformat = (function()
-    local is_mac = fn.has('macunix') == 1
-    return function(bufnr)
-        local icon
-        if vim.bo[bufnr].fileformat == 'unix' then
-            icon = is_mac and '' or 'ﱦ'
-        else
-            icon = ''
-        end
-        if bufnr == 0 then
-            return '%#StatusLineFormat#' .. icon .. '%#StatusLine#'
-        end
-        return icon
+local function fileformat(bufnr)
+    local icon
+    if vim.bo[bufnr].fileformat == 'unix' then
+        icon = jit.os == 'OSX' and '' or 'ﱦ'
+    else
+        icon = ''
     end
-end)()
+    if bufnr == 0 then
+        return '%#StatusLineFormat#' .. icon .. '%#StatusLine#'
+    end
+    return icon
+end
 
 function M.statusline()
     local stl = {}
@@ -193,7 +190,7 @@ function M.statusline()
         table.insert(stl, m_hl)
         table.insert(stl, ' %3l/%-3L %3v ')
     else
-        local bufnr = fn.winbufnr(vim.g.statusline_winid)
+        local bufnr = api.nvim_win_get_buf(vim.g.statusline_winid)
         table.insert(stl, '    %t')
         table.insert(stl, readonly(bufnr))
 
@@ -216,7 +213,7 @@ function M.tabline()
         end
         table.insert(tl, ' ' .. i .. ' ')
         local name
-        local bufnr = fn.winbufnr(api.nvim_tabpage_get_win(tp))
+        local bufnr = api.nvim_win_get_buf(api.nvim_tabpage_get_win(tp))
         if vim.bo[bufnr].modifiable then
             name = fn.fnamemodify(api.nvim_buf_get_name(bufnr), ':t')
         else

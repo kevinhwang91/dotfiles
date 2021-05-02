@@ -32,9 +32,8 @@ end
 
 function M.split_lastbuf(vertical)
     local sp = vertical and 'vert' or ''
-    local info_str = fn.execute(
-        [[echon map(getbufinfo({'buflisted':1}),'{"bufnr": v:val.bufnr, "lastused": v:val.lastused}')]])
-    local buf_info = fn.eval(info_str)
+    local buf_info = api.nvim_eval(
+        [[map(getbufinfo({'buflisted':1}),'{"bufnr": v:val.bufnr, "lastused": v:val.lastused}')]])
     local last_buf_info
     for _, info in ipairs(buf_info) do
         if fn.bufwinnr(info.bufnr) == -1 then

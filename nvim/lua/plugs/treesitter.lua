@@ -2,11 +2,23 @@ local M = {}
 local cmd = vim.cmd
 
 local function setup()
+    cmd([[
+        hi link TSPunctBracket Delimiter
+        hi link TSVariable NONE
+        hi link TSConstant NONE
+        hi link TSKeyword Keyword
+        hi link TSInclude Keyword
+        hi link TSConstBuiltin SpecialChar
+        hi link TSParameter Parameter
+        hi link TSVariableBuiltin SpecialChar
+    ]])
+
     cmd('pa nvim-treesitter')
     cmd('pa nvim-treesitter-textobjects')
     require('nvim-treesitter.configs').setup({
         ensure_installed = 'maintained',
-        highlight = {enable = true, disable = {'bash', 'yaml'}},
+        ignore_install = {'comment'},
+        highlight = {enable = true, disable = {'bash'}},
         textobjects = {
             select = {
                 enable = true,
@@ -29,7 +41,8 @@ local function setup()
                 goto_previous_start = {['[m'] = '@function.outer', ['[f'] = '@function.outer'},
                 goto_previous_end = {['[M'] = '@function.outer'}
             }
-        }
+        },
+        matchup = {enable = true}
     })
 end
 

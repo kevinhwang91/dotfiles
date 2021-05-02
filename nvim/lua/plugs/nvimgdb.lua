@@ -9,11 +9,18 @@ end, function(mode, lhs)
     api.nvim_buf_del_keymap(0, mode, lhs)
 end
 
-function M.manual_init(args)
+local function setup()
+    vim.g.nvimgdb_disable_start_keymaps = 1
+    vim.g.nvimgdb_config_override = {
+        codewin_command = 'vnew',
+        sign_breakpoint_priority = 99,
+        set_keymaps = 'GdbSetKeymaps',
+        unset_keymaps = 'GdbUnsetKeymaps',
+        set_tkeymaps = 'GdbSetTKeymaps'
+    }
+
     cmd([[
-        aug NvimGdb
-            au User NvimGdbStart lua require('plugs.nvimgdb').start()
-        aug end
+        au User NvimGdbStart lua require('plugs.nvimgdb').start()
 
         function! GdbSetKeymaps()
             call v:lua.require('plugs.nvimgdb').set_keymaps()
@@ -27,14 +34,6 @@ function M.manual_init(args)
             call v:lua.require('plugs.nvimgdb').set_tkeymaps()
         endfunction
     ]])
-
-    vim.schedule(function()
-        cmd('delf! GdbInit')
-        cmd('so ' .. vim.g.loaded_remote_plugins)
-        fn['GdbInit'](unpack(args))
-    end)
-
-    M.manual_init = nil
 end
 
 -- alacritty has remaped Control-([1-9]|[0]) to Control-[F1-F10] (F25-F34)
@@ -87,5 +86,7 @@ function M.start()
     vim.wo.number = false
     vim.wo.relativenumber = false
 end
+
+setup()
 
 return M

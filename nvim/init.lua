@@ -1,11 +1,13 @@
 local cmd = vim.cmd
 local fn = vim.fn
 
-local g = vim.g
-local o, wo, bo = vim.o, vim.wo, vim.bo
+local g, o, wo, bo = vim.g, vim.o, vim.wo, vim.bo
 local map = require('remap').map
 
+-- source filetype.vim later
+g.did_load_filetypes = 1
 cmd('syntax enable')
+
 wo.number = true
 wo.relativenumber = true
 wo.cursorline = true
@@ -52,6 +54,7 @@ o.confirm = true
 o.jumpoptions = 'stack'
 o.diffopt = o.diffopt .. ',vertical,internal,algorithm:patience'
 o.shada = [[!,'10,<50,s10,/100,@1000,h]]
+o.termguicolors = true
 
 -- undo
 bo.undofile = true
@@ -63,13 +66,13 @@ o.backup = false
 bo.swapfile = false
 o.swapfile = bo.swapfile
 
-if fn.has('termguicolors') == 1 then
-    o.termguicolors = true
-end
-
 g.loaded_netrwPlugin = 1
 g.loaded_matchparen = 1
 g.loaded_matchit = 1
+g.loaded_2html_plugin = 1
+
+-- I haven't any remote plugins
+g.loaded_remote_plugins = 1
 
 if vim.env.DISPLAY and fn.executable('xsel') then
     g.clipboard = {
@@ -118,6 +121,8 @@ map('n', 'qa', '<Cmd>qa<CR>')
 map('n', 'qt', '<Cmd>tabc<CR>')
 map('n', 'qc', '<Cmd>ccl<CR>')
 map('n', 'qs', '<Cmd>lcl<CR>')
+map('n', 'qd', [[<Cmd>lua require('kutils').close_diff()<CR>]])
+map('n', 'qD', [[<Cmd>tabdo lua require('kutils').close_diff()<CR><Cmd>noa tabe<Bar> noa bw<CR>]])
 map('n', '<Leader>w', '<Cmd>up<CR>')
 map('n', '<Leader>;w', '<Cmd>wq<CR>')
 map('n', '<C-g>', '1<C-g>')
@@ -207,9 +212,6 @@ map('x', 'zk', 'zk_')
 map('n', 'z', [[v:lua._G.prefix_timeout('z')]], {noremap = true, expr = true})
 map('x', 'z', [[v:lua._G.prefix_timeout('z')]], {noremap = true, expr = true})
 
-map('n', 'zZ', [[<Cmd>lua require('kutils').zz()<CR>]])
-map('x', 'zZ', [[<Cmd>lua require('kutils').zz()<CR>]])
-
 map('n', 'z[', [[<Cmd>lua require('kutils').nav_fold(false, vim.v.count1)<CR>]])
 map('n', 'z]', [[<Cmd>lua require('kutils').nav_fold(true, vim.v.count1)<CR>]])
 
@@ -232,32 +234,34 @@ end
 require('mru')
 require('stl')
 
-g.loaded_remote_plugins = fn.stdpath('data') .. '/rplugin.vim'
-cmd([[com! -Bar UpdateRemotePlugins call remote#host#UpdateRemotePlugins()]])
-
--- sakhnik/nvim-gdb
-g.nvimgdb_disable_start_keymaps = 1
-g.nvimgdb_config_override = {
-    codewin_command = 'vnew',
-    sign_breakpoint_priority = 99,
-    set_keymaps = 'GdbSetKeymaps',
-    unset_keymaps = 'GdbUnsetKeymaps',
-    set_tkeymaps = 'GdbSetTKeymaps'
-}
-map('n', '<Leader>dd', ':GdbStart gdb -q<Space>', {silent = false})
-map('n', '<Leader>dp', ':GdbStartPDB python -m pdb<Space>', {silent = false})
+if fn.glob(fn.stdpath('config') .. '/plugin/packer_compiled.vim') == '' then
+    require('plugs.packer').compile()
+else
+    cmd([[
+        com! PackerInstall lua require('plugs.packer').install()
+        com! PackerUpdate lua require('plugs.packer').update()
+        com! PackerSync lua require('plugs.packer').sync()
+        com! PackerClean lua require('plugs.packer').clean()
+        com! PackerCompile lua require('plugs.packer').compile()
+        com! PackerStatus lua require('plugs.packer').status()
+    ]])
+end
 
 cmd([[
-    function! GdbInit(...)
-        call v:lua.require('plugs.nvimgdb').manual_init(a:000)
-    endfunction
+    aug Packer
+        au!
+        au BufWritePost */plugs/packer.lua call execute(['luafile ' . expand('<afile>'), 'PackerCompile'])
+    aug END
 ]])
+
+pcall(cmd, 'color one')
 
 -- junegunn/fzf.vim
 -- `pacman -S fzf` will force nvim load plugin in /usr/share/vim/vimfiles/plugin/fzf.vim
 vim.g.loaded_fzf = true
 vim.env.FZF_DEFAULT_OPTS = vim.env.FZF_DEFAULT_OPTS .. ' --reverse --info=inline --border'
 vim.env.BAT_STYLE = 'numbers'
+map('n', '<Leader>f', '')
 map('n', '<Leader>ft', '<Cmd>BTags<CR>')
 map('n', '<Leader>fo', '<Cmd>Tags<CR>')
 map('n', '<Leader>fc', '<Cmd>BCommits<CR>')
@@ -280,53 +284,6 @@ cmd([[
     com! -bar -bang Helptags call fzf#vim#helptags(<bang>0)
 ]])
 
-if fn.glob(fn.stdpath('config') .. '/plugin/packer_compiled.vim') == '' then
-    require('plugs.packer').compile()
-else
-    cmd([[
-        com! PackerInstall lua require('plugs.packer').install()
-        com! PackerUpdate lua require('plugs.packer').update()
-        com! PackerSync lua require('plugs.packer').sync()
-        com! PackerClean lua require('plugs.packer').clean()
-        com! PackerCompile lua require('plugs.packer').compile()
-        com! PackerStatus lua require('plugs.packer').status()
-    ]])
-end
-
-cmd([[
-    aug Packer
-        au!
-        au BufWritePost */plugs/packer.lua call execute(['luafile ' . expand('<afile>'), 'PackerCompile'])
-    aug END
-]])
-
-pcall(cmd, 'colorscheme one')
-
--- kevinhwang91/nvim-bqf
-require('bqf').setup({
-    auto_enable = true,
-    func_map = {split = '<C-s>'},
-    filter = {fzf = {action_for = {['ctrl-s'] = 'split'}}}
-})
-
--- kevinhwang91/nvim-hlslens
-require('hlslens').setup({
-    auto_enable = true,
-    enable_incsearch = true,
-    calm_down = false,
-    nearest_only = false,
-    nearest_float_when = 'auto',
-    float_shadow_blend = 50,
-    virt_priority = 100
-})
-map('n', 'n', [[<Cmd>execute('norm! ' . v:count1 . 'n')<CR><Cmd>lua require('hlslens').start()<CR>]])
-map('n', 'N', [[<Cmd>execute('norm! ' . v:count1 . 'N')<CR><Cmd>lua require('hlslens').start()<CR>]])
-
--- rhysd/clever-f.vim
-g.clever_f_across_no_line = 1
-g.clever_f_timeout_ms = 1
-map('', ';', '<Plug>(clever-f-repeat-forward)', {})
-map('', ',', '<Plug>(clever-f-repeat-back)', {})
 
 -- kevinhwang91/rnvimr
 g.rnvimr_enable_ex = 1
@@ -352,97 +309,6 @@ map('t', '<M-i>', [[<C-\><C-n><Cmd>RnvimrResize<CR>]])
 map('t', '<M-o>', [[<C-\><C-n><Cmd>RnvimrToggle<CR>]])
 map('n', '<M-o>', '<Cmd>RnvimrToggle<CR>')
 
--- t9md/vim-choosewin
-g.choosewin_blink_on_land = 0
-g.choosewin_color_label = {gui = {'#98c379', '#202326', 'bold'}}
-g.choosewin_color_label_current = {gui = {'#528bff', '#202326', 'bold'}}
-g.choosewin_color_other = {gui = {'#2c323c'}}
-map('n', '<M-0>', '<Cmd>ChooseWin<CR>')
-
--- mhinz/vim-grepper
-g.grepper = {
-    tools = {'rg', 'grep'},
-    dir = 'repo,file',
-    open = 0,
-    switch = 1,
-    jump = 0,
-    simple_prompt = 1,
-    quickfix = 1,
-    searchreg = 1,
-    highlight = 0,
-    rg = {
-        grepprg = 'rg -H --no-heading --vimgrep --smart-case',
-        grepformat = '%f:%l:%c:%m,%f:%l:%m'
-    }
-}
--- if fn.executable('rg') then
---     vim.bo.grepprg = [[rg\ --vimgrep\ --no-heading\ --smart-case]]
---     vim.o.grepprg = vim.bo.grepprg
---     vim.o.grepformat = [[%f:%l:%c:%m,%f:%l:%m]]
--- end
-map('n', '<Leader>rg', [[<Cmd>Grepper -tool rg<CR>]])
-map('n', 'gs', [[<Cmd>lua require('yank').set_wv()<CR><Plug>(GrepperOperator)]], {})
-map('x', 'gs', '<Plug>(GrepperOperator)', {})
-cmd([[
-    aug Grepper
-        au!
-        au User Grepper call setqflist([], 'r', {'context': {'bqf': {'pattern_hl': getreg('/')}}}) | bo cope
-    aug END
-]])
-
--- andymass/vim-matchup
-g.matchup_surround_enabled = 1
-g.matchup_matchparen_timeout = 100
-g.matchup_matchparen_deferred = 1
-g.matchup_matchparen_deferred_show_delay = 150
-g.matchup_matchparen_deferred_hide_delay = 700
-g.matchup_matchparen_hi_surround_always = 2
-g.matchup_matchparen_offscreen = {method = 'popup', highlight = 'CurrentWord'}
-g.matchup_delim_start_plaintext = 1
-g.matchup_motion_override_Npercent = 0
-g.matchup_motion_cursor_end = 0
-g.matchup_mappings_enabled = 0
-
-cmd('hi link MatchWord Underlined')
-
-map('n', '%', '<Plug>(matchup-%)', {})
-map('x', '%', '<Plug>(matchup-%)', {})
-map('o', '%', '<Plug>(matchup-%)', {})
-map('n', '[5', '<Plug>(matchup-[%)', {})
-map('x', '[5', '<Plug>(matchup-[%)', {})
-map('o', '[5', '<Plug>(matchup-[%)', {})
-map('n', ']5', '<Plug>(matchup-]%)', {})
-map('x', ']5', '<Plug>(matchup-]%)', {})
-map('o', ']5', '<Plug>(matchup-]%)', {})
-map('n', '<Leader>5', '<Plug>(matchup-z%)', {})
-map('x', '<Leader>5', '<Plug>(matchup-z%)', {})
-map('o', '<Leader>5', '<Plug>(matchup-z%)', {})
-map('x', 'a5', '<Plug>(matchup-a%)', {})
-map('o', 'a5', '<Plug>(matchup-a%)', {})
-map('x', 'i5', '<Plug>(matchup-i%)', {})
-map('o', 'i5', '<Plug>(matchup-i%)', {})
-map('n', 'cs5', '<plug>(matchup-cs%)', {})
-map('n', 'sd5', '<plug>(matchup-ds%)', {})
-
--- haya14busa/vim-asterisk
-g['asterisk#keeppos'] = 0
-map('', '*', [[<Plug>(asterisk-z*)<Cmd>lua require('hlslens').start()<CR>]], {})
-map('', '#', [[<Plug>(asterisk-z#)<Cmd>lua require('hlslens').start()<CR>]], {})
-map('', 'g*', [[<Plug>(asterisk-gz*)<Cmd>lua require('hlslens').start()<CR>]], {})
-map('', 'g#', [[<Plug>(asterisk-gz#)<Cmd>lua require('hlslens').start()<CR>]], {})
-
--- tpope/vim-surround
-g.surround_no_mappings = 1
-map('n', 'sd', '<Plug>Dsurround', {})
-map('n', 'cs', '<Plug>Csurround', {})
-map('n', 'cS', '<Plug>CSurround', {})
-map('n', 'ys', '<Plug>Ysurround', {})
-map('n', 'yS', '<Plug>YSurround', {})
-map('n', 'yss', '<Plug>Yssurround', {})
-map('n', 'ygs', '<Plug>YSsurround', {})
-map('x', 'S', '<Plug>VSurround', {})
-map('x', 'gS', '<Plug>VgSurround', {})
-
 -- tpope/vim-repeat
 map('n', 'U', '<Plug>(RepeatUndo)', {})
 
@@ -452,48 +318,14 @@ g.targets_seekRanges =
     'cc cr cb cB lc ac Ac lr lb ar ab lB Ar aB Ab AB rr ll rb al rB Al bb aa bB Aa BB AA'
 g.targets_jumpRanges = g.targets_seekRanges
 g.targets_nl = 'nm'
-
--- tommcdo/vim-exchange
-g.exchange_no_mappings = 1
-map('n', 'cx', '<Plug>(Exchange)', {})
-map('x', 'X', '<Plug>(Exchange)', {})
-map('n', 'cx;', '<Plug>(ExchangeClear)', {})
-map('n', 'cxx', '<Plug>(ExchangeLine)', {})
-
--- mg979/vim-visual-multi
-g.VM_leader = '<Space>'
-g.VM_theme = 'codedark'
-g.VM_highlight_matches = ''
-g.VM_show_warnings = 0
-g.VM_silent_exit = 1
-g.VM_default_mappings = 1
-g.VM_maps = {
-    Delete = 's',
-    Undo = '<C-u>',
-    Redo = '<C-r>',
-    ['Select Cursor Up'] = '<M-C-k>',
-    ['Select Cursor Down'] = '<M-C-j>',
-    ['Move Left'] = '<M-C-h>',
-    ['Move Right'] = '<M-C-l>'
-}
-map('n', '<C-n>', '<Plug>(VM-Find-Under)', {})
-map('x', '<C-n>', '<Plug>(VM-Find-Subword-Under)', {})
-map('n', [[<Leader>\]], '<Plug>(VM-Add-Cursor-At-Pos)', {})
-map('n', '<Leader>/', '<Plug>(VM-Start-Regex-Search)', {})
-map('n', '<Leader>A', '<Plug>(VM-Select-All)', {})
-map('x', '<Leader>A', '<Plug>(VM-Visual-All)', {})
-map('x', '<Leader>c', '<Plug>(VM-Visual-Cursors)', {})
-map('n', '<M-C-k>', '<Plug>(VM-Select-Cursor-Up)', {})
-map('n', '<M-C-j>', '<Plug>(VM-Select-Cursor-Down)', {})
-map('n', 'g/', '<Cmd>VMSearch<CR>')
-
-cmd([[
-    aug VMlens
-        au!
-        au User visual_multi_start lua require('plugs.vmlens').start()
-        au User visual_multi_exit lua require('plugs.vmlens').exit()
-    aug END
-]])
+map('o', 'I', [[targets#e('o', 'i', 'I')]], {expr = true})
+map('x', 'I', [[targets#e('o', 'i', 'I')]], {expr = true})
+map('o', 'a', [[targets#e('o', 'a', 'a')]], {expr = true})
+map('x', 'a', [[targets#e('o', 'a', 'a')]], {expr = true})
+map('o', 'i', [[targets#e('o', 'I', 'i')]], {expr = true})
+map('x', 'i', [[targets#e('o', 'I', 'i')]], {expr = true})
+map('o', 'A', [[targets#e('o', 'A', 'A')]], {expr = true})
+map('x', 'A', [[targets#e('o', 'A', 'A')]], {expr = true})
 
 -- highlight syntax
 cmd([[
@@ -503,63 +335,13 @@ cmd([[
     aug END
 ]])
 
--- bootleq/vim-cycle
-g.cycle_no_mappings = 1
-g.cycle_default_groups = {
-    {{'true', 'false'}}, {{'enable', 'disable'}}, {{'yes', 'no'}}, {{'on', 'off'}}, {{'and', 'or'}},
-    {{'up', 'down'}}, {{'left', 'right'}}, {{'top', 'bottom'}}, {{'before', 'after'}},
-    {{'width', 'height'}}, {{'push', 'pull'}}, {{'max', 'min'}}, {{'&&', '||'}}, {{'++', '--'}},
-    {{',', '，'}}, {{'.', '。'}}, {{'?', '？'}}, {{'是', '否'}},
-    {{'(:)', '（:）'}, 'sub_pairs'}, {
-        {'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'}, 'hard_case',
-        {name = 'Days'}
-    }, {
-        {
-            'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September',
-            'October', 'November', 'December'
-        }, 'hard_case', {name = 'Months'}
-    }
-}
-g.cycle_default_groups_for_python = {{{'elif', 'else'}}}
-g.cycle_default_groups_for_sh = {{{'elif', 'else'}}}
-g.cycle_default_groups_for_zsh = g.cycle_default_groups_for_sh
-g.cycle_default_groups_for_vim = {{{'elseif', 'else'}}}
-g.cycle_default_groups_for_lua = {{{'elseif', 'else'}}}
-
-map('n', '<Plug>CycleFallbackNext', '<C-a>')
-map('n', '<Plug>CycleFallbackPrev', '<C-x>')
-map('n', '<C-a>', '<Plug>CycleNext', {})
-map('v', '<C-a>', '<Plug>CycleNext', {})
-map('n', '<C-x>', '<Plug>CyclePrev', {})
-map('v', '<C-x>', '<Plug>CyclePrev', {})
-
 -- mbbill/undotree
 g.undotree_WindowLayout = 3
 map('n', '<M-u>', '<Cmd>UndotreeToggle<CR>')
 cmd([[com! -nargs=0 UndotreeToggle lua require('plugs.undotree').toggle()]])
 
 -- tpope/vim-fugitive
-g.nremap = {
-    ['d?'] = 's?',
-    dv = 'sv',
-    dp = 'sp',
-    ds = 'sh',
-    dh = 'sh',
-    dq = 'qd',
-    d2o = 's2o',
-    d3o = 's3o',
-    dd = 'ss',
-    s = '<C-s>',
-    u = '<C-u>',
-    O = 'T',
-    ['*'] = '',
-    ['#'] = '',
-    ['<C-W>gf'] = 'gF',
-    ['[m'] = '[f',
-    [']m'] = ']f'
-}
-g.xremap = {s = 'S', u = '<C-u>'}
-map('n', '<Leader>gg', '<Cmd>tab Git<CR>')
+map('n', '<Leader>gg', [[<Cmd>lua require('plugs.fugitive').index()<CR>]])
 map('n', '<Leader>gc', ':Git commit<Space>', {silent = false})
 map('n', '<Leader>gC', ':Git commit --amend<Space>', {silent = false})
 map('n', '<Leader>ge', '<Cmd>Gedit<CR>')
@@ -569,33 +351,6 @@ map('n', '<Leader>gr',
     [[<Cmd>lua require('kutils').follow_symlink()<CR><Cmd>keepalt Gread<Bar>up!<CR>]])
 map('n', '<Leader>gd', ':Gdiffsplit!<Space>', {silent = false})
 map('n', '<Leader>gt', ':Git difftool -y<Space>', {silent = false})
-
-cmd([[
-    aug FugitiveCustom
-        au!
-        au User FugitiveIndex nmap <silent><buffer> st :Gtabedit <Plug><cfile><Bar>Gdiffsplit!<CR>
-    aug end
-]])
-
--- ruanyl/vim-gh-line
-g.gh_line_blame_map_default = 0
-map('n', '<Leader>gO', '<Plug>(gh-repo)', {})
-map('n', '<Leader>gL', '<Plug>(gh-line)', {})
-map('x', '<Leader>gL', '<Plug>(gh-line)', {})
-
--- airblade/vim-gitgutter
-g.gitgutter_highlight_linenrs = 1
-g.gitgutter_signs = 0
-g.gitgutter_map_keys = 0
-map('n', '<Leader>hp', '<Plug>(GitGutterPreviewHunk)', {})
-map('n', '<Leader>hs', '<Plug>(GitGutterStageHunk)', {})
-map('n', '<Leader>hu', '<Plug>(GitGutterUndoHunk)', {})
-map('n', '[c', '<Plug>(GitGutterPrevHunk)', {})
-map('n', ']c', '<Plug>(GitGutterNextHunk)', {})
-map('o', 'ih', '<Plug>(GitGutterTextObjectInnerPending)', {})
-map('o', 'ah', '<Plug>(GitGutterTextObjectOuterPending)', {})
-map('x', 'ih', '<Plug>(GitGutterTextObjectInnerVisual)', {})
-map('x', 'ah', '<Plug>(GitGutterTextObjectOuterVisual)', {})
 
 -- rbong/vim-flog
 g.flog_default_arguments = {max_count = 1000}
@@ -607,90 +362,8 @@ g.git_messenger_no_default_mappings = 0
 g.git_messenger_always_into_popup = 1
 map('n', '<Leader>gm', '<Cmd>GitMessenger<CR>')
 
--- rrethy/vim-hexokinase
-local all_hexokinase_pat = {'full_hex', 'triple_hex', 'rgb', 'rgba', 'hsl', 'hsla', 'colour_names'}
-g.Hexokinase_highlighters = {'backgroundfull'}
-g.Hexokinase_refreshEvents = {'BufRead', 'TextChanged', 'InsertLeave'}
-g.Hexokinase_ftOptOutPatterns = {css = all_hexokinase_pat, scss = all_hexokinase_pat}
-g.Hexokinase_termDisabled = 1
-
 -- sbdchd/neoformat
-g.neoformat_only_msg_on_error = 1
-g.neoformat_basic_format_align = 1
-g.neoformat_basic_format_retab = 1
-g.neoformat_basic_format_trim = 1
 map('n', '<M-C-l>', '<Cmd>Neoformat<CR>')
-
--- python
-g.neoformat_enabled_python = {'autopep8'}
-g.neoformat_python_autopep8 = {exe = 'autopep8', args = {'--max-line-length=100'}}
-
--- lua
-g.neoformat_enabled_lua = {'luaformat'}
-g.neoformat_lua_luaformat = {exe = 'lua-format'}
-
--- javascript
-g.neoformat_enabled_javascript = {'prettier'}
-
--- typescript
-g.neoformat_enabled_typescript = {'prettier'}
-
--- json
-g.neoformat_enabled_json = {'prettier'}
-
--- yaml
-g.neoformat_enabled_yaml = {'prettier'}
-g.neoformat_yaml_prettier = {
-    exe = 'prettier',
-    args = {'--stdin-filepath', '"%:p"', '--tab-width=2'},
-    stdin = 1
-}
-
--- sql
-g.neoformat_enabled_sql = {'sqlformatter'}
-g.neoformat_sql_sqlformatter = {exe = 'sql-formatter', stdin = 1}
-
-cmd([[
-    aug GoFormat
-        au!
-        au FileType go setl noexpandtab
-    aug end
-
-    aug SqlFormat
-        au!
-        au FileType sql setl tabstop=2 shiftwidth=2
-    aug end
-
-    aug MakeFileFormat
-        au!
-        au FileType make setl noexpandtab
-    aug end
-
-    aug PrettierFormat
-        au!
-        au FileType javascript,typescript,json setl noexpandtab
-        au FileType yaml setl tabstop=2 shiftwidth=2
-    aug end
-]])
-
--- editorconfig/editorconfig-vim
-g.EditorConfig_exclude_patterns = {'fugitive://.*'}
-g.EditorConfig_preserve_formatoptions = 1
-
--- pseewald/vim-anyfold
-g.anyfold_fold_display = 0
-g.anyfold_identify_comments = 0
-g.anyfold_motion = 0
-
--- jpalardy/vim-slime
-g.slime_target = 'tmux'
-g.slime_default_config = {socket_name = vim.split(vim.env.TMUX or '', ',')[1], target_pane = ':.'}
-g.slime_no_mappings = 1
-g.slime_python_ipython = 1
-map('x', '<C-c><C-c>', '<Plug>SlimeRegionSend', {})
-map('n', '<C-c><C-c>', '<Plug>SlimeParagraphSend', {})
-map('n', '<C-c>v', '<Plug>SlimeConfig', {})
-map('n', '<C-c>l', '<Plug>SlimeLineSend', {})
 
 -- plasticboy/vim-markdown
 g.vim_markdown_toc_autofit = 1
@@ -699,8 +372,9 @@ g.vim_markdown_folding_disabled = 1
 g.vim_markdown_emphasis_multiline = 0
 g.vim_markdown_edit_url_in = 'current'
 
--- iamcco/markdown-preview.nvim
-g.mkdp_auto_close = 0
+-- sakhnik/nvim-gdb
+map('n', '<Leader>dd', ':GdbStart gdb -q<Space>', {silent = false})
+map('n', '<Leader>dp', ':GdbStartPDB python -m pdb<Space>', {silent = false})
 
 -- neoclide/coc.nvim
 g.coc_global_extensions = {
@@ -726,27 +400,16 @@ g.NERDDefaultAlign = 'left'
 g.NERDToggleCheckAllLines = 1
 g.NERDTrimTrailingWhitespace = 1
 g.NERDCustomDelimiters = {lua = {left = '--', leftAlt = '', rightAlt = ''}}
-map('n', '<C-_>', '<Plug>NERDCommenterToggle', {})
-map('x', '<C-_>', '<Plug>NERDCommenterToggle', {})
-
--- othree/eregex.vim
-g.eregex_default_enable = 0
-
--- KabbAmine/vCoolor.vim
-g.vcoolor_disable_mappings = 1
-g.vcoolor_lowercase = 1
-map('n', '<Leader>pc', '<Cmd>VCoolor<CR>')
-
--- kevinhwang91/suda.vim
-map('n', '<Leader>W', '<Cmd>SudaWrite<CR>')
+map('', '<C-_>', '<Plug>NERDCommenterToggle', {})
 
 cmd([[
     com! -range=% -nargs=0 RmAnsi <line1>,<line2>s/\%x1b\[[0-9;]*[Km]//g
     com! -nargs=? -complete=buffer FollowSymlink lua require('kutils').follow_symlink(<f-args>)
-    com! -nargs=0 CleanDiffTab tabdo lua require('kutils').clean_diffed_tab()
     com! -nargs=0 CleanEmptyBuf lua require('kutils').clean_empty_bufs()
-    com! Jumps lua require('bultin').jumps2qf()
+    com! -nargs=0 Kill2Spaces lua require('kutils').kill2spaces()
+    com! -nargs=0 Jumps lua require('bultin').jumps2qf()
 ]])
+map('n', '<Leader>2p', '<Cmd>Kill2Spaces<CR>')
 
 cmd([[
     aug RnuColumn
@@ -771,20 +434,37 @@ cmd([[
 
 map('n', '<Leader>jj', '<Cmd>Jumps<CR>')
 
+require('plugs.manual')
+
 vim.schedule(function()
+    vim.defer_fn(function()
+        g.did_load_filetypes = nil
+        cmd('filetype on')
+        cmd('doautoall filetypedetect BufRead')
+    end, 30)
+
     vim.defer_fn(function()
         require('plugs.treesitter')
         require('plugs.fold')
     end, 50)
+
     vim.defer_fn(function()
+        require('plugs.config').matchup()
         cmd('pa vim-matchup')
         fn['matchup#loader#init_buffer']()
+        fn['matchup#loader#bufwinenter']()
+
+        local all_hexokinase_pat = {
+            'full_hex', 'triple_hex', 'rgb', 'rgba', 'hsl', 'hsla', 'colour_names'
+        }
+        g.Hexokinase_highlighters = {'backgroundfull'}
+        g.Hexokinase_refreshEvents = {'BufRead', 'TextChanged', 'InsertLeave'}
+        g.Hexokinase_ftOptOutPatterns = {css = all_hexokinase_pat, scss = all_hexokinase_pat}
+        g.Hexokinase_termDisabled = 1
         cmd('pa vim-hexokinase')
         cmd('HexokinaseTurnOn')
     end, 200)
-    vim.defer_fn(function()
-        cmd('pa vim-gitgutter')
-    end, 400)
+
     vim.defer_fn(function()
         cmd('pa tmux-complete.vim')
         cmd('pa coc.nvim')

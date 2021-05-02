@@ -30,12 +30,19 @@ local function setup()
     local cur_ft = vim.bo.ft
     if vim.tbl_contains(cxx_ft, cur_ft) then
         cmd('pa vim-lsp-cxx-highlight')
-        vim.bo.ft = cur_ft
+        fn['CocActionAsync']('reloadExtension', 'coc-clangd')
     else
-        cmd(('au Coc FileType %s ++once pa vim-lsp-cxx-highlight'):format(table.concat(cxx_ft, ',')))
+        local cxx_ft_str = table.concat(cxx_ft, ',')
+        cmd(('au Coc FileType %s %s'):format(cxx_ft_str,
+            ([[call execute(['au! Coc FileType %s', 'pa vim-lsp-cxx-highlight'])]]):format(
+                cxx_ft_str)))
     end
 
     cmd('hi link CocHighlightText CurrentWord')
+    if vim.g.colors_name == 'one' then
+        cmd('hi CocErrorSign ctermfg=130 guifg=#be5046')
+        cmd('hi CocWarningSign ctermfg=180 guifg=#e5c07b')
+    end
 
     map('i', '<C-space>', 'coc#refresh()', {noremap = true, expr = true})
     map('n', '<C-f>', [[coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"]],
@@ -119,7 +126,7 @@ end
 function M.show_documentation()
     if vim.b.filetype == 'vim' or vim.b.filetype == 'help' then
         cmd(('h %s'):format(fn.expand('<cword>')))
-    elseif api.nvim_exec([[echo CocAction('hasProvider', 'hover')]], true) == 'v:true' then
+    elseif api.nvim_eval([[CocAction('hasProvider', 'hover')]]) then
         fn['CocActionAsync']('doHover')
     else
         cmd('norm! K')
@@ -132,7 +139,8 @@ function M.diagnostic()
     for _, d in ipairs(diagnostics) do
         local text = ('[%s%s] %s'):format((d.source == '' and 'coc.nvim' or d.source),
             (d.code == vim.NIL and '' or ' ' .. d.code), d.message:match('[^\n]+\n*'))
-        local item = {filename = d.file, lnum = d.lnum, col = d.col, text = text, type = d.severity}
+        local qtype = d.severity == 'Hint' and 'N' or d.severity
+        local item = {filename = d.file, lnum = d.lnum, col = d.col, text = text, type = qtype}
         table.insert(loc_ranges, d.location.range)
         table.insert(items, item)
     end

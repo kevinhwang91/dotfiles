@@ -46,13 +46,13 @@ end
 
 local function detect_other_wins(cur_winid)
     cur_winid = cur_winid or api.nvim_get_current_win()
-    local bufnr = fn.winbufnr(cur_winid)
+    local bufnr = api.nvim_win_get_buf(cur_winid)
     if vim.bo[bufnr].buftype == 'nofile' then
         return true
     end
 
     for _, winid in ipairs(api.nvim_list_wins()) do
-        bufnr = fn.winbufnr(winid)
+        bufnr = api.nvim_win_get_buf(winid)
         local buftype = vim.bo[bufnr].buftype
         if winid ~= cur_winid and api.nvim_win_get_config(winid).relative ~= '' and buftype ~=
             'nofile' or buftype == 'quickfix' then

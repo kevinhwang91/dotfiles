@@ -4,6 +4,10 @@ if vim.fn.glob(install_path) == '' then
 end
 vim.cmd('pa packer.nvim')
 
+local function conf(name)
+    return ([[require('plugs.config').%s()]]):format(name)
+end
+
 return require('packer').startup({
     config = {
         opt_default = true,
@@ -14,10 +18,11 @@ return require('packer').startup({
             'wbthomason/packer.nvim',
             setup = function()
                 for _, flag in ipairs({
-                    'loaded_grepper', 'loaded_eregex', 'loaded_git_messenger', 'loaded_slime',
+                    'loaded_clever_f', 'loaded_grepper', 'loaded_eregex', 'loaded_slime',
                     'loaded_nerd_comments', 'loaded_suda', 'vcoolor_loaded', 'loaded_choosewin',
                     'loaded_cycle', 'loaded_doge', 'loaded_gh_line', 'loaded_hexokinase',
-                    'loaded_flog'
+                    'loaded_targets', 'loaded_surround', 'loaded_fugitive', 'loaded_flog',
+                    'loaded_git_messenger'
                 }) do
                     if vim.g[flag] ~= nil then
                         vim.g[flag] = nil
@@ -34,25 +39,55 @@ return require('packer').startup({
 
         use {'kevinhwang91/rnvimr', opt = false}
 
-        use {'kevinhwang91/nvim-bqf', opt = false, branch = 'optimize-magicwin'}
+        use {'kevinhwang91/nvim-bqf', ft = 'qf', config = conf('bqf')}
 
-        use {'kevinhwang91/nvim-hlslens', opt = false}
+        use {
+            'kevinhwang91/nvim-hlslens',
+            setup = [[vim.g.loaded_nvim_hlslens = 1]],
+            keys = {'n', 'N', '/', '?', '*', '#', 'g*', 'g#'},
+            config = conf('hlslens'),
+            requires = {{'haya14busa/vim-asterisk'}}
+        }
 
-        use {'rhysd/clever-f.vim', opt = false}
+        use {'Krasjet/auto-pairs', event = 'InsertEnter', config = [[vim.fn['AutoPairsTryInit']()]]}
+
+        use {
+            'tpope/vim-surround',
+            setup = [[vim.g.surround_no_mappings = 1]],
+            keys = {
+                {'n', 'sd'}, {'n', 'cs'}, {'n', 'cS'}, {'n', 'ys'}, {'n', 'yS'}, {'n', 'yss'},
+                {'n', 'ygs'}, {'x', 'S'}, {'x', 'gS'}
+            },
+            config = conf('surround')
+        }
+
+        use {
+            'mg979/vim-visual-multi',
+            keys = {
+                {'', '<C-n>'}, {'n', [[<Leader>\]]}, {'', '<Leader>A'}, {'x', '<Leader>c'},
+                {'n', '<M-C-k>'}, {'n', '<M-C-j'}, {'n', 'g/'}
+            },
+            cmd = {'VMSearch'},
+            config = conf('visualmulti'),
+            wants = {'nvim-hlslens', 'auto-pairs', 'vim-surround'}
+        }
+
+        use {'rhysd/clever-f.vim', keys = {'f', 'F', 't', 'T'}, config = conf('cleverf')}
 
         use {'antoinemadec/FixCursorHold.nvim', opt = false}
 
         use {'junegunn/fzf.vim', requires = {{'junegunn/fzf', run = './install --bin'}}}
 
-        use {'t9md/vim-choosewin', cmd = 'ChooseWin'}
+        use {'t9md/vim-choosewin', keys = '<M-0>', config = conf('choosewin')}
 
-        use {'mhinz/vim-grepper', cmd = 'Grepper', keys = '<Plug>(GrepperOperator)'}
+        use {
+            'mhinz/vim-grepper',
+            cmd = 'Grepper',
+            keys = {{'n', 'gs'}, {'x', 'gs'}, {'n', '<Leader>rg'}},
+            config = conf('grepper')
+        }
 
         use {'andymass/vim-matchup'}
-
-        use {'haya14busa/vim-asterisk', opt = false}
-
-        use {'tpope/vim-surround', opt = false}
 
         use {'tpope/vim-repeat', opt = false}
 
@@ -63,45 +98,50 @@ return require('packer').startup({
                 {'v', 'aI'}, {'v', 'iI'}
             }
         }
-        use {'wellle/targets.vim', opt = false}
+
+        use {'wellle/targets.vim', fn = 'targets#e'}
 
         use {
             'tommcdo/vim-exchange',
-            keys = {'<Plug>(Exchange)', '<Plug>(ExchangeClear)', '<Plug>(ExchangeLine)'}
+            keys = {{'x', 'X'}, {'n', 'cx'}, {'n', 'cx;'}, {'n', 'cxx'}},
+            setup = [[vim.g.exchange_no_mappings = 1]],
+            config = conf('exchange')
         }
-
-        use {'Krasjet/auto-pairs', opt = false}
 
         use {
-            'mg979/vim-visual-multi',
-            keys = {
-                '<Plug>(VM-Find-Under)', '<Plug>(VM-Find-Subword-Under)',
-                '<Plug>(VM-Start-Regex-Search)', '<Plug>(VM-Select-Cursor-Down)',
-                '<Plug>(VM-Select-Cursor-Up)', '<Plug>(VM-Visual-All)', '<Plug>(VM-Select-All)',
-                '<Plug>(VM-Add-Cursor-At-Pos)', '<Plug>(VM-Visual-Cursors)'
-            },
-            cmd = {'VMSearch'}
+            'bootleq/vim-cycle',
+            keys = {'<C-a>', '<C-x>'},
+            setup = [[vim.g.cycle_no_mappings = 1]],
+            config = conf('cycle')
         }
-
-        use {'bootleq/vim-cycle', keys = {'<Plug>CyclePrev', '<Plug>CycleNext'}}
 
         use {'mbbill/undotree'}
 
-        use {'tpope/vim-fugitive', opt = false}
+        use {
+            'tpope/vim-fugitive',
+            fn = 'fugitive#*',
+            cmd = {'Git', 'Gedit', 'Gread', 'Gwrite', 'Gdiffsplit'},
+            config = [[require('plugs.fugitive')]]
+        }
 
-        use {'ruanyl/vim-gh-line', keys = {'<Plug>(gh-repo)', '<Plug>(gh-line)'}}
+        use {'rbong/vim-flog', cmd = {'Flog', 'Flogsplit'}, requires = {{'tpope/vim-fugitive'}}}
 
         use {'airblade/vim-gitgutter'}
 
-        use {'rbong/vim-flog', cmd = {'Flog', 'Flogsplit'}}
+        use {
+            'ruanyl/vim-gh-line',
+            keys = {{'n', '<Leader>g0'}, {'', '<Leader>gL'}},
+            setup = [[vim.g.gh_line_blame_map_default = 0]],
+            config = conf('ghline')
+        }
 
         use {'rhysd/git-messenger.vim', cmd = {'GitMessenger'}}
 
         use {'rrethy/vim-hexokinase', run = 'make hexokinase'}
 
-        use {'sbdchd/neoformat', cmd = 'Neoformat'}
+        use {'sbdchd/neoformat', cmd = 'Neoformat', config = conf('neoformat')}
 
-        use {'editorconfig/editorconfig-vim', opt = false}
+        use {'editorconfig/editorconfig-vim'}
 
         use {'honza/vim-snippets', opt = false}
 
@@ -109,10 +149,9 @@ return require('packer').startup({
 
         use {
             'jpalardy/vim-slime',
-            keys = {
-                '<Plug>SlimeRegionSend', '<Plug>SlimeLineSend', '<Plug>SlimeParagraphSend',
-                '<Plug>SlimeConfig'
-            }
+            keys = {{'', '<C-c><C-c>'}, {'n', '<C-c>v'}, {'n', '<C-c>l'}},
+            setup = [[vim.g.slime_no_mappings = 1]],
+            config = conf('slime')
         }
 
         use {'plasticboy/vim-markdown', ft = 'markdown'}
@@ -120,18 +159,28 @@ return require('packer').startup({
         use {
             'iamcco/markdown-preview.nvim',
             run = 'cd app && yarn install',
-            ft = {'markdown', 'html'}
+            ft = {'markdown', 'html'},
+            setup = [[vim.g.mkdp_auto_close = 0]]
         }
 
-        use {'sakhnik/nvim-gdb', run = ':UpdateRemotePlugins', opt = false}
+        use {
+            'sakhnik/nvim-gdb',
+            cmd = {'GdbStart', 'GdbStartPDB'},
+            config = [[require('plugs.nvimgdb')]]
+        }
 
-        use {'kevinhwang91/vim-ibus-sw', opt = false}
+        use {'kevinhwang91/vim-ibus-sw', event = 'InsertEnter'}
 
-        use {'othree/eregex.vim', cmd = 'E2v'}
+        use {'othree/eregex.vim', cmd = 'E2v', setup = [[vim.g.eregex_default_enable = 0]]}
 
-        use {'KabbAmine/vCoolor.vim', cmd = {'VCoolor', 'VCoolIns'}}
+        use {
+            'KabbAmine/vCoolor.vim',
+            keys = {{'n', '<Leader>pc'}, {'n', '<Leader>yb'}, {'n', '<Leader>yr'}},
+            setup = [[vim.vcoolor_disable_mappings = 1 vim.vcoolor_lowercase = 1]],
+            config = conf('vcoolor')
+        }
 
-        use {'kevinhwang91/suda.vim', cmd = 'SudaWrite'}
+        use {'kevinhwang91/suda.vim', keys = {'n', '<Leader>W'}, config = conf('suda')}
 
         use {'neoclide/coc.nvim', branch = 'master', run = 'yarn install --frozen-lockfile'}
 

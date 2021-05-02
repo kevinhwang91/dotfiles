@@ -9,6 +9,11 @@ local bl_ft
 local anyfold_prefer_ft
 
 local function setup()
+
+    vim.g.anyfold_fold_display = 0
+    vim.g.anyfold_identify_comments = 0
+    vim.g.anyfold_motion = 0
+
     bl_ft = {'man', 'help', 'markdown'}
     anyfold_prefer_ft = {'python'}
     cmd([[
@@ -26,9 +31,9 @@ end
 function M.do_fold()
     local ret = false
     local fsize
-    local bufname = api.nvim_buf_get_name(0)
+    local filename = api.nvim_buf_get_name(0)
     if vim.tbl_contains(anyfold_prefer_ft, vim.bo.filetype) then
-        fsize = fn.getfsize(bufname)
+        fsize = fn.getfsize(filename)
         if 0 < fsize and fsize < 524288 then
             cmd('AnyFoldActivate')
             ret = true
@@ -39,7 +44,7 @@ function M.do_fold()
             vim.wo.foldmethod = 'expr'
             vim.wo.foldexpr = 'nvim_treesitter#foldexpr()'
         elseif not fsize then
-            fsize = fn.getfsize(bufname)
+            fsize = fn.getfsize(filename)
             if 0 < fsize and fsize < 524288 then
                 cmd('AnyFoldActivate')
             end
@@ -92,7 +97,7 @@ function M.foldtext()
                             fn.win_screenpos(0)[2]
     local width = api.nvim_win_get_width(0) - gutter_size
     local fold_info = (' %d lines %s'):format(1 + fe - fs, (' + '):rep(vim.v.foldlevel))
-    local spaces = pad:rep(width - fn.strwidth(fold_info .. line))
+    local spaces = pad:rep(width - api.nvim_strwidth(fold_info .. line))
     return line .. spaces .. fold_info
 end
 

@@ -202,7 +202,7 @@ if (( $+commands[nvim] )); then
 
     alias ng='_ng'
     _ng() {
-        git rev-parse >/dev/null 2>&1 && nvim +Git +'winc o' +'bw 1'
+        git rev-parse >/dev/null 2>&1 && nvim +"lua require('plugs.fugitive').index()"
     }
 
     alias ngl='_ngl'

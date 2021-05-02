@@ -4,7 +4,7 @@ local fn = vim.fn
 local cmd = vim.cmd
 
 function M.follow_symlink(fname)
-    fname = fname and fn.fnamemodify(fname, ':p') or fn.expand('%:p')
+    fname = fname and fn.fnamemodify(fname, ':p') or api.nvim_buf_get_name(0)
     if fn.getftype(fname) ~= 'link' then
         return
     end
@@ -23,34 +23,22 @@ function M.clean_empty_bufs()
     end
 end
 
-function M.clean_diffed_tab(tabpage)
-    if fn.tabpagenr('$') == 1 then
-        return
-    end
-    tabpage = tabpage or api.nvim_get_current_tabpage()
-    for _, winid in pairs(api.nvim_tabpage_list_wins(tabpage)) do
-        if not vim.wo[winid].diff then
-            return
-        end
-    end
-    cmd('tabc ' .. api.nvim_tabpage_get_number(tabpage))
-end
+function M.close_diff()
+    local winids = vim.tbl_filter(function(winid)
+        return vim.wo[winid].diff
+    end, api.nvim_list_wins())
 
-function M.zz()
-    local lnum1, lcount = api.nvim_win_get_cursor(0)[1], api.nvim_buf_line_count(0)
-    if lnum1 == lcount then
-        fn.execute(('keepj norm! %dzb'):format(lnum1))
-        return
-    end
-    cmd('norm! zvzz')
-    lnum1 = api.nvim_win_get_cursor(0)[1]
-    cmd('norm! L')
-    local lnum2 = api.nvim_win_get_cursor(0)[1]
-    if lnum2 + fn.getwinvar(0, '&scrolloff') >= lcount then
-        fn.execute(('keepj norm! %dzb'):format(lnum2))
-    end
-    if lnum1 ~= lnum2 then
-        cmd('keepj norm! ``')
+    if #winids > 1 then
+        for _, winid in ipairs(winids) do
+            local ok, msg = pcall(api.nvim_win_close, winid, false)
+            if not ok then
+                if msg:match('^Vim:E444:') then
+                    if api.nvim_buf_get_name(0):match('fugitive://') then
+                        cmd('Gedit')
+                    end
+                end
+            end
+        end
     end
 end
 
@@ -79,6 +67,17 @@ function M.nav_fold(forward, cnt)
     else
         cmd([[norm! m']])
     end
+end
+
+-- My eyes can't get along with 2 spaces indent!
+function M.kill2spaces()
+    cmd('sil! GitGutterBufferDisable')
+    vim.bo.ts = 4
+    vim.bo.sw = 4
+    local pos = api.nvim_win_get_cursor(0)
+    cmd('%!unexpand -t2 --first-only')
+    vim.bo.modified = false
+    api.nvim_win_set_cursor(0, pos)
 end
 
 return M

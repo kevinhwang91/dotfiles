@@ -1,5 +1,6 @@
 local M = {}
 local fn = vim.fn
+local api = vim.api
 local cmd = vim.cmd
 
 local mru = require('mru')
@@ -26,7 +27,7 @@ end
 
 local function mru_source()
     local mru_list = mru.list()
-    if #mru_list > 0 and mru_list[1] == fn.expand('%:p') then
+    if #mru_list > 0 and mru_list[1] == api.nvim_buf_get_name(0) then
         table.remove(mru_list, 1)
     end
     return vim.tbl_map(function(val)
