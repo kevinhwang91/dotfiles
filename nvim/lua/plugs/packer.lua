@@ -65,7 +65,7 @@ return require('packer').startup({
             'mg979/vim-visual-multi',
             keys = {
                 {'', '<C-n>'}, {'n', [[<Leader>\]]}, {'', '<Leader>A'}, {'x', '<Leader>c'},
-                {'n', '<M-C-k>'}, {'n', '<M-C-j'}, {'n', 'g/'}
+                {'n', '<M-C-k>'}, {'n', '<M-C-j>'}, {'n', 'g/'}
             },
             cmd = {'VMSearch'},
             config = conf('visualmulti'),
@@ -180,11 +180,9 @@ return require('packer').startup({
             config = conf('vcoolor')
         }
 
-        use {'kevinhwang91/suda.vim', keys = {'n', '<Leader>W'}, config = conf('suda')}
+        use {'kevinhwang91/suda.vim', keys = {{'n', '<Leader>W'}}, config = conf('suda')}
 
         use {'neoclide/coc.nvim', branch = 'master', run = 'yarn install --frozen-lockfile'}
-
-        use {'kevinhwang91/vim-lsp-cxx-highlight'}
 
         use {'wellle/tmux-complete.vim'}
 
@@ -204,7 +202,12 @@ return require('packer').startup({
 
         use {'nvim-treesitter/nvim-treesitter-textobjects'}
 
+        use {'rktjmp/lush.nvim'}
+
+        use {'MTDL9/vim-log-highlighting', event = 'BufNewFile,BufRead *.log'}
+
         -- keep learning :)
         use {'nvim-lua/plenary.nvim'}
+
     end
 })

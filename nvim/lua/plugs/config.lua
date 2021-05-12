@@ -7,11 +7,12 @@ local map = require('remap').map
 
 function M.bqf()
     if g.colors_name == 'one' then
-        cmd('hi BqfPreviewBorder ctermfg=71 guifg=#50a14f')
+        cmd('hi! link BqfPreviewBorder Parameter')
     end
 
     require('bqf').setup({
         auto_enable = true,
+        preview = {auto_preview = true},
         func_map = {split = '<C-s>'},
         filter = {fzf = {action_for = {['ctrl-s'] = 'split'}}}
     })
@@ -114,6 +115,7 @@ function M.grepper()
         quickfix = 1,
         searchreg = 1,
         highlight = 0,
+        stop = 10000,
         rg = {
             grepprg = 'rg -H --no-heading --vimgrep --smart-case',
             grepformat = '%f:%l:%c:%m,%f:%l:%m'
@@ -122,12 +124,13 @@ function M.grepper()
     map('n', 'gs', [[<Cmd>lua require('yank').set_wv()<CR><Plug>(GrepperOperator)]], {})
     map('x', 'gs', '<Plug>(GrepperOperator)', {})
     map('n', '<Leader>rg', [[<Cmd>Grepper -tool rg<CR>]])
-    cmd([[
+    cmd(([[
         aug Grepper
             au!
-            au User Grepper call setqflist([], 'r', {'context': {'bqf': {'pattern_hl': getreg('/')}}}) | bo cope
+            au User Grepper ++nested %s | %s
         aug END
-    ]])
+    ]]):format([[call setqflist([], 'r', {'context': {'bqf': {'pattern_hl': getreg('/')}}})]],
+        'bo cope'))
 
     -- if fn.executable('rg') then
     --     vim.bo.grepprg = [[rg\ --vimgrep\ --no-heading\ --smart-case]]
@@ -156,7 +159,7 @@ function M.matchup()
     g.matchup_motion_cursor_end = 0
     g.matchup_mappings_enabled = 0
 
-    cmd('hi link MatchWord Underlined')
+    cmd('hi! link MatchWord Underlined')
 
     map('n', '%', '<Plug>(matchup-%)', {})
     map('x', '%', '<Plug>(matchup-%)', {})

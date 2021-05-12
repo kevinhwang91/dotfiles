@@ -1,9 +1,9 @@
 local M = {}
 local cmd = vim.cmd
-local api = vim.api
-local fn = vim.fn
 
 local g = vim.g
+
+local gittool = require('gittool')
 
 local function setup()
     cmd([[
@@ -15,9 +15,8 @@ local function setup()
 end
 
 function M.find_git()
-    local fname = api.nvim_buf_get_name(0)
-    local d_git = fn.finddir('.git', fname .. ';')
-    if d_git ~= '' then
+    local root = gittool.root()
+    if root ~= '' then
         cmd('aug! FindGitForPlugs')
         M.find_git = nil
         M.git_relation()
@@ -37,7 +36,7 @@ function M.git_relation()
             hi link GitGutterChangeDeleteLineNr GitGutterChangeDeleteLine
             ]])
         if g.colors_name == 'one' then
-            cmd('hi GitGutterChangeDeleteLine ctermfg=130 guifg=#be5046')
+            cmd('hi! GitGutterChangeDeleteLine guifg=#be5046')
         end
 
         g.gitgutter_highlight_linenrs = 1

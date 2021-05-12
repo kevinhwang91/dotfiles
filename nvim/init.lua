@@ -1,28 +1,28 @@
 local cmd = vim.cmd
 local fn = vim.fn
 
-local g, o, wo, bo = vim.g, vim.o, vim.wo, vim.bo
+local env, g, o, wo, bo = vim.env, vim.g, vim.o, vim.wo, vim.bo
 local map = require('remap').map
 
 -- source filetype.vim later
 g.did_load_filetypes = 1
 cmd('syntax enable')
 
-wo.number = true
-wo.relativenumber = true
-wo.cursorline = true
-wo.signcolumn = 'yes:1'
+wo.nu = true
+wo.rnu = true
+wo.cul = true
+wo.scl = 'yes:1'
 wo.foldcolumn = '1'
 wo.foldenable = true
 wo.list = true
-bo.tabstop = 4
-o.tabstop = bo.tabstop
-bo.shiftwidth = 4
-o.shiftwidth = bo.shiftwidth
+bo.ts = 4
+o.ts = bo.ts
+bo.sw = 4
+o.sw = bo.sw
+bo.et = true
+o.et = bo.et
 bo.softtabstop = -1
 o.softtabstop = bo.softtabstop
-bo.expandtab = true
-o.expandtab = bo.expandtab
 bo.autoindent = true
 o.autoindent = bo.autoindent
 bo.smartindent = true
@@ -53,7 +53,7 @@ o.shortmess = o.shortmess .. 'acIS'
 o.confirm = true
 o.jumpoptions = 'stack'
 o.diffopt = o.diffopt .. ',vertical,internal,algorithm:patience'
-o.shada = [[!,'10,<50,s10,/100,@1000,h]]
+o.shada = [[!,'10,<50,s10,/50,@50,h]]
 o.termguicolors = true
 
 -- undo
@@ -74,14 +74,14 @@ g.loaded_2html_plugin = 1
 -- I haven't any remote plugins
 g.loaded_remote_plugins = 1
 
-if vim.env.DISPLAY and fn.executable('xsel') then
+if env.DISPLAY and fn.executable('xsel') then
     g.clipboard = {
         name = 'xsel',
         copy = {['+'] = 'xsel --nodetach -i -b', ['*'] = 'xsel --nodetach -i -b'},
         paste = {['+'] = 'xsel -o -b', ['*'] = 'xsel -o -b'},
         cache_enabled = true
     }
-elseif vim.env.TMUX then
+elseif env.TMUX then
     g.clipboard = {
         name = 'tmux',
         copy = {['+'] = 'tmux load-buffer -w -', ['*'] = 'tmux load-buffer -w -'},
@@ -231,8 +231,10 @@ function _G.prefix_timeout(prefix)
     return char == '' and [[\<Ignore>]] or prefix .. char
 end
 
+require('dev')
 require('mru')
 require('stl')
+require('qf')
 
 if fn.glob(fn.stdpath('config') .. '/plugin/packer_compiled.vim') == '' then
     require('plugs.packer').compile()
@@ -247,10 +249,17 @@ else
     ]])
 end
 
-cmd([[
+cmd(([[
     aug Packer
         au!
-        au BufWritePost */plugs/packer.lua call execute(['luafile ' . expand('<afile>'), 'PackerCompile'])
+        au BufWritePost */plugs/packer.lua call execute([%s, %s])
+    aug END
+]]):format([['luafile ' . expand('<afile>')]], [['PackerCompile']]))
+
+cmd([[
+    aug LushTheme
+        au!
+        au BufWritePost */lua/lush_theme/*.lua lua require('plugs.lush').write_post()
     aug END
 ]])
 
@@ -258,20 +267,21 @@ pcall(cmd, 'color one')
 
 -- junegunn/fzf.vim
 -- `pacman -S fzf` will force nvim load plugin in /usr/share/vim/vimfiles/plugin/fzf.vim
-vim.g.loaded_fzf = true
-vim.env.FZF_DEFAULT_OPTS = vim.env.FZF_DEFAULT_OPTS .. ' --reverse --info=inline --border'
-vim.env.BAT_STYLE = 'numbers'
+g.loaded_fzf = true
+env.FZF_DEFAULT_OPTS = env.FZF_DEFAULT_OPTS .. ' --reverse --info=inline --border'
+env.BAT_STYLE = 'numbers'
 map('n', '<Leader>f', '')
+map('n', '<Leader>ff', '<Cmd>FZF<CR>')
+map('n', '<Leader>fm', '<Cmd>Marks<CR>')
 map('n', '<Leader>ft', '<Cmd>BTags<CR>')
 map('n', '<Leader>fo', '<Cmd>Tags<CR>')
-map('n', '<Leader>fc', '<Cmd>BCommits<CR>')
 map('n', '<Leader>f/', '<Cmd>History/<CR>')
 map('n', '<Leader>f;', '<Cmd>History:<CR>')
-map('n', '<Leader>fg', '<Cmd>GFiles<CR>')
-map('n', '<Leader>fm', '<Cmd>Marks<CR>')
-map('n', '<Leader>ff', '<Cmd>FZF<CR>')
-map('n', '<Leader>fb', '<Cmd>Buffers<CR>')
-map('n', '<Leader>fr', [[<Cmd>lua require('plugs.fzf').mru()<CR>]])
+map('n', '<Leader>fc', [[<Cmd>lua require('gittool').root_exe('BCommits')<CR>]])
+map('n', '<Leader>fg', [[<Cmd>lua require('gittool').root_exe('GFiles')<CR>]])
+map('n', '<Leader>fb', [[<Cmd>lua require('gittool').root_exe('Buffers')<CR>]])
+map('n', '<Leader>f,', [[<Cmd>lua require('gittool').root_exe('Rg')<CR>]])
+map('n', '<Leader>fr', [[<Cmd>lua require('gittool').root_exe(require('plugs.fzf').mru)<CR>]])
 
 cmd([[
     aug Fzf
@@ -283,7 +293,6 @@ cmd([[
     com! -nargs=* -bar -bang Maps call fzf#vim#maps(<q-args>, <bang>0)
     com! -bar -bang Helptags call fzf#vim#helptags(<bang>0)
 ]])
-
 
 -- kevinhwang91/rnvimr
 g.rnvimr_enable_ex = 1
@@ -304,7 +313,7 @@ g.rnvimr_ranger_views = {
     {maxwidth = 49, ratio = {1}}
 }
 
-cmd('hi link RnvimrNormal CursorLine')
+cmd('hi! link RnvimrNormal CursorLine')
 map('t', '<M-i>', [[<C-\><C-n><Cmd>RnvimrResize<CR>]])
 map('t', '<M-o>', [[<C-\><C-n><Cmd>RnvimrToggle<CR>]])
 map('n', '<M-o>', '<Cmd>RnvimrToggle<CR>')
@@ -328,12 +337,12 @@ map('o', 'A', [[targets#e('o', 'A', 'A')]], {expr = true})
 map('x', 'A', [[targets#e('o', 'A', 'A')]], {expr = true})
 
 -- highlight syntax
-cmd([[
+cmd(([[
     aug LuaHighlight
         au!
-        au TextYankPost * lua if not vim.b.visual_multi then vim.highlight.on_yank({higroup='IncSearch', timeout=800}) end
+        au TextYankPost * lua if not vim.b.visual_multi then %s end
     aug END
-]])
+]]):format([[pcall(vim.highlight.on_yank, {higroup='IncSearch', timeout=800})]]))
 
 -- mbbill/undotree
 g.undotree_WindowLayout = 3
@@ -363,7 +372,7 @@ g.git_messenger_always_into_popup = 1
 map('n', '<Leader>gm', '<Cmd>GitMessenger<CR>')
 
 -- sbdchd/neoformat
-map('n', '<M-C-l>', '<Cmd>Neoformat<CR>')
+map('n', '<M-C-l>', [[<Cmd>lua require('gittool').root_exe('Neoformat')<CR>]])
 
 -- plasticboy/vim-markdown
 g.vim_markdown_toc_autofit = 1
@@ -441,7 +450,7 @@ vim.schedule(function()
         g.did_load_filetypes = nil
         cmd('filetype on')
         cmd('doautoall filetypedetect BufRead')
-    end, 30)
+    end, 20)
 
     vim.defer_fn(function()
         require('plugs.treesitter')
@@ -468,5 +477,5 @@ vim.schedule(function()
     vim.defer_fn(function()
         cmd('pa tmux-complete.vim')
         cmd('pa coc.nvim')
-    end, 500)
+    end, 1000)
 end)

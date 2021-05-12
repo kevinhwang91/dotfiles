@@ -26,7 +26,7 @@ end
 function M.close_diff()
     local winids = vim.tbl_filter(function(winid)
         return vim.wo[winid].diff
-    end, api.nvim_list_wins())
+    end, api.nvim_tabpage_list_wins(0))
 
     if #winids > 1 then
         for _, winid in ipairs(winids) do

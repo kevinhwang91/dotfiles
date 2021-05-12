@@ -21,7 +21,17 @@
 					},
 					"diagnostics": {
 						"enable": true,
-						"globals": ["hs", "vim", "jit", "it", "describe", "before_each", "after_each"]
+						"globals": [
+							"hs",
+							"vim",
+							"jit",
+							"it",
+							"describe",
+							"before_each",
+							"after_each",
+							"p",
+							"ldebug"
+						]
 					},
 					"telemetry": {
 						"enable": false
@@ -41,7 +51,6 @@
 		}
 	},
 	"clangd.enabled": true,
-	"clangd.semanticHighlighting": true,
 	"go.trace.server": "off",
 	"rust-analyzer.trace.server": "off",
 	"tsserver.trace.server": "off",

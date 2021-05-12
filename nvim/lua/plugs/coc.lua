@@ -26,22 +26,10 @@ local function setup()
         aug END
     ]])
 
-    local cxx_ft = {'c', 'cpp', 'objc', 'objcpp', 'cc', 'cuda'}
-    local cur_ft = vim.bo.ft
-    if vim.tbl_contains(cxx_ft, cur_ft) then
-        cmd('pa vim-lsp-cxx-highlight')
-        fn['CocActionAsync']('reloadExtension', 'coc-clangd')
-    else
-        local cxx_ft_str = table.concat(cxx_ft, ',')
-        cmd(('au Coc FileType %s %s'):format(cxx_ft_str,
-            ([[call execute(['au! Coc FileType %s', 'pa vim-lsp-cxx-highlight'])]]):format(
-                cxx_ft_str)))
-    end
-
-    cmd('hi link CocHighlightText CurrentWord')
+    cmd('hi! link CocHighlightText CurrentWord')
     if vim.g.colors_name == 'one' then
-        cmd('hi CocErrorSign ctermfg=130 guifg=#be5046')
-        cmd('hi CocWarningSign ctermfg=180 guifg=#e5c07b')
+        cmd('hi! CocErrorSign guifg=#be5046')
+        cmd('hi! CocWarningSign guifg=#e5c07b')
     end
 
     map('i', '<C-space>', 'coc#refresh()', {noremap = true, expr = true})

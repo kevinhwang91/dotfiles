@@ -1,7 +1,6 @@
 local M = {}
 local api = vim.api
 local cmd = vim.cmd
-local fn = vim.fn
 
 local shadow_winblend = 70
 local shadow_winid = -1

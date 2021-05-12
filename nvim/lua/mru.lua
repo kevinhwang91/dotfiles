@@ -3,58 +3,36 @@ local api = vim.api
 local fn = vim.fn
 local cmd = vim.cmd
 
-local disk_file
-local tmp_file
+local db
 local max
-local count
+local bufs
+local tmp_prefix
 
 local function setup()
-    disk_file = vim.env.HOME .. '/.mru_file'
-    tmp_file = '/tmp/' .. vim.env.USER .. '_mru_file'
+    db = vim.env.HOME .. '/.mru_file'
     max = 1000
-    count = 0
+    bufs = {}
+    tmp_prefix = fn.tempname()
 
-    if fn.filereadable(tmp_file) == 0 then
-        M.write2ram()
-    end
-    M.update(0)
-
+    M.store_buf(0)
     cmd([[
         aug Mru
             au!
-            au BufEnter,BufAdd * lua require('mru').update(vim.fn.expand('<abuf>', 1))
-            au VimLeavePre,VimSuspend * lua require('mru').write2disk()
-            au FocusLost * lua require('mru').write2disk()
-        aug END')
+            au BufEnter,BufAdd,FocusGained * lua require('mru').store_buf(vim.fn.expand('<abuf>', 1))
+            au VimLeavePre,VimSuspend * lua require('mru').flush()
+            au FocusLost * lua require('mru').flush()
+        aug END
     ]])
-
-    -- https://github.com/neovim/neovim/pull/7670
-    -- TODO Neovim + Tmux will fire FocusGained on startup
-    if vim.env.TMUX then
-        cmd(('au Mru FocusGained * ++once %s'):format(
-            [[execute("au Mru FocusGained * lua require('mru').write2ram()")]]))
-    else
-        cmd([[au Mru FocusGained * lua require('mru').write2ram()]])
-    end
 end
 
-local function list(file)
-    local mru_list = {}
-    local fd = io.open(file, 'r')
-    if fd then
-        for line in fd:lines() do
-            local f_existed = io.open(line, 'r')
-            if f_existed then
-                f_existed:close()
-                table.insert(mru_list, line)
-            end
-        end
-        fd:close()
+local function file_exists(name)
+    local f = io.open(name, 'r')
+    if f ~= nil then
+        f:close()
+        return true
+    else
+        return false
     end
-    while #mru_list > max do
-        table.remove(mru_list)
-    end
-    return mru_list
 end
 
 local function write_file(file_path, lines)
@@ -69,51 +47,70 @@ local function write_file(file_path, lines)
     end
 end
 
-function M.list()
-    return list(tmp_file)
-end
+local function list(file)
+    local mru_list = {}
+    local fname_set = {[''] = true}
 
-function M.write2disk(mru_list)
-    mru_list = not mru_list and list(tmp_file)
-    if #mru_list > 0 then
-        write_file(disk_file, mru_list)
-    end
-end
-
-function M.write2ram()
-    local mru_list = list(disk_file)
-    write_file(tmp_file, mru_list)
-end
-
-function M.update(bufnr)
-    bufnr = bufnr == 0 and api.nvim_get_current_buf() or tonumber(bufnr)
-    local filename = api.nvim_buf_get_name(bufnr)
-    if filename == '' or vim.bo[bufnr].buftype ~= '' or fn.filereadable(filename) == 0 then
-        return
+    local add_list = function(name)
+        if not fname_set[name] then
+            fname_set[name] = true
+            if file_exists(name) then
+                if #mru_list < max then
+                    table.insert(mru_list, name)
+                else
+                    return false
+                end
+            end
+        end
+        return true
     end
 
-    local mru_list = list(tmp_file)
-    local idx = -1
-    for i, fname in ipairs(mru_list) do
-        if fname == filename then
-            idx = i
-            break
+    while #bufs > 0 do
+        local bufnr = table.remove(bufs)
+        if api.nvim_buf_is_valid(bufnr) and vim.bo[bufnr].buftype == '' then
+            local fname = api.nvim_buf_get_name(bufnr)
+            if not fname:match(tmp_prefix) then
+                if not add_list(fname) then
+                    break
+                end
+            end
         end
     end
-    if idx == 1 then
-        return
-    elseif idx > 1 then
-        table.remove(mru_list, idx)
-    end
-    table.insert(mru_list, 1, filename)
 
-    count = (count + 1) % 10
-    if count == 0 then
-        M.write2disk()
-    else
-        write_file(tmp_file, mru_list)
+    local fd = io.open(file, 'r')
+    if fd then
+        for fname in fd:lines() do
+            if not add_list(fname) then
+                break
+            end
+        end
+        fd:close()
     end
+    return mru_list
 end
+
+function M.list()
+    local mru_list = list(db)
+    write_file(db, mru_list)
+    return mru_list
+end
+
+function M.flush()
+    write_file(db, list(db))
+end
+
+M.store_buf = (function()
+    local count = 0
+    return function(bufnr)
+        bufnr = bufnr and tonumber(bufnr) or api.nvim_get_current_buf()
+        table.insert(bufs, bufnr)
+        count = (count + 1) % 10
+        if count == 0 then
+            local mru_list = list(db)
+            write_file(db, mru_list)
+        end
+    end
+end)()
 
 setup()
 

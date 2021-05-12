@@ -3,7 +3,7 @@ local cmd = vim.cmd
 local fn = vim.fn
 local api = vim.api
 
-local parsers = require('nvim-treesitter.parsers')
+-- local parsers = require('nvim-treesitter.parsers')
 
 local bl_ft
 local anyfold_prefer_ft
@@ -40,10 +40,12 @@ function M.do_fold()
         end
     end
     if not ret then
-        if parsers.has_parser() then
-            vim.wo.foldmethod = 'expr'
-            vim.wo.foldexpr = 'nvim_treesitter#foldexpr()'
-        elseif not fsize then
+        -- nvim_treesitter#foldexpr() format may block
+        -- if parsers.has_parser() then
+        --     vim.wo.foldmethod = 'expr'
+        --     vim.wo.foldexpr = 'nvim_treesitter#foldexpr()'
+        -- elseif not fsize then
+        if not fsize then
             fsize = fn.getfsize(filename)
             if 0 < fsize and fsize < 524288 then
                 cmd('AnyFoldActivate')

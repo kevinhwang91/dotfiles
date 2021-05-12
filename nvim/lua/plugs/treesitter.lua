@@ -3,21 +3,15 @@ local cmd = vim.cmd
 
 local function setup()
     cmd([[
-        hi link TSPunctBracket Delimiter
-        hi link TSVariable NONE
-        hi link TSConstant NONE
-        hi link TSKeyword Keyword
-        hi link TSInclude Keyword
-        hi link TSConstBuiltin SpecialChar
-        hi link TSParameter Parameter
-        hi link TSVariableBuiltin SpecialChar
+        hi! link TSVariable NONE
+        hi! link TSParameter Parameter
+        hi! link TSConstructor NONE
     ]])
 
     cmd('pa nvim-treesitter')
     cmd('pa nvim-treesitter-textobjects')
     require('nvim-treesitter.configs').setup({
         ensure_installed = 'maintained',
-        ignore_install = {'comment'},
         highlight = {enable = true, disable = {'bash'}},
         textobjects = {
             select = {
@@ -42,7 +36,7 @@ local function setup()
                 goto_previous_end = {['[M'] = '@function.outer'}
             }
         },
-        matchup = {enable = true}
+        matchup = {enable = false}
     })
 end
 
