@@ -6,7 +6,7 @@
     name = USER_NAME
 
 [core]
-    pager = delta
+    pager = delta -w $COLUMNS
     excludesfile = ~/.gitignore
 
 [blame]
@@ -35,18 +35,18 @@
     line-numbers = true
     syntax-theme = TwoDark
     navigate = true
-    width = 1
-    minus-style = syntax "#450a15"
-    minus-emph-style = syntax "#600818"
-    plus-style = syntax "#0b4820"
-    plus-emph-style = syntax "#175c2e"
-    hunk-header-style = syntax bold
+    minus-style = syntax "#442d30"
+    minus-emph-style = syntax "#5e3031"
+    plus-style = syntax "#2a3c33"
+    plus-emph-style = syntax "#2D4D38"
+    hunk-header-style = syntax "#213352" bold
     hunk-header-decoration-style = omit
-    file-style = yellow italic
-    file-decoration-style = yellow ul
+    commit-style = "#d19a66" bold
+    file-style = "#d19a66" bold
+    file-decoration-style = "#d19a66" ul ol
     line-numbers-zero-style = "#4b5263"
-    line-numbers-left-format = "{nm:^4} "
-    line-numbers-right-format = "{np:^4} "
+    line-numbers-left-format = ""
+    line-numbers-right-format = "{np:>4} "
 
 [interactive]
     diffFilter = delta --color-only
