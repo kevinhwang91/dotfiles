@@ -1,16 +1,11 @@
 local M = {}
 local cmd = vim.cmd
+local fn = vim.fn
+
+local do_sy_tbl = {}
 
 local function setup()
-    cmd([[
-        hi! link TSVariable NONE
-        hi! link TSParameter Parameter
-        hi! link TSConstructor NONE
-    ]])
-
-    cmd('pa nvim-treesitter')
-    cmd('pa nvim-treesitter-textobjects')
-    require('nvim-treesitter.configs').setup({
+    local conf = {
         ensure_installed = 'maintained',
         highlight = {enable = true, disable = {'bash'}},
         textobjects = {
@@ -37,7 +32,32 @@ local function setup()
             }
         },
         matchup = {enable = false}
-    })
+    }
+    cmd([[
+        hi! link TSVariable NONE
+        hi! link TSParameter Parameter
+        hi! link TSConstructor NONE
+    ]])
+
+    cmd('pa nvim-treesitter')
+    cmd('pa nvim-treesitter-textobjects')
+
+    require('nvim-treesitter.configs').setup(conf)
+
+    local parsers = require('nvim-treesitter.parsers')
+    local hl_disabled = conf.highlight.disable
+    for lang in pairs(parsers.list) do
+        if not vim.tbl_contains(hl_disabled, lang) then
+            do_sy_tbl[lang] = true
+        end
+    end
+end
+
+function M.synset()
+    local ft = fn.expand('<amatch>')
+    if not do_sy_tbl[ft] then
+        vim.bo.syntax = ft
+    end
 end
 
 setup()

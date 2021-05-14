@@ -40,7 +40,7 @@ function M.index()
         cmd('tab Git')
     end
     if bufname == '' then
-        cmd('noa bw #')
+        cmd('sil! noa bw #')
     end
 end
 

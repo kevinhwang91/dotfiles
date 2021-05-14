@@ -3,6 +3,28 @@ local api = vim.api
 local fn = vim.fn
 local cmd = vim.cmd
 
+function M.file_exists(name)
+    local f = io.open(name, 'r')
+    if f ~= nil then
+        f:close()
+        return true
+    else
+        return false
+    end
+end
+
+function M.write_file(file_path, lines)
+    local file_path_ = file_path .. '_'
+    local fd_ = io.open(file_path_, 'w')
+    if fd_ then
+        for _, line in ipairs(lines) do
+            fd_:write(line, '\n')
+        end
+        fd_:close()
+        os.rename(file_path_, file_path)
+    end
+end
+
 function M.follow_symlink(fname)
     fname = fname and fn.fnamemodify(fname, ':p') or api.nvim_buf_get_name(0)
     if fn.getftype(fname) ~= 'link' then
@@ -31,11 +53,9 @@ function M.close_diff()
     if #winids > 1 then
         for _, winid in ipairs(winids) do
             local ok, msg = pcall(api.nvim_win_close, winid, false)
-            if not ok then
-                if msg:match('^Vim:E444:') then
-                    if api.nvim_buf_get_name(0):match('fugitive://') then
-                        cmd('Gedit')
-                    end
+            if not ok and msg:match('^Vim:E444:') then
+                if api.nvim_buf_get_name(0):match('^fugitive://') then
+                    cmd('Gedit')
                 end
             end
         end

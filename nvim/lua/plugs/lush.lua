@@ -37,7 +37,7 @@ function M.dump(name)
             fp:write(header)
             fp:write(([[let g:colors_name = '%s'%s]]):format(name, '\n'))
             for _, line in ipairs(lines) do
-                fp:write(line .. '\n')
+                fp:write(line, '\n')
             end
             fp:close()
             cmd('so ' .. theme_path)

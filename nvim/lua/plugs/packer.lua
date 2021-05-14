@@ -17,6 +17,8 @@ return require('packer').startup({
         use {
             'wbthomason/packer.nvim',
             setup = function()
+                -- below plugins will define commands or keymaps, should clear their loaded
+                -- variables after packer reload
                 for _, flag in ipairs({
                     'loaded_clever_f', 'loaded_grepper', 'loaded_eregex', 'loaded_slime',
                     'loaded_nerd_comments', 'loaded_suda', 'vcoolor_loaded', 'loaded_choosewin',
@@ -201,6 +203,8 @@ return require('packer').startup({
         use {'nvim-treesitter/nvim-treesitter', run = ':TSUpdate'}
 
         use {'nvim-treesitter/nvim-treesitter-textobjects'}
+
+        use {'nvim-treesitter/playground', cmd = 'TSHighlightCapturesUnderCursor'}
 
         use {'rktjmp/lush.nvim'}
 

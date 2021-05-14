@@ -3,14 +3,16 @@ local fn = vim.fn
 local api = vim.api
 local cmd = vim.cmd
 
+local default_preview_window
 local mru = require('mru')
+local cmdhist = require('cmdhist')
 
 local function setup()
     vim.g.fzf_action = {['ctrl-t'] = 'tabedit', ['ctrl-s'] = 'split', ['ctrl-v'] = 'vsplit'}
     vim.g.fzf_layout = {window = {width = 0.7, height = 0.7}}
     cmd([[
-        function! FzfMruFiles(name, opts) abort
-            call fzf#run(fzf#wrap(a:name, a:opts, 0))
+        function! FzfWrapper(opts) abort
+            call fzf#run(fzf#wrap(a:opts))
         endfunction
 
         aug Fzf
@@ -22,26 +24,75 @@ local function setup()
     vim.g.loaded_fzf = nil
     cmd('pa fzf')
     cmd('pa fzf.vim')
+    default_preview_window = {'right:50%, border-left', 'ctrl-/'}
     M.resize_preview_layout()
 end
 
+local function run_wrapper(opts)
+    local sink = opts['sink*']
+    if sink then
+        local fzf_wrap = fn['fzf#wrap'](opts)
+        fzf_wrap['sink*'] = sink
+        fn['fzf#run'](fzf_wrap)
+    else
+        fn['FzfWrapper'](opts)
+    end
+end
+
 local function mru_source()
-    local mru_list = mru.list()
-    if #mru_list > 0 and mru_list[1] == api.nvim_buf_get_name(0) then
-        table.remove(mru_list, 1)
+    local list = mru.list()
+    if #list > 0 and list[1] == api.nvim_buf_get_name(0) then
+        table.remove(list, 1)
     end
     return vim.tbl_map(function(val)
         return fn.fnamemodify(val, ':~:.')
-    end, mru_list)
+    end, list)
+end
+
+local function cmdhist_source()
+    return cmdhist.list()
+end
+
+local function cmdhist_sink(ret)
+    local key, cmdl = unpack(ret)
+    fn.histadd(':', cmdl)
+    if key == 'ctrl-e' then
+        cmd('redraw')
+        api.nvim_feedkeys(api.nvim_replace_termcodes(':<up>', true, false, true), 'n', false)
+    else
+        vim.defer_fn(function()
+            local ok, msg = pcall(cmd, ('norm :%s%c'):format(cmdl, 0x0d))
+            if not ok then
+                local _, sub_index = msg:find('Vim%(%a+%):')
+                if sub_index then
+                    msg = msg:sub(sub_index + 1)
+                end
+                api.nvim_err_writeln(msg)
+            end
+        end, 0)
+    end
 end
 
 function M.mru()
-    local preview_args = vim.g.fzf_preview_window or {'right:50%, border-left', 'ctrl-/'}
+    local preview_args = vim.g.fzf_preview_window or default_preview_window
     local opts = #preview_args == 0 and {'hidden'} or preview_args
     opts = fn['fzf#vim#with_preview'](unpack(opts))
     vim.list_extend(opts.options, {'--prompt', 'MRU> ', '--tiebreak', 'index'})
+    opts.name = 'mru-files'
     opts.source = mru_source()
-    fn['FzfMruFiles']('mru-files', opts)
+    run_wrapper(opts)
+end
+
+function M.cmdhist()
+    local opts = {
+        name = 'history-command',
+        source = cmdhist_source(),
+        ['sink*'] = cmdhist_sink,
+        options = {
+            '--prompt', 'Hist: ', '--tiebreak', 'index', '--expect', 'ctrl-e,ctrl-v,ctrl-s,ctrl-t'
+        }
+    }
+    fn['FzfWrapper'](opts)
 end
 
 function M.resize_preview_layout()

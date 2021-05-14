@@ -46,14 +46,13 @@ o.showbreak = '╰─➤'
 o.foldlevelstart = 99
 o.title = true
 o.titlestring = '%(%m%)%(%{expand(\"%:~\")}%)'
-o.history = 3000
 o.lazyredraw = true
 o.inccommand = 'nosplit'
 o.shortmess = o.shortmess .. 'acIS'
 o.confirm = true
 o.jumpoptions = 'stack'
 o.diffopt = o.diffopt .. ',vertical,internal,algorithm:patience'
-o.shada = [[!,'10,<50,s10,/50,@50,h]]
+o.shada = [['10,<50,s10,/20,@20,:0,h]]
 o.termguicolors = true
 
 -- undo
@@ -263,6 +262,13 @@ cmd([[
     aug END
 ]])
 
+cmd([[
+    aug CmdlHist
+        au!
+        au CmdlineEnter : lua require('cmdhist')
+    aug END
+]])
+
 pcall(cmd, 'color one')
 
 -- junegunn/fzf.vim
@@ -276,12 +282,12 @@ map('n', '<Leader>fm', '<Cmd>Marks<CR>')
 map('n', '<Leader>ft', '<Cmd>BTags<CR>')
 map('n', '<Leader>fo', '<Cmd>Tags<CR>')
 map('n', '<Leader>f/', '<Cmd>History/<CR>')
-map('n', '<Leader>f;', '<Cmd>History:<CR>')
 map('n', '<Leader>fc', [[<Cmd>lua require('gittool').root_exe('BCommits')<CR>]])
 map('n', '<Leader>fg', [[<Cmd>lua require('gittool').root_exe('GFiles')<CR>]])
 map('n', '<Leader>fb', [[<Cmd>lua require('gittool').root_exe('Buffers')<CR>]])
 map('n', '<Leader>f,', [[<Cmd>lua require('gittool').root_exe('Rg')<CR>]])
 map('n', '<Leader>fr', [[<Cmd>lua require('gittool').root_exe(require('plugs.fzf').mru)<CR>]])
+map('n', '<Leader>f;', [[<Cmd>lua require('plugs.fzf').cmdhist()<CR>]])
 
 cmd([[
     aug Fzf
@@ -447,15 +453,15 @@ require('plugs.manual')
 
 vim.schedule(function()
     vim.defer_fn(function()
-        g.did_load_filetypes = nil
-        cmd('filetype on')
-        cmd('doautoall filetypedetect BufRead')
-    end, 20)
-
-    vim.defer_fn(function()
         require('plugs.treesitter')
-        require('plugs.fold')
-    end, 50)
+        cmd([[
+            unlet g:did_load_filetypes
+            au! syntaxset
+            au syntaxset FileType * lua require('plugs.treesitter').synset()
+            filetype on
+            doautoall filetypedetect BufRead
+        ]])
+    end, 30)
 
     vim.defer_fn(function()
         require('plugs.config').matchup()
@@ -473,6 +479,10 @@ vim.schedule(function()
         cmd('pa vim-hexokinase')
         cmd('HexokinaseTurnOn')
     end, 200)
+
+    vim.defer_fn(function()
+        require('plugs.fold')
+    end, 500)
 
     vim.defer_fn(function()
         cmd('pa tmux-complete.vim')

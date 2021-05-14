@@ -3,6 +3,8 @@ local api = vim.api
 local fn = vim.fn
 local cmd = vim.cmd
 
+local utils = require('kutils')
+
 local db
 local max
 local bufs
@@ -18,33 +20,11 @@ local function setup()
     cmd([[
         aug Mru
             au!
-            au BufEnter,BufAdd,FocusGained * lua require('mru').store_buf(vim.fn.expand('<abuf>', 1))
+            au BufEnter,BufAdd,FocusGained * lua require('mru').store_buf()
             au VimLeavePre,VimSuspend * lua require('mru').flush()
             au FocusLost * lua require('mru').flush()
         aug END
     ]])
-end
-
-local function file_exists(name)
-    local f = io.open(name, 'r')
-    if f ~= nil then
-        f:close()
-        return true
-    else
-        return false
-    end
-end
-
-local function write_file(file_path, lines)
-    local file_path_ = file_path .. '_'
-    local fd_ = io.open(file_path_, 'w')
-    if fd_ then
-        for _, line in ipairs(lines) do
-            fd_:write(line .. '\n')
-        end
-        fd_:close()
-        os.rename(file_path_, file_path)
-    end
 end
 
 local function list(file)
@@ -54,7 +34,7 @@ local function list(file)
     local add_list = function(name)
         if not fname_set[name] then
             fname_set[name] = true
-            if file_exists(name) then
+            if utils.file_exists(name) then
                 if #mru_list < max then
                     table.insert(mru_list, name)
                 else
@@ -91,23 +71,23 @@ end
 
 function M.list()
     local mru_list = list(db)
-    write_file(db, mru_list)
+    utils.write_file(db, mru_list)
     return mru_list
 end
 
 function M.flush()
-    write_file(db, list(db))
+    utils.write_file(db, list(db))
 end
 
 M.store_buf = (function()
     local count = 0
-    return function(bufnr)
+    return function()
+        local bufnr = fn.expand('<abuf>', 1)
         bufnr = bufnr and tonumber(bufnr) or api.nvim_get_current_buf()
         table.insert(bufs, bufnr)
         count = (count + 1) % 10
         if count == 0 then
-            local mru_list = list(db)
-            write_file(db, mru_list)
+            M.list()
         end
     end
 end)()
