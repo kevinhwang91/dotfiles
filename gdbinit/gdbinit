@@ -1,4 +1,4 @@
-set prompt \033[34mgdb \033[0m
+set prompt \001\033[34m\002gdb \001\033[0m\002
 set history expansion on
 set history save on
 set history size 10000
