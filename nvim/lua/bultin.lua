@@ -11,9 +11,7 @@ function M.jumps2qf()
         local bufnr, lnum, col = loc.bufnr, loc.lnum, loc.col + 1
         if api.nvim_buf_is_valid(bufnr) then
             local text = api.nvim_buf_get_lines(bufnr, lnum - 1, lnum, false)[1]
-            if not text then
-                text = '......'
-            end
+            text = text and text:match('%C*') or '......'
             table.insert(items, {bufnr = bufnr, lnum = lnum, col = col, text = text})
         end
         if pos + 1 == i then

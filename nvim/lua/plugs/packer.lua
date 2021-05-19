@@ -132,7 +132,7 @@ return require('packer').startup({
 
         use {
             'ruanyl/vim-gh-line',
-            keys = {{'n', '<Leader>g0'}, {'', '<Leader>gL'}},
+            keys = {'<Leader>gO', '<Leader>gL'},
             setup = [[vim.g.gh_line_blame_map_default = 0]],
             config = conf('ghline')
         }
@@ -209,6 +209,8 @@ return require('packer').startup({
         use {'rktjmp/lush.nvim'}
 
         use {'MTDL9/vim-log-highlighting', event = 'BufNewFile,BufRead *.log'}
+
+        use {'nanotee/luv-vimdocs', opt = false}
 
         -- keep learning :)
         use {'nvim-lua/plenary.nvim'}

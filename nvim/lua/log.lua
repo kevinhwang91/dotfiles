@@ -43,7 +43,7 @@ local function inspect(v)
     if t == 'nil' then
         s = 'nil'
     elseif t ~= 'string' then
-        s = vim.inspect(v, {indent = '', newline = ' '})
+        s = vim.inspect(v)
     else
         s = tostring(v)
     end

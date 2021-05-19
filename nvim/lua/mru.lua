@@ -47,7 +47,7 @@ local function list(file)
 
     while #bufs > 0 do
         local bufnr = table.remove(bufs)
-        if api.nvim_buf_is_valid(bufnr) and vim.bo[bufnr].buftype == '' then
+        if api.nvim_buf_is_valid(bufnr) and vim.bo[bufnr].bt == '' then
             local fname = api.nvim_buf_get_name(bufnr)
             if not fname:match(tmp_prefix) then
                 if not add_list(fname) then

@@ -212,6 +212,20 @@ function M.cycle()
 end
 
 function M.gitgutter()
+    cmd([[
+        hi! link GitGutterAdd Constant
+        hi! link GitGutterChange Type
+        hi! link GitGutterDelete Identifier
+        hi! link GitGutterAddLineNr GitGutterAdd
+        hi! link GitGutterChangeLineNr GitGutterChange
+        hi! link GitGutterDeleteLineNr GitGutterDelete
+        hi! link GitGutterChangeDeleteLineNr GitGutterChangeDeleteLine
+        hi! link GitGutterAddIntraLine DiffText
+        hi! link GitGutterDeleteIntraLine DiffText
+    ]])
+    if g.colors_name == 'one' then
+        cmd('hi! GitGutterChangeDeleteLine guifg=#be5046')
+    end
     map('n', '<Leader>hp', '<Plug>(GitGutterPreviewHunk)', {})
     map('n', '<Leader>hs', '<Plug>(GitGutterStageHunk)', {})
     map('n', '<Leader>hu', '<Plug>(GitGutterUndoHunk)', {})
@@ -224,7 +238,7 @@ function M.gitgutter()
 end
 
 function M.ghline()
-    map('n', '<Leader>gO', '<Plug>(gh-repo)', {})
+    map('', '<Leader>gO', '<Plug>(gh-repo)', {})
     map('', '<Leader>gL', '<Plug>(gh-line)', {})
 end
 

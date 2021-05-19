@@ -45,7 +45,8 @@ function M.dump(name)
             api.nvim_err_writeln(msg)
         end
     else
-        api.nvim_err_writeln(msg:sub(1, msg:find('\n') - 1))
+        msg = type(msg) == 'table' and msg.msg or msg:match('[^\n]+')
+        api.nvim_err_writeln(msg)
     end
 end
 

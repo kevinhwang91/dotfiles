@@ -16,10 +16,10 @@ local mode_map = setmetatable({
     R = {'R', '%#StatusLineReplace#'},
     v = {'V', '%#StatusLineVisual#'},
     V = {'VL', '%#StatusLineVisual#'},
-    [''] = {'VB', '%#StatusLineVisual#'},
+    [('%c'):format(0x16)] = {'VB', '%#StatusLineVisual#'}, -- ^V
     s = {'S', '%#StatusLineVisual#'},
     S = {'SL', '%#StatusLineVisual#'},
-    [''] = {'SB', '%#StatusLineVisual#'},
+    [('%c'):format(0x13)] = {'SB', '%#StatusLineVisual#'}, -- ^S
     c = {'C', '%#StatusLineCommand#'},
     ['!'] = {'!', '%#StatusLineCommand#'},
     r = {'P', '%#StatusLineCommand#'},
@@ -31,10 +31,11 @@ local mode_map = setmetatable({
 })
 
 local function readonly(bufnr)
+    local ret
     if vim.bo[bufnr].readonly then
-        return fn.filereadable(api.nvim_buf_get_name(bufnr or 0)) == 1 and '' or ''
+        ret = fn.filereadable(api.nvim_buf_get_name(bufnr or 0)) == 1 and '' or ''
     end
-    return nil
+    return ret
 end
 
 local function quickfix()
@@ -60,14 +61,14 @@ local function filename()
     local fname
     if vim.b.fugitive_fname ~= '' then
         fname = vim.b.fugitive_fname
-    elseif bufname == '' and vim.bo.buftype == '' then
+    elseif bufname == '' and vim.bo.bt == '' then
         fname = '[No Name]'
-    elseif vim.bo.buftype == 'quickfix' then
+    elseif vim.bo.bt == 'quickfix' then
         fname = quickfix()
     else
         fname = fn.expand('%:t')
-        if fn.expand('%:e') == '' or vim.bo.filetype == '' then
-            fname = ('%s (%s)'):format(fname, vim.bo.filetype)
+        if fn.expand('%:e') == '' or vim.bo.ft == '' then
+            fname = ('%s (%s)'):format(fname, vim.bo.ft)
         end
     end
     return '%#StatusLine' .. (vim.bo.modified and 'FileModified#' or 'FileName#') .. fname ..
@@ -80,39 +81,37 @@ local fugitive = (function()
     local last_branch = {nil, nil}
 
     return function()
+        local ret
         local bufname = api.nvim_buf_get_name(0)
-        if bufname == '' or fn.exists('*FugitiveExtractGitDir') == 0 then
-            return nil
-        end
-
-        local branch
-        if bufname ~= last_branch[1] or vim.loop.hrtime() - tick > threshold then
-            if not vim.b.git_dir or vim.b.git_dir == '' then
-                return nil
+        if bufname ~= '' and fn.exists('*FugitiveExtractGitDir') == 1 then
+            local branch
+            if bufname ~= last_branch[1] or vim.loop.hrtime() - tick > threshold then
+                if vim.b.git_dir and vim.b.git_dir ~= '' then
+                    branch = fn['FugitiveHead']()
+                    local info = fn['FugitiveParse']()[1]
+                    if info ~= '' then
+                        local commit = vim.split(info, ':')[1]
+                        branch = ('%s(%s)'):format(branch, commit:sub(0, 6))
+                    end
+                    last_branch = {bufname, branch}
+                    tick = vim.loop.hrtime()
+                end
+            else
+                branch = last_branch[2]
             end
-            branch = fn['FugitiveHead']()
-            local info = fn['FugitiveParse']()[1]
-            if info ~= '' then
-                local commit = vim.split(info, ':')[1]
-                branch = ('%s(%s)'):format(branch, commit:sub(0, 6))
+            if branch then
+                ret = '%#StatusLineBranch# ' .. branch .. '%#StatusLine#'
             end
-            last_branch = {bufname, branch}
-            tick = vim.loop.hrtime()
-        else
-            branch = last_branch[2]
         end
-        return '%#StatusLineBranch# ' .. branch .. '%#StatusLine#'
+        return ret
     end
 end)()
 
 local function gitgutter()
-    if fn.exists('*GitGutterGetHunkSummary') == 0 or vim.bo.readonly or not vim.bo.modifiable then
-        return nil
-    else
+    local ret
+    if fn.exists('*GitGutterGetHunkSummary') == 1 and not vim.bo.readonly and vim.bo.modifiable then
         local cnt = fn['GitGutterGetHunkSummary']()
-        if type(cnt) ~= 'table' or #cnt ~= 3 or cnt[1] == 0 and cnt[2] == 0 and cnt[3] == 0 then
-            return nil
-        else
+        if type(cnt) == 'table' and #cnt == 3 and (cnt[1] > 0 or cnt[2] > 0 or cnt[3] > 0) then
             local list = {}
             local symbol = {
                 '%#StatusLineHunkAdd#+', '%#StatusLineHunkChange#~', '%#StatusLineHunkRemove#-'
@@ -120,9 +119,10 @@ local function gitgutter()
             for i = 1, 3 do
                 table.insert(list, symbol[i] .. cnt[i])
             end
-            return table.concat(list, ' ') .. '%#StatusLine#'
+            ret = table.concat(list, ' ') .. '%#StatusLine#'
         end
     end
+    return ret
 end
 
 local function coc_status()
@@ -139,18 +139,19 @@ local coc_diagnostic = (function()
     })
 
     return function()
+        local ret
         local info = vim.b.coc_diagnostic_info
-        if not info or (info.warning == 0 and info.error == 0) then
-            return nil
+        if info and (info.warning > 0 and info.error > 0) then
+            local signs = {}
+            if info.warning > 0 then
+                table.insert(signs, coc_signs['warning'] .. ' ' .. info.warning)
+            end
+            if info.error > 0 then
+                table.insert(signs, coc_signs['error'] .. ' ' .. info.error)
+            end
+            ret = table.concat(signs, ' ') .. '%#StatusLine#'
         end
-        local signs = {}
-        if info.warning > 0 then
-            table.insert(signs, coc_signs['warning'] .. ' ' .. info.warning)
-        end
-        if info.error > 0 then
-            table.insert(signs, coc_signs['error'] .. ' ' .. info.error)
-        end
-        return table.concat(signs, ' ') .. '%#StatusLine#'
+        return ret
     end
 end)()
 
@@ -161,10 +162,7 @@ local function fileformat(bufnr)
     else
         icon = ''
     end
-    if bufnr == 0 then
-        return '%#StatusLineFormat#' .. icon .. '%#StatusLine#'
-    end
-    return icon
+    return bufnr == 0 and '%#StatusLineFormat#' .. icon .. '%#StatusLine#' or icon
 end
 
 function M.statusline()
@@ -217,7 +215,7 @@ function M.tabline()
         if vim.bo[bufnr].modifiable then
             name = fn.fnamemodify(api.nvim_buf_get_name(bufnr), ':t')
         else
-            name = vim.bo[bufnr].filetype
+            name = vim.bo[bufnr].ft
         end
         if name and name ~= '' then
             table.insert(tl, name .. ' ')

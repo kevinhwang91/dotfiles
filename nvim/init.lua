@@ -269,7 +269,10 @@ cmd([[
     aug END
 ]])
 
-pcall(cmd, 'color one')
+local theme = 'one'
+if not pcall(cmd, ('color %s'):format(theme)) then
+    require('plugs.lush').dump(theme)
+end
 
 -- junegunn/fzf.vim
 -- `pacman -S fzf` will force nvim load plugin in /usr/share/vim/vimfiles/plugin/fzf.vim
@@ -457,7 +460,7 @@ vim.schedule(function()
         cmd([[
             unlet g:did_load_filetypes
             au! syntaxset
-            au syntaxset FileType * lua require('plugs.treesitter').synset()
+            au syntaxset FileType * lua require('plugs.treesitter').hijack_synset()
             filetype on
             doautoall filetypedetect BufRead
         ]])

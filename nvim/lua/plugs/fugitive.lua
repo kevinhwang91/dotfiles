@@ -44,6 +44,19 @@ function M.index()
     end
 end
 
+-- placeholder for Git difftool --name-only :)
+function M.diff_hist()
+    local info = fn.getqflist({idx = 0, context = 0})
+    local idx, ctx = info.idx, info.context
+    if idx and ctx and type(ctx.items) == 'table' then
+        local diff = ctx.items[idx].diff or {}
+        if #diff == 1 then
+            cmd('abo vert diffs ' .. diff[1].filename)
+            cmd('winc p')
+        end
+    end
+end
+
 setup()
 
 return M

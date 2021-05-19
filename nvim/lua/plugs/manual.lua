@@ -26,19 +26,6 @@ end
 function M.git_relation()
     local config = require('plugs.config')
     vim.defer_fn(function()
-        cmd([[
-            hi link GitGutterAdd Constant
-            hi link GitGutterChange Type
-            hi link GitGutterDelete Identifier
-            hi link GitGutterAddLineNr GitGutterAdd
-            hi link GitGutterChangeLineNr GitGutterChange
-            hi link GitGutterDeleteLineNr GitGutterDelete
-            hi link GitGutterChangeDeleteLineNr GitGutterChangeDeleteLine
-            ]])
-        if g.colors_name == 'one' then
-            cmd('hi! GitGutterChangeDeleteLine guifg=#be5046')
-        end
-
         g.gitgutter_highlight_linenrs = 1
         g.gitgutter_signs = 0
         g.gitgutter_map_keys = 0
@@ -55,6 +42,7 @@ function M.git_relation()
                 cmd('delc ' .. del_cmd)
             end
             cmd('pa vim-fugitive')
+            cmd('doautoall fugitive BufReadCmd')
             cmd('doautoall fugitive BufRead')
             require('plugs.fugitive')
         end

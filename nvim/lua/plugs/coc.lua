@@ -4,8 +4,11 @@ local fn = vim.fn
 local cmd = vim.cmd
 
 local map = require('remap').map
+local diag_qfid
 
 local function setup()
+    diag_qfid = -1
+
     -- https://github.com/neoclide/coc.nvim/issues/2853
     fn['coc#config']('snippets', {ultisnips = {enable = true}})
     fn['CocActionAsync']('deactivateExtension', 'coc-snippets')
@@ -17,6 +20,7 @@ local function setup()
         aug Coc
             au!
             au User CocLocationsChange ++nested lua require('plugs.coc').jump2loc()
+            au User CocDiagnosticChange ++nested lua require('plugs.coc').diagnostic_change()
             au CursorHold * sil! call CocActionAsync('highlight', '', v:lua.require('plugs.coc').hl_fallback)
             au User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
             au VimLeavePre * if get(g:, 'coc_process_pid', 0) | call system('kill -9 -- -' . g:coc_process_pid) | endif
@@ -84,7 +88,11 @@ end
 
 function M.go2def()
     local cur_bufnr = api.nvim_get_current_buf()
-    if api.nvim_exec([[echo CocAction('jumpDefinition')]], true) == 'v:true' then
+    if vim.bo.ft == 'help' then
+        local cword = fn.expand('<cword>')
+        cmd('tag ' .. cword)
+        vim.w.gtd = 'tag'
+    elseif api.nvim_exec([[echo CocAction('jumpDefinition')]], true) == 'v:true' then
         vim.w.gtd = 'coc'
     else
         local cword = fn.expand('<cword>')
@@ -92,7 +100,7 @@ function M.go2def()
             local wv = fn.winsaveview()
             cmd('ltag ' .. cword)
             local def_size = fn.getloclist(0, {size = 0}).size
-            vim.w.gtd = 'tag'
+            vim.w.gtd = 'ltag'
             if def_size > 1 then
                 api.nvim_set_current_buf(cur_bufnr)
                 fn.winrestview(wv)
@@ -102,8 +110,8 @@ function M.go2def()
                 fn.search(cword, 'c')
             end
         end) then
-            vim.w.gtd = 'search'
             fn.searchdecl(cword)
+            vim.w.gtd = 'search'
         end
     end
     if api.nvim_get_current_buf() ~= cur_bufnr then
@@ -112,7 +120,8 @@ function M.go2def()
 end
 
 function M.show_documentation()
-    if vim.b.filetype == 'vim' or vim.b.filetype == 'help' then
+    local ft = vim.bo.ft
+    if ft == 'vim' or ft == 'help' then
         cmd(('h %s'):format(fn.expand('<cword>')))
     elseif api.nvim_eval([[CocAction('hasProvider', 'hover')]]) then
         fn['CocActionAsync']('doHover')
@@ -121,7 +130,14 @@ function M.show_documentation()
     end
 end
 
-function M.diagnostic()
+function M.diagnostic_change()
+    local info = fn.getqflist({id = diag_qfid, winid = 0, nr = 0})
+    if info.winid ~= 0 then
+        M.diagnostic(info.winid, info.nr, true)
+    end
+end
+
+function M.diagnostic(winid, nr, keep)
     local diagnostics = fn['CocAction']('diagnosticList')
     local items, loc_ranges = {}, {}
     for _, d in ipairs(diagnostics) do
@@ -132,12 +148,34 @@ function M.diagnostic()
         table.insert(loc_ranges, d.location.range)
         table.insert(items, item)
     end
-    fn.setqflist({}, ' ', {
+    local id
+    if winid and nr then
+        id = diag_qfid
+    else
+        local info = fn.getqflist({id = diag_qfid, winid = 0, nr = 0})
+        id, winid, nr = info.id, info.winid, info.nr
+    end
+    local action = id == 0 and ' ' or 'r'
+    fn.setqflist({}, action, {
+        id = id ~= 0 and id or nil,
         title = 'CocDiagnosticList',
         items = items,
         context = {bqf = {lsp_ranges_hl = loc_ranges}}
     })
-    cmd('bo cope')
+
+    if id == 0 then
+        local info = fn.getqflist({id = id, nr = 0})
+        diag_qfid, nr = info.id, info.nr
+    end
+
+    if not keep then
+        if winid == 0 then
+            cmd('bo cope')
+        else
+            api.nvim_set_current_win(winid)
+        end
+        cmd(('sil %dchi'):format(nr))
+    end
 end
 
 function M.jump2loc(locs)
@@ -160,10 +198,10 @@ end
 
 local function get_cur_word()
     local lnum, col = unpack(api.nvim_win_get_cursor(0))
-    local line = api.nvim_buf_get_lines(0, lnum - 1, lnum, true)[1]
-    local word = fn.matchstr(line:sub(1, col + 1), '\\k*$') ..
-                     fn.matchstr(line:sub(col + 1, -1), '^\\k*'):sub(2, -1)
-    return ([[\<%s\>]]):format(word:gsub('[\\/]', '\\%1'))
+    local line = api.nvim_buf_get_lines(0, lnum - 1, lnum, true)[1]:match('%C*')
+    local word = fn.matchstr(line:sub(1, col + 1), [[\k*$]]) ..
+                     fn.matchstr(line:sub(col + 1, -1), [[^\k*]]):sub(2, -1)
+    return ([[\<%s\>]]):format(word:gsub('[\\/~]', [[\%1]]))
 end
 
 -- CocHasProvider('documentHighlight') has probability of RPC failure
@@ -176,7 +214,7 @@ local fb_bl_ft = {
 local hl_fb_tbl = {}
 
 function M.hl_fallback()
-    if vim.tbl_contains(fb_bl_ft, vim.bo.filetype) or api.nvim_get_mode() == 't' and vim.bo.buftype ==
+    if vim.tbl_contains(fb_bl_ft, vim.bo.ft) or api.nvim_get_mode().mode == 't' and vim.bo.bt ==
         'terminal' then
         return
     end

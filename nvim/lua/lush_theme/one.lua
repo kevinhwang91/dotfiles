@@ -50,7 +50,7 @@ local theme = lush(function()
         Folded {fg = black1, bg = mono1}, --
         FoldColumn {fg = mono2, bg = black1}, --
         SignColumn {bg = black1}, --
-        IncSearch {fg = black1, bg = yellow1}, --
+        IncSearch {fg = yellow1, bg = black1, gui = 'reverse'}, --
         -- Substitute {}, --
         LineNr {fg = mono2}, --
         CursorLineNr {fg = white1, bg = black2}, --

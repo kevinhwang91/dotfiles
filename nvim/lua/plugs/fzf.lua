@@ -60,16 +60,7 @@ local function cmdhist_sink(ret)
         cmd('redraw')
         api.nvim_feedkeys(api.nvim_replace_termcodes(':<up>', true, false, true), 'n', false)
     else
-        vim.defer_fn(function()
-            local ok, msg = pcall(cmd, ('norm :%s%c'):format(cmdl, 0x0d))
-            if not ok then
-                local _, sub_index = msg:find('Vim%(%a+%):')
-                if sub_index then
-                    msg = msg:sub(sub_index + 1)
-                end
-                api.nvim_err_writeln(msg)
-            end
-        end, 0)
+        api.nvim_feedkeys((':%s%c'):format(cmdl, 0x0d), '', false)
     end
 end
 

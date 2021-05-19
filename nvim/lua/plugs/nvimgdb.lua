@@ -53,6 +53,8 @@ function M.set_keymaps()
     bmap('n', '<C-P>', '<Cmd>GdbFrameUp<CR>')
     bmap('n', '<C-N>', '<Cmd>GdbFrameDown<CR>')
     bmap('n', '<Leader>wl', '<Cmd>GdbCreateWatch info locals<CR>')
+    bmap('n', '<Leader>wp', '<Cmd>abo GdbLopenBreakpoints<CR>')
+    bmap('n', '<Leader>wt', '<Cmd>abo GdbLopenBacktrace<CR>')
 end
 
 function M.unset_keymaps()
@@ -77,7 +79,7 @@ end
 
 function M.start()
     fn.sign_undefine('GdbCurrentLine')
-    fn.sign_define('GdbCurrentLine', {numhl = 'Operator'})
+    fn.sign_define('GdbCurrentLine', {numhl = 'Operator', linehl = 'QuickFixLine'})
     for i = 1, 9 do
         fn.sign_define('GdbBreakpoint' .. i, {texthl = 'WarningMsg'})
     end

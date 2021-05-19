@@ -53,7 +53,7 @@ local function setup()
     end
 end
 
-function M.synset()
+function M.hijack_synset()
     local ft = fn.expand('<amatch>')
     if not do_sy_tbl[ft] then
         vim.bo.syntax = ft

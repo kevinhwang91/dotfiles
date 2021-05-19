@@ -15,7 +15,9 @@ nnoremap <buffer> rl :Floggit reset <C-r>=flog#get_commit_at_line().short_commit
 nnoremap <buffer> rh :Floggit reset --hard <C-r>=flog#get_commit_at_line().short_commit_hash<CR>
 nnoremap <buffer> <Leader>gt :Floggit difftool -y <C-r>=flog#get_commit_at_line().short_commit_hash<CR>
 xnoremap <buffer> <Leader>gt :Floggit difftool -y<Space>
-nnoremap <buffer> <Leader>gr :Flogsetargs -raw-args=<C-r>=flog#get_commit_at_line().short_commit_hash<CR>
+nnoremap <buffer> <Leader>gs :Flogsetargs -- <C-r>=flog#get_commit_at_line().short_commit_hash<CR>
+nnoremap <buffer> <Leader>gp :Flogsetargs -raw-args=--first-parent --<Space>
+nnoremap <buffer> <Leader>gr :Flogsetargs -raw-args=
 nnoremap <buffer> <Leader>gj :Flogjump<Space>
 
 function s:scroll(direction) abort
