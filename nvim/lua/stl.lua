@@ -38,14 +38,17 @@ local function readonly(bufnr)
     return ret
 end
 
-local function quickfix()
-    local qf_type = fn.getwininfo(api.nvim_get_current_win())[1].loclist == 1 and 'loc' or 'qf'
+local function quickfix(winid)
+    winid = winid or api.nvim_get_current_win()
+    local qf_type = fn.getwininfo(winid)[1].loclist == 1 and 'loc' or 'qf'
     local what = {nr = 0, size = 0}
     local info = qf_type == 'loc' and fn.getloclist(0, what) or fn.getqflist(what)
     what = {nr = '$'}
     local nr = (qf_type == 'loc' and fn.getloclist(0, what) or fn.getqflist(what)).nr
     local prefix = qf_type == 'loc' and 'Location' or 'Quickfix'
-    return ('%s (%d/%d) [%d] %s'):format(prefix, info.nr, nr, info.size, vim.w.quickfix_title)
+    local ok, msg = pcall(api.nvim_win_get_var, winid, 'quickfix_title')
+    local title = ok and msg or ''
+    return ('%s (%d/%d) [%d] %s'):format(prefix, info.nr, nr, info.size, title)
 end
 
 local function filename()
@@ -188,8 +191,10 @@ function M.statusline()
         table.insert(stl, m_hl)
         table.insert(stl, ' %3l/%-3L %3v ')
     else
-        local bufnr = api.nvim_win_get_buf(vim.g.statusline_winid)
-        table.insert(stl, '    %t')
+        local winid = vim.g.statusline_winid
+        local bufnr = api.nvim_win_get_buf(winid)
+        table.insert(stl, '   ')
+        table.insert(stl, vim.bo[bufnr].bt == 'quickfix' and quickfix(winid) or '%t')
         table.insert(stl, readonly(bufnr))
 
         table.insert(stl, '%<%=')

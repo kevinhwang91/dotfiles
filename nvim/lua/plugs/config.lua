@@ -130,7 +130,8 @@ function M.grepper()
             au!
             au User Grepper ++nested %s | %s
         aug END
-    ]]):format([[call setqflist([], 'r', {'context': {'bqf': {'pattern_hl': getreg('/')}}})]],
+    ]]):format(
+        [[call setqflist([], 'r', {'context': {'bqf': {'pattern_hl': '\%#' . getreg('/')}}})]],
         'bo cope'))
 
     -- if fn.executable('rg') then

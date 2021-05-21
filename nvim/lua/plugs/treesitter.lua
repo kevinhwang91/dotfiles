@@ -56,7 +56,9 @@ end
 function M.hijack_synset()
     local ft = fn.expand('<amatch>')
     if not do_sy_tbl[ft] then
+        -- if ft ~= 'qf' then
         vim.bo.syntax = ft
+        -- end
     end
 end
 

@@ -1,4 +1,4 @@
-setl so=1
+setl so=2
 
 " fix last window is floating with hl and blend
 if &winhl != ''

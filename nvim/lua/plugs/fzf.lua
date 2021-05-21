@@ -24,7 +24,7 @@ local function setup()
     vim.g.loaded_fzf = nil
     cmd('pa fzf')
     cmd('pa fzf.vim')
-    default_preview_window = {'right:50%, border-left', 'ctrl-/'}
+    default_preview_window = {'right:50%,border-left', 'ctrl-/'}
     M.resize_preview_layout()
 end
 
@@ -80,7 +80,7 @@ function M.cmdhist()
         source = cmdhist_source(),
         ['sink*'] = cmdhist_sink,
         options = {
-            '--prompt', 'Hist: ', '--tiebreak', 'index', '--expect', 'ctrl-e,ctrl-v,ctrl-s,ctrl-t'
+            '--prompt', 'Hist: ', '--tiebreak', 'index', '--expect', 'ctrl-e'
         }
     }
     fn['FzfWrapper'](opts)

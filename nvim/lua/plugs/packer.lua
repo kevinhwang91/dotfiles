@@ -122,7 +122,7 @@ return require('packer').startup({
         use {
             'tpope/vim-fugitive',
             fn = 'fugitive#*',
-            cmd = {'Git', 'Gedit', 'Gread', 'Gwrite', 'Gdiffsplit'},
+            cmd = {'Git', 'Gedit', 'Gread', 'Gwrite', 'Gdiffsplit', 'Gvdiffsplit'},
             config = [[require('plugs.fugitive')]]
         }
 
@@ -214,6 +214,5 @@ return require('packer').startup({
 
         -- keep learning :)
         use {'nvim-lua/plenary.nvim'}
-
     end
 })

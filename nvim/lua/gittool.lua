@@ -32,7 +32,7 @@ function M.cd_root(path, window)
     local cd = window and 'lcd' or 'cd'
     local r = M.root(path)
     if r ~= '' then
-        cmd(('%s %s'):format(cd, r))
+        cmd(('noa %s %s'):format(cd, r))
     end
     return r
 end
@@ -52,7 +52,7 @@ function M.root_exe(exec)
     end
 
     if r ~= '' then
-        fn.win_execute(cur_winid, 'lcd ' .. old_cwd)
+        fn.win_execute(cur_winid, 'noa lcd ' .. old_cwd)
     end
 end
 

@@ -76,6 +76,7 @@ local function setup()
     map('n', '<Leader>qd', [[<Cmd>lua require('plugs.coc').diagnostic()<CR>]])
 
     cmd([[com! -nargs=0 ClangdSH call CocAction('runcom', 'clangd.switchSourceHeader')]])
+    cmd([[com! -nargs=0 DiagnosticToggleBuffer call CocAction('diagnosticToggleBuffer')]])
     map('n', '<Leader>sh', '<Cmd>ClangdSH<CR>')
 end
 
@@ -131,9 +132,11 @@ function M.show_documentation()
 end
 
 function M.diagnostic_change()
-    local info = fn.getqflist({id = diag_qfid, winid = 0, nr = 0})
-    if info.winid ~= 0 then
-        M.diagnostic(info.winid, info.nr, true)
+    if vim.v.exiting == vim.NIL then
+        local info = fn.getqflist({id = diag_qfid, winid = 0, nr = 0})
+        if info.winid ~= 0 then
+            M.diagnostic(info.winid, info.nr, true)
+        end
     end
 end
 

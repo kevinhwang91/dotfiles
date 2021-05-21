@@ -82,7 +82,7 @@ function M.enable_reload()
     if api.nvim_get_mode().mode == 'c' then
         vim.defer_fn(M.reload, 50)
     else
-        cmd([[au CmdlHist CmdlineEnter : ++once lua require('cmdhist').reload()]])
+        cmd([[au CmdlHist CmdlineEnter : ++once lua vim.schedule(require('cmdhist').reload)]])
     end
 end
 
