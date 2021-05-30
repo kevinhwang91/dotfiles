@@ -54,7 +54,6 @@ function M.surround()
 end
 
 function M.visualmulti()
-    g.VM_leader = '<Space>'
     g.VM_theme = 'codedark'
     g.VM_highlight_matches = ''
     g.VM_show_warnings = 0
@@ -64,6 +63,7 @@ function M.visualmulti()
         Delete = 's',
         Undo = '<C-u>',
         Redo = '<C-r>',
+        ['Select Operator'] = 'v',
         ['Select Cursor Up'] = '<M-C-k>',
         ['Select Cursor Down'] = '<M-C-j>',
         ['Move Left'] = '<M-C-h>',

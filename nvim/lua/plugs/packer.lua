@@ -13,7 +13,7 @@ return require('packer').startup({
         opt_default = true,
         display = {open_cmd = 'tabedit', keybindings = {prompt_revert = 'R', diff = 'D'}}
     },
-    function(use)
+    function(use, use_rocks)
         use {
             'wbthomason/packer.nvim',
             setup = function()
@@ -65,6 +65,7 @@ return require('packer').startup({
 
         use {
             'mg979/vim-visual-multi',
+            setup = [[vim.g.VM_leader = '<Space>']],
             keys = {
                 {'', '<C-n>'}, {'n', [[<Leader>\]]}, {'', '<Leader>A'}, {'x', '<Leader>c'},
                 {'n', '<M-C-k>'}, {'n', '<M-C-j>'}, {'n', 'g/'}
@@ -214,5 +215,7 @@ return require('packer').startup({
 
         -- keep learning :)
         use {'nvim-lua/plenary.nvim'}
+
+        use_rocks {'lrexlib-PCRE2'}
     end
 })

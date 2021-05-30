@@ -146,8 +146,7 @@ function M.diagnostic(winid, nr, keep)
     for _, d in ipairs(diagnostics) do
         local text = ('[%s%s] %s'):format((d.source == '' and 'coc.nvim' or d.source),
             (d.code == vim.NIL and '' or ' ' .. d.code), d.message:match('[^\n]+\n*'))
-        local qtype = d.severity == 'Hint' and 'N' or d.severity
-        local item = {filename = d.file, lnum = d.lnum, col = d.col, text = text, type = qtype}
+        local item = {filename = d.file, lnum = d.lnum, col = d.col, text = text, type = d.severity}
         table.insert(loc_ranges, d.location.range)
         table.insert(items, item)
     end

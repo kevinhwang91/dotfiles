@@ -144,7 +144,7 @@ local coc_diagnostic = (function()
     return function()
         local ret
         local info = vim.b.coc_diagnostic_info
-        if info and (info.warning > 0 and info.error > 0) then
+        if info and (info.warning > 0 or info.error > 0) then
             local signs = {}
             if info.warning > 0 then
                 table.insert(signs, coc_signs['warning'] .. ' ' .. info.warning)

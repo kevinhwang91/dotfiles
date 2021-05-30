@@ -64,6 +64,10 @@ local function setup()
     log_file = table.concat({log_dir, 'kvnvim.log'}, path_sep())
     log_date_fmt = '%y-%m-%d %T'
 
+    local pipe = io.popen('ps -p $PPID -o tty=')
+    local tty = pipe:lines()()
+    pipe:close()
+
     for l in pairs(levels) do
         M[l:lower()] = function(...)
             local argc = select('#', ...)
@@ -80,7 +84,8 @@ local function setup()
             local linfo = info.short_src .. ':' .. info.currentline
 
             local fp = assert(io.open(log_file, 'a+'))
-            local str = string.format('[%s] [%s] %s : %s\n', os.date(log_date_fmt), l, linfo, msg)
+            local str = string.format('>%s [%s] [%s] %s : %s\n', tty, os.date(log_date_fmt), l,
+                linfo, msg)
             fp:write(str)
             fp:close()
         end

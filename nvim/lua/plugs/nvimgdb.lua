@@ -79,7 +79,7 @@ end
 
 function M.start()
     fn.sign_undefine('GdbCurrentLine')
-    fn.sign_define('GdbCurrentLine', {numhl = 'Operator', linehl = 'QuickFixLine'})
+    fn.sign_define('GdbCurrentLine', {linehl = 'QuickFixLine'})
     for i = 1, 9 do
         fn.sign_define('GdbBreakpoint' .. i, {texthl = 'WarningMsg'})
     end

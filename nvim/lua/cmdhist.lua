@@ -31,11 +31,13 @@ local function list(file, limit)
         return true
     end
 
-    while #hist_bufs > 0 do
-        local hist = table.remove(hist_bufs)
+    local i = #hist_bufs
+    while i > 0 do
+        local hist = hist_bufs[i]
         if not add_list(hist) then
             break
         end
+        i = i - 1
     end
 
     local fd = io.open(file, 'r')
@@ -81,15 +83,13 @@ end
 function M.enable_reload()
     if api.nvim_get_mode().mode == 'c' then
         vim.defer_fn(M.reload, 50)
-    else
+    elseif fn.exists('#CmdlHist#CmdlineEnter#:') == 0 then
         cmd([[au CmdlHist CmdlineEnter : ++once lua vim.schedule(require('cmdhist').reload)]])
     end
 end
 
 function M.list()
     local hist_list = list(db)
-    utils.write_file(db, hist_list)
-
     for i = math.min(#hist_list, hist_bufs_size), 1, -1 do
         fn.histadd(':', hist_list[i])
     end
@@ -100,10 +100,11 @@ end
 function M.flush()
     if #hist_bufs > 0 then
         utils.write_file(db, list(db))
+        hist_bufs = {}
     end
 end
 
-local store = (function()
+M.store = (function()
     local count = 0
     return function()
         local hist = fn.histget(':')
@@ -112,7 +113,7 @@ local store = (function()
             last_hist = hist
             count = (count + 1) % 10
             if count == 0 then
-                M.list()
+                M.flush()
             end
         end
     end
@@ -120,7 +121,7 @@ end)()
 
 function M.fire_leave()
     if not vim.v.event.abort then
-        vim.schedule(store)
+        vim.schedule(M.store)
     end
 end
 

@@ -5,7 +5,6 @@ local fn = vim.fn
 
 local git = require('gittool')
 
--- TODO syntax is so hard!!!!
 function _G.qftf(info)
     local items
     local ret = {}
@@ -15,7 +14,7 @@ function _G.qftf(info)
     else
         items = fn.getloclist(info.winid, {id = info.id, items = 0}).items
     end
-    local limit = 25
+    local limit = 27
     local fname_fmt1, fname_fmt2 = '%-' .. limit .. 's', '…%.' .. (limit - 1) .. 's'
     local valid_fmt, unvalid_fmt = '%s |%5d:%-3d|%s %s', '%s'
     for i = info.start_idx, info.end_idx do
@@ -36,8 +35,8 @@ function _G.qftf(info)
                     fname = fname_fmt2:format(fname:sub(1 - limit, -1))
                 end
             end
-            local lnum = e.lnum > 99999 and 'inf' or e.lnum
-            local col = e.col > 999 and 'inf' or e.col
+            local lnum = e.lnum > 99999 and -1 or e.lnum
+            local col = e.col > 999 and -1 or e.col
             local qtype = e.type == '' and '' or ' ' .. e.type:sub(1, 1):upper()
             str = valid_fmt:format(fname, lnum, col, qtype, e.text)
         else

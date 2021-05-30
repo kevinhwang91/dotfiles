@@ -56,6 +56,7 @@ end
 local function cmdhist_sink(ret)
     local key, cmdl = unpack(ret)
     fn.histadd(':', cmdl)
+    cmdhist.store()
     if key == 'ctrl-e' then
         cmd('redraw')
         api.nvim_feedkeys(api.nvim_replace_termcodes(':<up>', true, false, true), 'n', false)
@@ -79,9 +80,7 @@ function M.cmdhist()
         name = 'history-command',
         source = cmdhist_source(),
         ['sink*'] = cmdhist_sink,
-        options = {
-            '--prompt', 'Hist: ', '--tiebreak', 'index', '--expect', 'ctrl-e'
-        }
+        options = {'--prompt', 'Hist: ', '--tiebreak', 'index', '--expect', 'ctrl-e'}
     }
     fn['FzfWrapper'](opts)
 end
