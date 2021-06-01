@@ -17,7 +17,7 @@ end
 function M.find_git()
     local root = gittool.root()
     if root ~= '' then
-        cmd('aug! FindGitForPlugs')
+        cmd('au! FindGitForPlugs BufRead | aug! FindGitForPlugs')
         M.find_git = nil
         M.git_relation()
     end

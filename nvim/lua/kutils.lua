@@ -2,6 +2,7 @@ local M = {}
 local api = vim.api
 local fn = vim.fn
 local cmd = vim.cmd
+local uv = vim.loop
 
 function M.file_exists(name)
     local f = io.open(name, 'r')
@@ -99,5 +100,45 @@ function M.kill2spaces()
     vim.bo.modified = false
     api.nvim_win_set_cursor(0, pos)
 end
+
+function M.killable_defer(timer, func, delay)
+    vim.validate({
+        timer = {timer, 'userdata', true},
+        func = {func, 'function'},
+        delay = {delay, 'number'}
+    })
+    local stop = function()
+        timer:stop()
+        if not timer:is_closing() then
+            timer:close()
+        end
+    end
+    if timer and timer:has_ref() then
+        stop()
+    end
+    timer = uv.new_timer()
+    timer:start(delay, 0, function()
+        vim.schedule(function()
+            if timer:has_ref() then
+                stop()
+                func()
+            end
+        end)
+    end)
+    return timer
+end
+
+M.cool_echo = (function()
+    local timer
+    return function(msg, hl, history, delay)
+        -- TODO without schedule wrapper may echo prefix spaces
+        vim.schedule(function()
+            api.nvim_echo({{msg, hl}}, history, {})
+        end)
+        timer = M.killable_defer(timer, function()
+            api.nvim_echo({{'', ''}}, false, {})
+        end, delay or 2500)
+    end
+end)()
 
 return M

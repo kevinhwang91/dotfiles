@@ -88,10 +88,10 @@ end
 function M.resize_preview_layout()
     pcall(function()
         local layout = vim.g.fzf_layout.window
-        if vim.o.columns * layout.width[false] - 2 > 100 then
+        if vim.o.columns * layout.width - 2 > 100 then
             vim.g.fzf_preview_window = {'right:50%,border-left'}
         else
-            if vim.o.lines * layout.height[false] - 2 > 25 then
+            if vim.o.lines * layout.height - 2 > 25 then
                 vim.g.fzf_preview_window = {'down:50%,border-top'}
             else
                 vim.g.fzf_preview_window = {}

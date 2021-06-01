@@ -62,20 +62,25 @@ local function filename()
     end
 
     local fname
+    local bt = vim.bo.bt
     if vim.b.fugitive_fname ~= '' then
         fname = vim.b.fugitive_fname
-    elseif bufname == '' and vim.bo.bt == '' then
+    elseif bufname == '' and bt == '' then
         fname = '[No Name]'
-    elseif vim.bo.bt == 'quickfix' then
+    elseif bt == 'quickfix' then
         fname = quickfix()
     else
         fname = fn.expand('%:t')
-        if fn.expand('%:e') == '' or vim.bo.ft == '' then
-            fname = ('%s (%s)'):format(fname, vim.bo.ft)
+        local ft = vim.bo.ft
+        if fn.expand('%:e') == '' or ft == '' then
+            fname = ('%s (%s)'):format(fname, ft)
         end
     end
+    if bt == '' then
+        fname = fname .. ' %m'
+    end
     return '%#StatusLine' .. (vim.bo.modified and 'FileModified#' or 'FileName#') .. fname ..
-               ' %m%#StatusLine#'
+               '%#StatusLine#'
 end
 
 local fugitive = (function()
@@ -194,7 +199,7 @@ function M.statusline()
         local winid = vim.g.statusline_winid
         local bufnr = api.nvim_win_get_buf(winid)
         table.insert(stl, '   ')
-        table.insert(stl, vim.bo[bufnr].bt == 'quickfix' and quickfix(winid) or '%t')
+        table.insert(stl, vim.bo[bufnr].bt == 'quickfix' and quickfix(winid) or '%t %m')
         table.insert(stl, readonly(bufnr))
 
         table.insert(stl, '%<%=')

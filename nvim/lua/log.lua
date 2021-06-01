@@ -7,6 +7,7 @@ local level_nr
 local level_default
 local log_file
 local log_date_fmt
+local tty
 
 local function get_level_nr(l)
     local nr
@@ -50,6 +51,13 @@ local function inspect(v)
     return s
 end
 
+local function load_tty()
+    local pipe = io.popen('ps -p $PPID -o tty=')
+    tty = pipe:lines()()
+    pipe:close()
+    return tty
+end
+
 local function path_sep()
     return vim.loop.os_uname().sysname == 'Windows' and [[\]] or '/'
 end
@@ -63,10 +71,6 @@ local function setup()
 
     log_file = table.concat({log_dir, 'kvnvim.log'}, path_sep())
     log_date_fmt = '%y-%m-%d %T'
-
-    local pipe = io.popen('ps -p $PPID -o tty=')
-    local tty = pipe:lines()()
-    pipe:close()
 
     for l in pairs(levels) do
         M[l:lower()] = function(...)
@@ -84,8 +88,8 @@ local function setup()
             local linfo = info.short_src .. ':' .. info.currentline
 
             local fp = assert(io.open(log_file, 'a+'))
-            local str = string.format('>%s [%s] [%s] %s : %s\n', tty, os.date(log_date_fmt), l,
-                linfo, msg)
+            local str = string.format('>%s [%s] [%s] %s : %s\n', tty or load_tty(),
+                os.date(log_date_fmt), l, linfo, msg)
             fp:write(str)
             fp:close()
         end

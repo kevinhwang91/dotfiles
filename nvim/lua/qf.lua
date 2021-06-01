@@ -32,7 +32,7 @@ function _G.qftf(info)
                 if fn.strwidth(fname) <= limit then
                     fname = fname_fmt1:format(fname)
                 else
-                    fname = fname_fmt2:format(fname:sub(1 - limit, -1))
+                    fname = fname_fmt2:format(fname:sub(1 - limit))
                 end
             end
             local lnum = e.lnum > 99999 and -1 or e.lnum

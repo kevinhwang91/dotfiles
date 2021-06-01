@@ -4,6 +4,7 @@ local fn = vim.fn
 local cmd = vim.cmd
 
 local map = require('remap').map
+local utils = require('kutils')
 local diag_qfid
 
 local function setup()
@@ -89,19 +90,19 @@ end
 
 function M.go2def()
     local cur_bufnr = api.nvim_get_current_buf()
+    local by
     if vim.bo.ft == 'help' then
-        local cword = fn.expand('<cword>')
-        cmd('tag ' .. cword)
-        vim.w.gtd = 'tag'
+        api.nvim_feedkeys(api.nvim_replace_termcodes('<C-]>', true, false, true), 'n', false)
+        by = 'tag'
     elseif api.nvim_exec([[echo CocAction('jumpDefinition')]], true) == 'v:true' then
-        vim.w.gtd = 'coc'
+        by = 'coc'
     else
         local cword = fn.expand('<cword>')
-        if not pcall(function()
+        local ok, msg = pcall(function()
             local wv = fn.winsaveview()
             cmd('ltag ' .. cword)
             local def_size = fn.getloclist(0, {size = 0}).size
-            vim.w.gtd = 'ltag'
+            by = 'ltag'
             if def_size > 1 then
                 api.nvim_set_current_buf(cur_bufnr)
                 fn.winrestview(wv)
@@ -110,13 +111,19 @@ function M.go2def()
                 cmd('lcl')
                 fn.search(cword, 'c')
             end
-        end) then
+        end)
+        if not ok then
+            p(msg)
             fn.searchdecl(cword)
-            vim.w.gtd = 'search'
+            by = 'search'
         end
     end
     if api.nvim_get_current_buf() ~= cur_bufnr then
         cmd('norm! zz')
+    end
+
+    if by then
+        utils.cool_echo('go2def: ' .. by, 'Special')
     end
 end
 
@@ -141,43 +148,52 @@ function M.diagnostic_change()
 end
 
 function M.diagnostic(winid, nr, keep)
-    local diagnostics = fn['CocAction']('diagnosticList')
-    local items, loc_ranges = {}, {}
-    for _, d in ipairs(diagnostics) do
-        local text = ('[%s%s] %s'):format((d.source == '' and 'coc.nvim' or d.source),
-            (d.code == vim.NIL and '' or ' ' .. d.code), d.message:match('[^\n]+\n*'))
-        local item = {filename = d.file, lnum = d.lnum, col = d.col, text = text, type = d.severity}
-        table.insert(loc_ranges, d.location.range)
-        table.insert(items, item)
-    end
-    local id
-    if winid and nr then
-        id = diag_qfid
-    else
-        local info = fn.getqflist({id = diag_qfid, winid = 0, nr = 0})
-        id, winid, nr = info.id, info.winid, info.nr
-    end
-    local action = id == 0 and ' ' or 'r'
-    fn.setqflist({}, action, {
-        id = id ~= 0 and id or nil,
-        title = 'CocDiagnosticList',
-        items = items,
-        context = {bqf = {lsp_ranges_hl = loc_ranges}}
-    })
+    fn['CocActionAsync']('diagnosticList', '', function(err, res)
+        if err == vim.NIL then
+            local items, loc_ranges = {}, {}
+            for _, d in ipairs(res) do
+                local text = ('[%s%s] %s'):format((d.source == '' and 'coc.nvim' or d.source),
+                    (d.code == vim.NIL and '' or ' ' .. d.code), d.message:match('[^\n]+\n*'))
+                local item = {
+                    filename = d.file,
+                    lnum = d.lnum,
+                    col = d.col,
+                    text = text,
+                    type = d.severity
+                }
+                table.insert(loc_ranges, d.location.range)
+                table.insert(items, item)
+            end
+            local id
+            if winid and nr then
+                id = diag_qfid
+            else
+                local info = fn.getqflist({id = diag_qfid, winid = 0, nr = 0})
+                id, winid, nr = info.id, info.winid, info.nr
+            end
+            local action = id == 0 and ' ' or 'r'
+            fn.setqflist({}, action, {
+                id = id ~= 0 and id or nil,
+                title = 'CocDiagnosticList',
+                items = items,
+                context = {bqf = {lsp_ranges_hl = loc_ranges}}
+            })
 
-    if id == 0 then
-        local info = fn.getqflist({id = id, nr = 0})
-        diag_qfid, nr = info.id, info.nr
-    end
+            if id == 0 then
+                local info = fn.getqflist({id = id, nr = 0})
+                diag_qfid, nr = info.id, info.nr
+            end
 
-    if not keep then
-        if winid == 0 then
-            cmd('bo cope')
-        else
-            api.nvim_set_current_win(winid)
+            if not keep then
+                if winid == 0 then
+                    cmd('bo cope')
+                else
+                    api.nvim_set_current_win(winid)
+                end
+                cmd(('sil %dchi'):format(nr))
+            end
         end
-        cmd(('sil %dchi'):format(nr))
-    end
+    end)
 end
 
 function M.jump2loc(locs)
