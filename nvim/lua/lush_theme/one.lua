@@ -47,7 +47,7 @@ local theme = lush(function()
         -- TermCursorNC {}, --
         ErrorMsg {fg = red1}, --
         VertSplit {fg = mono3}, --
-        Folded {fg = black1, bg = mono1}, --
+        Folded {fg = white1, bg = mono3}, --
         FoldColumn {fg = mono2, bg = black1}, --
         SignColumn {bg = black1}, --
         IncSearch {fg = yellow1, bg = black1, gui = 'reverse'}, --

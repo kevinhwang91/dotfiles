@@ -1,6 +1,7 @@
 local M = {}
 local fn = vim.fn
 local api = vim.api
+local uv = vim.loop
 
 local function setup()
     _G.statusline = M.statusline
@@ -87,51 +88,88 @@ local fugitive = (function()
     local tick = 0
     local threshold = 1000000000
     local last_branch = {nil, nil}
+    local loaded = false
+
+    local function is_loaded()
+        if not loaded and uv.hrtime() - tick > threshold then
+            loaded = fn.exists('*FugitiveExtractGitDir') == 1
+            if not loaded then
+                tick = uv.hrtime()
+            end
+        end
+        return loaded
+    end
 
     return function()
         local ret
-        local bufname = api.nvim_buf_get_name(0)
-        if bufname ~= '' and fn.exists('*FugitiveExtractGitDir') == 1 then
-            local branch
-            if bufname ~= last_branch[1] or vim.loop.hrtime() - tick > threshold then
-                if vim.b.git_dir and vim.b.git_dir ~= '' then
-                    branch = fn['FugitiveHead']()
-                    local info = fn['FugitiveParse']()[1]
-                    if info ~= '' then
-                        local commit = vim.split(info, ':')[1]
-                        branch = ('%s(%s)'):format(branch, commit:sub(0, 6))
+        if is_loaded() then
+            local bufname = api.nvim_buf_get_name(0)
+            if bufname ~= '' then
+                local branch
+                if bufname ~= last_branch[1] or uv.hrtime() - tick > threshold then
+                    if vim.b.git_dir and vim.b.git_dir ~= '' then
+                        branch = fn['FugitiveHead']()
+                        local info = fn['FugitiveParse']()[1]
+                        if info ~= '' then
+                            local commit = vim.split(info, ':')[1]
+                            branch = ('%s(%s)'):format(branch, commit:sub(1, 6))
+                        end
+                        last_branch = {bufname, branch}
+                        tick = uv.hrtime()
                     end
-                    last_branch = {bufname, branch}
-                    tick = vim.loop.hrtime()
+                else
+                    branch = last_branch[2]
                 end
-            else
-                branch = last_branch[2]
-            end
-            if branch then
-                ret = '%#StatusLineBranch# ' .. branch .. '%#StatusLine#'
+                if branch then
+                    ret = '%#StatusLineBranch# ' .. branch .. '%#StatusLine#'
+                end
             end
         end
         return ret
     end
 end)()
 
-local function gitgutter()
-    local ret
-    if fn.exists('*GitGutterGetHunkSummary') == 1 and not vim.bo.readonly and vim.bo.modifiable then
-        local cnt = fn['GitGutterGetHunkSummary']()
-        if type(cnt) == 'table' and #cnt == 3 and (cnt[1] > 0 or cnt[2] > 0 or cnt[3] > 0) then
-            local list = {}
-            local symbol = {
-                '%#StatusLineHunkAdd#+', '%#StatusLineHunkChange#~', '%#StatusLineHunkRemove#-'
-            }
-            for i = 1, 3 do
-                table.insert(list, symbol[i] .. cnt[i])
+local gitgutter = (function()
+    local tick = 0
+    local threshold = 200000000
+    local last_ret
+    local loaded = false
+
+    local function is_loaded()
+        if not loaded and uv.hrtime() - tick > threshold then
+            loaded = fn.exists('*GitGutterGetHunkSummary') == 1
+            if not loaded then
+                tick = uv.hrtime()
             end
-            ret = table.concat(list, ' ') .. '%#StatusLine#'
         end
+        return loaded
     end
-    return ret
-end
+
+    return function()
+        local ret
+        if is_loaded() and uv.hrtime() - tick > threshold then
+            if not vim.bo.readonly and vim.bo.modifiable then
+                local cnt = fn['GitGutterGetHunkSummary']()
+                if type(cnt) == 'table' and #cnt == 3 and (cnt[1] > 0 or cnt[2] > 0 or cnt[3] > 0) then
+                    local list = {}
+                    local symbol = {
+                        '%#StatusLineHunkAdd#+', '%#StatusLineHunkChange#~',
+                        '%#StatusLineHunkRemove#-'
+                    }
+                    for i = 1, 3 do
+                        table.insert(list, symbol[i] .. cnt[i])
+                    end
+                    ret = table.concat(list, ' ') .. '%#StatusLine#'
+                end
+            end
+            tick = uv.hrtime()
+            last_ret = ret
+        else
+            ret = last_ret
+        end
+        return ret
+    end
+end)()
 
 local function coc_status()
     return vim.trim(vim.g.coc_status or '')

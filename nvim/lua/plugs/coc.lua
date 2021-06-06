@@ -26,8 +26,6 @@ local function setup()
             au User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
             au VimLeavePre * if get(g:, 'coc_process_pid', 0) | call system('kill -9 -- -' . g:coc_process_pid) | endif
             au InsertCharPre * lua require('plugs.coc').enable_ultisnips()
-            au FileType vim xmap if <Plug>(coc-funcobj-i) | omap if <Plug>(coc-funcobj-i)
-            au FileType vim xmap af <Plug>(coc-funcobj-a) | omap af <Plug>(coc-funcobj-a)
         aug END
     ]])
 
@@ -67,6 +65,16 @@ local function setup()
     map('x', '<M-CR>', '<Plug>(coc-codeaction-selected)', {})
     map('n', '<Leader>qf', '<Plug>(coc-fix-current)', {})
 
+    map('x', 'if', [[:<C-u>lua require('plugs.coc').textobj('func', true, true)<CR>]])
+    map('x', 'af', [[:<C-u>lua require('plugs.coc').textobj('func', false, true)<CR>]])
+    map('o', 'if', [[:<C-u>lua require('plugs.coc').textobj('func', true)<CR>]])
+    map('o', 'af', [[:<C-u>lua require('plugs.coc').textobj('func', false)<CR>]])
+
+    map('x', 'ik', [[:<C-u>lua require('plugs.coc').textobj('class', true, true)<CR>]])
+    map('x', 'ak', [[:<C-u>lua require('plugs.coc').textobj('class', false, true)<CR>]])
+    map('o', 'ik', [[:<C-u>lua require('plugs.coc').textobj('class', true)<CR>]])
+    map('o', 'ak', [[:<C-u>lua require('plugs.coc').textobj('class', false)<CR>]])
+
     map('x', '<Leader>sr',
         [[<Cmd>lua require('plugs.coc').enable_ultisnips()<CR><Plug>(coc-snippets-select)]], {})
     map('x', '<Leader>sx', '<Plug>(coc-convert-snippet)', {})
@@ -98,7 +106,7 @@ function M.go2def()
         by = 'coc'
     else
         local cword = fn.expand('<cword>')
-        local ok, msg = pcall(function()
+        if not pcall(function()
             local wv = fn.winsaveview()
             cmd('ltag ' .. cword)
             local def_size = fn.getloclist(0, {size = 0}).size
@@ -111,9 +119,7 @@ function M.go2def()
                 cmd('lcl')
                 fn.search(cword, 'c')
             end
-        end)
-        if not ok then
-            p(msg)
+        end) then
             fn.searchdecl(cword)
             by = 'search'
         end
@@ -130,7 +136,7 @@ end
 function M.show_documentation()
     local ft = vim.bo.ft
     if ft == 'vim' or ft == 'help' then
-        cmd(('h %s'):format(fn.expand('<cword>')))
+        cmd(('sil! h %s'):format(fn.expand('<cword>')))
     elseif api.nvim_eval([[CocAction('hasProvider', 'hover')]]) then
         fn['CocActionAsync']('doHover')
     else
@@ -243,6 +249,28 @@ function M.hl_fallback()
     winid = api.nvim_get_current_win()
     m_id = fn.matchadd('CocHighlightText', get_cur_word(), -1, -1, {window = winid})
     hl_fb_tbl = {m_id, winid}
+end
+
+function M.textobj(obj, inner, visual)
+    local symbols = {func = {'Method', 'Function'}, class = {'Interface', 'Struct', 'Class'}}
+    local done = false
+    local err
+    fn['CocActionAsync']('selectSymbolRange', inner, visual and fn.visualmode() or '', symbols[obj],
+        function(e)
+            if e ~= vim.NIL then
+                err = true
+            end
+            done = true
+        end)
+    if not vim.wait(3200, function()
+        return done
+    end) or err then
+        if obj == 'func' then
+            obj = 'function'
+        end
+        require('nvim-treesitter.textobjects.select').select_textobject(
+            ('@%s.%s'):format(obj, inner and 'inner' or 'outer'), visual and 'x' or 'o')
+    end
 end
 
 setup()

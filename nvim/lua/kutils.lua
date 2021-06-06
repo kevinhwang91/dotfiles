@@ -65,7 +65,7 @@ end
 
 function M.nav_fold(forward, cnt)
     local wv = fn.winsaveview()
-    cmd([[norm! m']])
+    cmd([[norm! m`]])
     local cur_l, cur_c
     while cnt > 0 do
         if forward then
@@ -85,8 +85,6 @@ function M.nav_fold(forward, cnt)
     local cur_l1, cur_c1 = unpack(api.nvim_win_get_cursor(0))
     if cur_l == cur_l1 and cur_c == cur_c1 then
         fn.winrestview(wv)
-    else
-        cmd([[norm! m']])
     end
 end
 

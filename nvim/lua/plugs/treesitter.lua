@@ -2,6 +2,8 @@ local M = {}
 local cmd = vim.cmd
 local fn = vim.fn
 
+local map = require('remap').map
+
 local do_sy_tbl = {}
 
 local function setup()
@@ -9,20 +11,7 @@ local function setup()
         ensure_installed = 'maintained',
         highlight = {enable = true, disable = {'bash'}},
         textobjects = {
-            select = {
-                enable = true,
-                keymaps = {
-                    ['af'] = '@function.outer',
-                    ['if'] = '@function.inner',
-                    ['ia'] = '@parameter.inner',
-                    ['ac'] = '@conditional.outer',
-                    ['ic'] = '@conditional.inner',
-                    ['al'] = '@loop.outer',
-                    ['il'] = '@loop.inner',
-                    ['ak'] = '@class.outer',
-                    ['ik'] = '@class.inner'
-                }
-            },
+            select = {enable = true, keymaps = {['ia'] = '@parameter.inner'}},
             move = {
                 enable = true,
                 goto_next_start = {[']m'] = '@function.outer'},
@@ -43,6 +32,10 @@ local function setup()
     cmd('pa nvim-treesitter-textobjects')
 
     require('nvim-treesitter.configs').setup(conf)
+
+    cmd('pa iswap.nvim')
+    require('iswap').setup {grey = 'disable', hl_snipe = 'IncSearch', hl_selection = 'MatchParen'}
+    map('n', '<Leader>sp', '<Cmd>ISwap<CR>')
 
     local parsers = require('nvim-treesitter.parsers')
     local hl_disabled = conf.highlight.disable

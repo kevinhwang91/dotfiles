@@ -29,6 +29,7 @@ function M.git_relation()
         g.gitgutter_highlight_linenrs = 1
         g.gitgutter_signs = 0
         g.gitgutter_map_keys = 0
+        g.gitgutter_close_preview_on_escape = 1
         cmd('pa vim-gitgutter')
         config.gitgutter()
         cmd('doautoall gitgutter BufEnter')

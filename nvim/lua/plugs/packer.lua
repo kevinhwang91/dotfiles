@@ -67,8 +67,8 @@ return require('packer').startup({
             'mg979/vim-visual-multi',
             setup = [[vim.g.VM_leader = '<Space>']],
             keys = {
-                {'', '<C-n>'}, {'n', [[<Leader>\]]}, {'', '<Leader>A'}, {'x', '<Leader>c'},
-                {'n', '<M-C-k>'}, {'n', '<M-C-j>'}, {'n', 'g/'}
+                {'', '<C-n>'}, {'n', [[<Leader>\]]}, {'', '<Leader>A'}, {'n', '<M-C-k>'},
+                {'n', '<M-C-j>'}, {'n', 'g/'}
             },
             cmd = {'VMSearch'},
             config = conf('visualmulti'),
@@ -212,6 +212,8 @@ return require('packer').startup({
         use {'MTDL9/vim-log-highlighting', event = 'BufNewFile,BufRead *.log'}
 
         use {'nanotee/luv-vimdocs', opt = false}
+
+        use {'mizlan/iswap.nvim'}
 
         -- keep learning :)
         use {'nvim-lua/plenary.nvim'}

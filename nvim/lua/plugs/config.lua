@@ -32,9 +32,9 @@ function M.hlslens()
     cmd([[com! HlSearchLensToggle lua require('hlslens').toggle()]])
 
     map('n', 'n',
-        [[<Cmd>execute('norm! ' . v:count1 . 'n')<CR><Cmd>lua require('hlslens').start()<CR>]])
+        [[<Cmd>lua vim.cmd('norm! ' .. vim.v.count1 .. 'nzv') require('hlslens').start()<CR>]])
     map('n', 'N',
-        [[<Cmd>execute('norm! ' . v:count1 . 'N')<CR><Cmd>lua require('hlslens').start()<CR>]])
+        [[<Cmd>lua vim.cmd('norm! ' .. vim.v.count1 .. 'Nzv') require('hlslens').start()<CR>]])
     map('', '*', [[<Plug>(asterisk-z*)<Cmd>lua require('hlslens').start()<CR>]], {})
     map('', '#', [[<Plug>(asterisk-z#)<Cmd>lua require('hlslens').start()<CR>]], {})
     map('', 'g*', [[<Plug>(asterisk-gz*)<Cmd>lua require('hlslens').start()<CR>]], {})
