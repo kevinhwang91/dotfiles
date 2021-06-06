@@ -22,6 +22,7 @@ let g:highlightedyank_highlight_color = 'rgba(209, 154, 102, 155)'
 let g:highlightedyank_highlight_duration = '800'
 
 set argtextobj
+set textobj-indent
 
 set NERDTree
 let g:NERDTreeMapCloseDir = 'h'
