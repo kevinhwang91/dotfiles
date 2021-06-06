@@ -15,6 +15,7 @@ fi
 alias mv='mv -i'
 alias cp='cp -i'
 alias rm='rm -i'
+alias reset='reset && source ~/.zshrc'
 
 alias th='trash'
 
@@ -230,7 +231,7 @@ if (( $+commands[nvim] )); then
         alias ngdb='_ngdb'
         compdef __ngdb_compdef _ngdb
         _ngdb() {
-            nvim +"GdbStart gdb $*" +'bw 1'
+            nvim +"GdbStart gdb $*"
         }
         __ngdb_compdef() {
             _gdb
