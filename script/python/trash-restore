@@ -4,123 +4,123 @@ import os
 import sys
 import shutil
 
-from trashcli.restore import RestoreCmd
+from trashcli import restore
 
 
-class FrestoreCmd(RestoreCmd):
+def restore_by_input(res_cmd, trashed_files):
+    for i, trashedfile in enumerate(trashed_files):
+        res_cmd.println('{:4d} {} {}'.format(
+            i, trashedfile.deletion_date, trashedfile.original_location))
+    index_elements = res_cmd.input(
+        'What file to restore [0..{:d}]: \n'.format(len(trashed_files)-1))
+    if index_elements == "":
+        res_cmd.println('Exiting')
+    else:
+        index_elements = index_elements.split(',')
+        for index_element in index_elements:
+            indices = index_element.split('-')
+            try:
+                indices = list(map(int, indices))
+                for index in indices:
+                    if (index < 0 or index >= len(trashed_files)):
+                        raise IndexError('Out of range')
+                if len(indices) == 1:
+                    res_cmd.restore(trashed_files[indices[0]])
+                elif len(indices) == 2:
+                    for trash in trashed_files[indices[0]:indices[1]+1]:
+                        res_cmd.restore(trash)
+                else:
+                    raise ValueError('Invalid range, restoration abandoned')
+            except (ValueError, IndexError) as err:
+                res_cmd.printerr('Invalid entry: {}'.format(err))
+                res_cmd.exit(1)
+            except OSError as err:
+                res_cmd.printerr(err)
+                res_cmd.exit(1)
 
-    def restore_by_input(self, trashed_files):
-        for i, trashedfile in enumerate(trashed_files):
-            self.println('{:4d} {} {}'.format(
-                i, trashedfile.deletion_date, trashedfile.original_location))
-        index_elements = self.input(
-            'What file to restore [0..{:d}]: \n'.format(len(trashed_files)-1))
-        if index_elements == "":
-            self.println('Exiting')
-        else:
-            index_elements = index_elements.split(',')
-            for index_element in index_elements:
-                indices = index_element.split('-')
-                try:
-                    indices = list(map(int, indices))
-                    for index in indices:
-                        if (index < 0 or index >= len(trashed_files)):
-                            raise IndexError('Out of range')
-                    if len(indices) == 1:
-                        self.restore(trashed_files[indices[0]])
-                    elif len(indices) == 2:
-                        for trash in trashed_files[indices[0]:indices[1]+1]:
-                            self.restore(trash)
-                    else:
-                        raise ValueError('Invalid range, restoration abandoned')
-                except (ValueError, IndexError) as err:
-                    self.printerr('Invalid entry: {}'.format(err))
-                    self.exit(1)
-                except OSError as err:
-                    self.printerr(err)
-                    self.exit(1)
 
-    def restore_by_fzf(self, trashed_files):
-        import subprocess
-        encoding = sys.getdefaultencoding()
-        fzf_preview_cmd = """
-            t=${$(readlink {2}):-{2}}
-            if [[ $(file -i $t) =~ directory ]]; then
-                (exa --color=always -T -L 1 $t ||
-                    tree -C -L 1 $t ||
-                    echo This is a directory.) 2>/dev/null
-            elif [[ $(file -i $t) =~ binary ]]; then
-                echo This is a binary file.
-            elif (( $(stat -c %s $t) > 204800 )); then
-                cat $t 2>/dev/null
-            else
-                (bat --color=always --style=plain --theme=TwoDark -n -- $t </dev/tty ||
-                    cat $t) 2>/dev/null
-            fi
-        """
-        fzf_cmd = 'fzfp' if os.getenv('TMUX') and shutil.which('fzfp') else 'fzf'
-        fzf_pro = subprocess.Popen(
-            [fzf_cmd, '--header=  Which files to restore?', '-d', '\t', '--with-nth=1',
-             '--height=60%', '--reverse', '-m', '--ansi', '--preview-window', ':hidden',
-             '--preview', fzf_preview_cmd],
+def restore_by_fzf(res_cmd, trashed_files):
+    import subprocess
+    encoding = sys.getdefaultencoding()
+    fzf_preview_cmd = """
+        t=${$(readlink {2}):-{2}}
+        if [[ $(file -i $t) =~ directory ]]; then
+            (exa --color=always -T -L 1 $t ||
+                tree -C -L 1 $t ||
+                echo This is a directory.) 2>/dev/null
+        elif [[ $(file -i $t) =~ binary ]]; then
+            echo This is a binary file.
+        elif (( $(stat -c %s $t) > 204800 )); then
+            cat $t 2>/dev/null
+        else
+            (bat --color=always --style=plain --theme=TwoDark -n -- $t </dev/tty ||
+                cat $t) 2>/dev/null
+        fi
+    """
+    fzf_cmd = 'fzfp' if os.getenv('TMUX') and shutil.which('fzfp') else 'fzf'
+    fzf_pro = subprocess.Popen(
+        [fzf_cmd, '--header=  Which files to restore?', '-d', '\t', '--with-nth=1',
+         '--height=60%', '--reverse', '--tac', '-m', '--ansi', '--preview-window', ':hidden',
+         '--preview', fzf_preview_cmd],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=None
+    )
+    pin = fzf_pro.stdin
+
+    render = shutil.which('grcat')
+    if render:
+        render_pro = subprocess.Popen(
+            [render, 'trash.grc'],
             stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
+            stdout=fzf_pro.stdin,
             stderr=None
         )
-        pin = fzf_pro.stdin
+        pin = render_pro.stdin
+    try:
+        for i, trashedfile in enumerate(trashed_files):
+            line = '{:4d} {} {}\t{}\n'.format(i, trashedfile.deletion_date,
+                                              trashedfile.original_location,
+                                              trashedfile.original_file)
+            pin.write(line.encode(encoding))
+            pin.flush()
+        pin.close()
+    except OSError as err:
+        import errno
+        if err.errno != errno.EPIPE:
+            raise
 
-        render = shutil.which('grcat')
-        if render:
-            render_pro = subprocess.Popen(
-                [render, 'trash.grc'],
-                stdin=subprocess.PIPE,
-                stdout=fzf_pro.stdin,
-                stderr=None
-            )
-            pin = render_pro.stdin
+    if render:
+        fzf_pro.stdin.close()
+    ret_code = fzf_pro.wait()
+
+    if ret_code:
+        res_cmd.exit(ret_code)
+
+    for line in fzf_pro.stdout.readlines():
+        index = -1
+        if line:
+            index = line.decode(encoding).split()[0]
         try:
-            for i, trashedfile in enumerate(trashed_files):
-                line = '{:4d} {} {}\t{}\n'.format(i, trashedfile.deletion_date,
-                                                  trashedfile.original_location,
-                                                  trashedfile.original_file)
-                pin.write(line.encode(encoding))
-                pin.flush()
-            pin.close()
+            index = int(index)
+            trashed_file = trashed_files[index]
+            res_cmd.restore(trashed_file)
+        except (ValueError, IndexError) as err:
+            res_cmd.printerr('Invalid entry: {}'.format(err))
+            res_cmd.exit(1)
         except OSError as err:
-            import errno
-            if err.errno != errno.EPIPE:
-                raise
-
-        if render:
-            fzf_pro.stdin.close()
-        ret_code = fzf_pro.wait()
-
-        if ret_code:
-            self.exit(ret_code)
-
-        for line in fzf_pro.stdout.readlines():
-            if line:
-                index = line.decode(encoding).split()[0]
-            try:
-                index = int(index)
-                trashed_file = trashed_files[index]
-                self.restore(trashed_file)
-            except (ValueError, IndexError) as err:
-                self.printerr('Invalid entry: {}'.format(err))
-                self.exit(1)
-            except OSError as err:
-                self.printerr(err)
-                self.exit(1)
-
-    def handle_trashed_files(self, trashed_files):
-        trashed_files = sorted(trashed_files, key=lambda f: f.deletion_date, reverse=True)
-        if not trashed_files:
-            self.report_no_files_found()
-        elif shutil.which('fzf') is None:
-            self.restore_by_input(trashed_files)
-        else:
-            self.restore_by_fzf(trashed_files)
+            res_cmd.printerr(err)
+            res_cmd.exit(1)
 
 
-FrestoreCmd(stdout=sys.stdout, stderr=sys.stderr,
-            environ=os.environ, exit=sys.exit, input=input).run(sys.argv)
+def handle_trashed_files(self, trashed_files):
+    if not trashed_files:
+        self.report_no_files_found()
+    elif shutil.which('fzf') is None:
+        restore_by_input(self, trashed_files)
+    else:
+        restore_by_fzf(self, trashed_files)
+
+
+restore.RestoreCmd.handle_trashed_files = handle_trashed_files
+sys.exit(restore.main())

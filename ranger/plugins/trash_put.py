@@ -1,4 +1,5 @@
 import os
+import sys
 import shlex
 from functools import partial
 from ranger.api.commands import Command
@@ -14,20 +15,11 @@ class TrashPut(Command):
         self.trash_put = None
         try:
             from trashcli import put
-            from trashcli import fstab
-            #  Make stdout and stderr are None
-            self.trash_put = put.TrashPutCmd(
-                None, None, os.environ, fstab.volume_of, put.parent_path,
-                os.path.realpath)
+            self.trash_put = put
         except ImportError:
             pass
 
     def execute(self):
-
-        if not self.trash_put:
-            self.fm.notify('Error: no trashcli module found!', bad=True)
-            return
-
         def is_directory_with_files(path):
             return os.path.isdir(path) and not os.path.islink(path) and len(os.listdir(path)) > 0
 
@@ -66,10 +58,20 @@ class TrashPut(Command):
 
     def _trash_delete_files(self, args):
         """
-        trash_put may output error message but stderr is None,
-        so catch the AttributeError and use builtin delete to fallback
+        trash_put may output error message, so catch the Exception and use builtin delete to
+        fallback
         """
+        argv_b = sys.argv
+        out_b = sys.stdout
+        err_b = sys.stderr
         try:
-            self.trash_put.run(args)
-        except AttributeError:
+            sys.argv = args
+            sys.stderr = None
+            sys.stdout = None
+            self.trash_put.main()
+        except Exception:
             self.fm.delete(args[1:])
+        finally:
+            sys.argv = argv_b
+            sys.stdout = out_b
+            sys.stderr = err_b
