@@ -35,7 +35,7 @@ local function setup()
         cmd('hi! CocWarningSign guifg=#e5c07b')
     end
 
-    map('i', '<C-space>', 'coc#refresh()', {noremap = true, expr = true})
+    map('i', '<C-space>', 'coc#refresh()', {noremap = true, expr = true, silent = true})
     map('n', '<C-f>', [[coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"]],
         {noremap = true, expr = true})
     map('n', '<C-b>', [[coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"]],
@@ -84,9 +84,9 @@ local function setup()
     map('n', '<M-q>', [[<Cmd>echo CocAction('getCurrentFunctionSymbol')<CR>]])
     map('n', '<Leader>qd', [[<Cmd>lua require('plugs.coc').diagnostic()<CR>]])
 
-    cmd([[com! -nargs=0 ClangdSH call CocAction('runcom', 'clangd.switchSourceHeader')]])
     cmd([[com! -nargs=0 DiagnosticToggleBuffer call CocAction('diagnosticToggleBuffer')]])
-    map('n', '<Leader>sh', '<Cmd>ClangdSH<CR>')
+    cmd([[com! -nargs=0 CocOutput CocCommand workspace.showOutput]])
+    map('n', '<Leader>sh', '<Cmd>CocCommand clangd.switchSourceHeader<CR>')
 end
 
 function M.enable_ultisnips()
@@ -102,7 +102,7 @@ function M.go2def()
     if vim.bo.ft == 'help' then
         api.nvim_feedkeys(api.nvim_replace_termcodes('<C-]>', true, false, true), 'n', false)
         by = 'tag'
-    elseif api.nvim_exec([[echo CocAction('jumpDefinition')]], true) == 'v:true' then
+    elseif api.nvim_exec([[echo CocAction('jumpDefinition')]], true):match('v:true$') then
         by = 'coc'
     else
         local cword = fn.expand('<cword>')
@@ -117,7 +117,7 @@ function M.go2def()
                 cmd('abo lw')
             elseif def_size == 1 then
                 cmd('lcl')
-                fn.search(cword, 'c')
+                fn.search(cword, 'cs')
             end
         end) then
             fn.searchdecl(cword)
@@ -159,7 +159,7 @@ function M.diagnostic(winid, nr, keep)
             local items, loc_ranges = {}, {}
             for _, d in ipairs(res) do
                 local text = ('[%s%s] %s'):format((d.source == '' and 'coc.nvim' or d.source),
-                    (d.code == vim.NIL and '' or ' ' .. d.code), d.message:match('[^\n]+\n*'))
+                    (d.code == vim.NIL and '' or ' ' .. d.code), d.message:match('([^\n]+)\n*'))
                 local item = {
                     filename = d.file,
                     lnum = d.lnum,

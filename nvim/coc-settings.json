@@ -65,6 +65,7 @@
 	"java.codeGeneration.useBlocks": true,
 	"java.import.maven.enabled": true,
 	"java.maven.downloadSources": true,
+	"python.analysis.diagnosticMode": "openFilesOnly",
 	"go.goplsUseDaemon": false,
 	"rust-analyzer.server.path": "rust-analyzer",
 	"yaml.validate": true,

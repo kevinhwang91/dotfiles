@@ -4,6 +4,7 @@ local fn = vim.fn
 local api = vim.api
 
 -- local parsers = require('nvim-treesitter.parsers')
+local utils = require('kutils')
 
 local bl_ft
 local anyfold_prefer_ft
@@ -103,20 +104,22 @@ end
 
 function M.foldtext()
     local fs, fe = vim.v.foldstart, vim.v.foldend
-    local fs_line = api.nvim_buf_get_lines(0, fs - 1, fs, false)[1]
-    while not fs_line:match('%w') do
-        fs = fn.nextnonblank(fs + 1)
-        fs_line = api.nvim_buf_get_lines(0, fs - 1, fs, false)[1]
+    local fs_lines = api.nvim_buf_get_lines(0, fs - 1, fe - 1, false)
+    local fs_line = fs_lines[1]
+    for _, line in ipairs(fs_lines) do
+        if line:match('%w') then
+            fs_line = line
+            break
+        end
     end
-
     local pad = ' '
-    local line = fs_line:gsub('\t', pad:rep(vim.bo.tabstop))
+    fs_line = utils.expandtab(fs_line)
     local gutter_size = fn.screenpos(0, api.nvim_win_get_cursor(0)[1], 1).curscol -
                             fn.win_screenpos(0)[2]
     local width = api.nvim_win_get_width(0) - gutter_size
     local fold_info = (' %d lines %s'):format(1 + fe - fs, (' + '):rep(vim.v.foldlevel))
-    local spaces = pad:rep(width - api.nvim_strwidth(fold_info .. line))
-    return line .. spaces .. fold_info
+    local spaces = pad:rep(width - #fold_info - api.nvim_strwidth(fs_line))
+    return fs_line .. spaces .. fold_info
 end
 
 setup()

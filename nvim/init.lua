@@ -351,7 +351,7 @@ cmd(([[
         au!
         au TextYankPost * lua if not vim.b.visual_multi then %s end
     aug END
-]]):format([[pcall(vim.highlight.on_yank, {higroup='IncSearch', timeout=800})]]))
+]]):format([[pcall(vim.highlight.on_yank, {higroup='IncSearch', timeout=500})]]))
 
 -- mbbill/undotree
 g.undotree_WindowLayout = 3

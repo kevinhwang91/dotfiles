@@ -139,4 +139,25 @@ M.cool_echo = (function()
     end
 end)()
 
+function M.expandtab(str, bufnr)
+    bufnr = bufnr or 0
+    local ts = vim.bo[bufnr].ts
+    local new = ''
+    local pad = ' '
+    local ti = 0
+    local i = 1
+    while true do
+        i = str:find('\t', i)
+        if not i then
+            new = new .. str:sub(ti + 1)
+            break
+        end
+        new = new .. str:sub(ti + 1, i - 1)
+        new = new .. pad:rep(ts - #new % ts)
+        ti = i
+        i = i + 1
+    end
+    return new
+end
+
 return M
