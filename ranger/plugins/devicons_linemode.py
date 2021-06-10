@@ -70,7 +70,7 @@ FILE_NODE_EXTENSIONS = {
     'gem'      : '',
     'gemspec'  : '',
     'gif'      : '',
-    'go'       : '',
+    'go'       : '',
     'gz'       : '',
     'gzip'     : '',
     'h'        : '',
