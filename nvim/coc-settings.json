@@ -1,12 +1,46 @@
 {
 	"coc.preferences.useQuickfixForLocations": false,
 	"coc.preferences.extensionUpdateCheck": "weekly",
-	"diagnostic.maxWindowWidth": 100,
-	"diagnostic.signPriority": 20,
+	"coc.preferences.messageLevel": "error",
+	"suggest.enablePreselect": true,
+	"suggest.noselect": false,
+	"suggest.snippetIndicator": "",
+	"suggest.languageSourcePriority": 90,
+	"suggest.triggerCompletionWait": 50,
+	"suggest.completionItemKindLabels": {
+		"keyword": "",
+		"variable": "",
+		"value": "",
+		"operator": "Ψ",
+		"constructor": "",
+		"function": "ƒ",
+		"reference": "渚",
+		"constant": "",
+		"method": "",
+		"struct": "פּ",
+		"class": "",
+		"interface": "",
+		"text": "",
+		"enum": "",
+		"enumMember": "",
+		"module": "",
+		"color": "",
+		"property": "",
+		"field": "料",
+		"unit": "",
+		"event": "鬒",
+		"file": "",
+		"folder": "",
+		"snippet": "",
+		"typeParameter": "",
+		"default": ""
+	},
 	"diagnostic.errorSign": "",
 	"diagnostic.warningSign": "",
 	"diagnostic.infoSign": "",
 	"diagnostic.hintSign": "",
+	"diagnostic.maxWindowWidth": 100,
+	"diagnostic.signPriority": 20,
 	"diagnostic.enableHighlightLineNumber": false,
 	"languageserver": {
 		"lua": {
@@ -19,6 +53,12 @@
 						"maxPreload": 2000,
 						"preloadFileSize": 1000
 					},
+					"runtime": {
+						"version": "LuaJIT"
+					},
+					"completion": {
+						"callSnippet": "Replace"
+					},
 					"diagnostics": {
 						"enable": true,
 						"globals": [
@@ -30,11 +70,15 @@
 							"before_each",
 							"after_each",
 							"p",
-							"ldebug"
+							"info"
 						]
 					},
 					"telemetry": {
 						"enable": false
+					},
+					"window": {
+						"progressBar": false,
+						"statusBar": false
 					}
 				}
 			}
@@ -64,7 +108,7 @@
 	"java.enabled": true,
 	"java.codeGeneration.useBlocks": true,
 	"java.import.maven.enabled": true,
-	"java.maven.downloadSources": true,
+	"java.maven.downloadSources": false,
 	"python.analysis.diagnosticMode": "openFilesOnly",
 	"go.goplsUseDaemon": false,
 	"rust-analyzer.server.path": "rust-analyzer",
@@ -73,7 +117,9 @@
 	"yaml.completion": true,
 	"snippets.enableStatusItem": false,
 	"snippets.ultisnips.enable": false,
-	"snippets.snipmate.enable": true,
+	"snippets.snipmate.enable": false,
+	"snippets.loadFromExtensions": true,
+	"snippets.shortcut": "SP",
 	"diagnostic-languageserver.filetypes": {
 		"sh": "shellcheck",
 		"python": "pylint"

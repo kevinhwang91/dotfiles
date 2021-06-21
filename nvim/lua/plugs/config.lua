@@ -32,9 +32,9 @@ function M.hlslens()
     cmd([[com! HlSearchLensToggle lua require('hlslens').toggle()]])
 
     map('n', 'n',
-        [[<Cmd>lua vim.cmd('norm! ' .. vim.v.count1 .. 'nzv') require('hlslens').start()<CR>]])
+        [[<Cmd>execute('norm! ' . v:count1 . 'nzv')<CR><Cmd>lua require('hlslens').start()<CR>]])
     map('n', 'N',
-        [[<Cmd>lua vim.cmd('norm! ' .. vim.v.count1 .. 'Nzv') require('hlslens').start()<CR>]])
+        [[<Cmd>execute('norm! ' . v:count1 . 'Nzv')<CR><Cmd>lua require('hlslens').start()<CR>]])
     map('', '*', [[<Plug>(asterisk-z*)<Cmd>lua require('hlslens').start()<CR>]], {})
     map('', '#', [[<Plug>(asterisk-z#)<Cmd>lua require('hlslens').start()<CR>]], {})
     map('', 'g*', [[<Plug>(asterisk-gz*)<Cmd>lua require('hlslens').start()<CR>]], {})
@@ -82,10 +82,11 @@ function M.visualmulti()
     map('n', 'g/', '<Cmd>VMSearch<CR>')
 
     cmd([[
-        aug VMlens
+        aug VisualMulti
             au!
-            au User visual_multi_start lua require('plugs.vmlens').start()
-            au User visual_multi_exit lua require('plugs.vmlens').exit()
+            au User visual_multi_start lua require('plugs.vm').start()
+            au User visual_multi_exit lua require('plugs.vm').exit()
+            au User visual_multi_mappings lua require('plugs.vm').mappings()
         aug END
     ]])
 end
@@ -118,7 +119,7 @@ function M.grepper()
         highlight = 0,
         stop = 10000,
         rg = {
-            grepprg = 'rg -H --no-heading --vimgrep --smart-case',
+            grepprg = 'rg -H --no-heading --vimgrep --smart-case $* .',
             grepformat = '%f:%l:%c:%m,%f:%l:%m'
         }
     }
@@ -135,7 +136,7 @@ function M.grepper()
         'bo cope'))
 
     -- if fn.executable('rg') then
-    --     vim.bo.grepprg = [[rg\ --vimgrep\ --no-heading\ --smart-case]]
+    --     vim.bo.grepprg = [[rg --vimgrep --no-heading --smart-case $* .]]
     --     vim.o.grepprg = vim.bo.grepprg
     --     vim.o.grepformat = [[%f:%l:%c:%m,%f:%l:%m]]
     -- end
@@ -277,29 +278,6 @@ function M.neoformat()
     -- sql
     g.neoformat_enabled_sql = {'sqlformatter'}
     g.neoformat_sql_sqlformatter = {exe = 'sql-formatter', stdin = 1}
-
-    cmd([[
-        aug GoFormat
-            au!
-            au FileType go setl noexpandtab
-        aug end
-
-        aug SqlFormat
-            au!
-            au FileType sql setl tabstop=2 shiftwidth=2
-        aug end
-
-        aug MakeFileFormat
-            au!
-            au FileType make setl noexpandtab
-        aug end
-
-        aug PrettierFormat
-            au!
-            au FileType javascript,typescript,json setl noexpandtab
-            au FileType yaml setl tabstop=2 shiftwidth=2
-        aug end
-    ]])
 end
 
 function M.slime()

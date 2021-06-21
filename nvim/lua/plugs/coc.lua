@@ -10,12 +10,12 @@ local diag_qfid
 local function setup()
     diag_qfid = -1
 
-    -- https://github.com/neoclide/coc.nvim/issues/2853
-    fn['coc#config']('snippets', {ultisnips = {enable = true}})
-    fn['CocActionAsync']('deactivateExtension', 'coc-snippets')
-
-    fn['coc#config']('languageserver.lua.settings.Lua.workspace',
-        {library = {[vim.env.VIMRUNTIME .. '/lua'] = true}})
+    fn['coc#config']('languageserver.lua.settings.Lua.workspace', {
+        library = {
+            [vim.env.VIMRUNTIME .. '/lua'] = true,
+            [vim.env.VIMRUNTIME .. '/lua/treesitter'] = true
+        }
+    })
 
     cmd([[
         aug Coc
@@ -25,7 +25,6 @@ local function setup()
             au CursorHold * sil! call CocActionAsync('highlight', '', v:lua.require('plugs.coc').hl_fallback)
             au User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
             au VimLeavePre * if get(g:, 'coc_process_pid', 0) | call system('kill -9 -- -' . g:coc_process_pid) | endif
-            au InsertCharPre * lua require('plugs.coc').enable_ultisnips()
         aug END
     ]])
 
@@ -37,17 +36,17 @@ local function setup()
 
     map('i', '<C-space>', 'coc#refresh()', {noremap = true, expr = true, silent = true})
     map('n', '<C-f>', [[coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"]],
-        {noremap = true, expr = true})
+        {noremap = true, expr = true, silent = true})
     map('n', '<C-b>', [[coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"]],
-        {noremap = true, expr = true})
+        {noremap = true, expr = true, silent = true})
     map('v', '<C-f>', [[coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"]],
-        {noremap = true, expr = true})
+        {noremap = true, expr = true, silent = true})
     map('v', '<C-b>', [[coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"]],
-        {noremap = true, expr = true})
+        {noremap = true, expr = true, silent = true})
     map('i', '<C-f>', [[coc#float#has_scroll() ? "\<C-r>=coc#float#scroll(1)\<cr>" : "\<Right>"]],
-        {noremap = true, expr = true})
+        {noremap = true, expr = true, silent = true})
     map('i', '<C-b>', [[coc#float#has_scroll() ? "\<C-r>=coc#float#scroll(0)\<cr>" : "\<Left>"]],
-        {noremap = true, expr = true})
+        {noremap = true, expr = true, silent = true})
 
     map('n', '[d', '<Plug>(coc-diagnostic-prev)', {})
     map('n', ']d', '<Plug>(coc-diagnostic-next)', {})
@@ -59,41 +58,22 @@ local function setup()
 
     map('n', 'K', [[<Cmd>lua require('plugs.coc').show_documentation()<CR>]])
 
-    map('n', '<Leader>rn', '<Plug>(coc-refactor)', {})
-    map('n', '<Leader>ac', '<Plug>(coc-codeaction)', {})
-    map('n', '<M-CR>', '<Plug>(coc-codeaction-line)', {})
-    map('x', '<M-CR>', '<Plug>(coc-codeaction-selected)', {})
-    map('n', '<Leader>qf', '<Plug>(coc-fix-current)', {})
+    map('n', '<Leader>ac', [[<Cmd>lua require('plugs.coc').code_action('')<CR>]])
+    map('n', '<M-CR>', [[<Cmd>lua require('plugs.coc').code_action('line')<CR>]])
+    map('x', '<M-CR>', [[:<C-u>lua require('plugs.coc').code_action(vim.fn.visualmode())<CR>]])
 
-    map('x', 'if', [[:<C-u>lua require('plugs.coc').textobj('func', true, true)<CR>]])
-    map('x', 'af', [[:<C-u>lua require('plugs.coc').textobj('func', false, true)<CR>]])
-    map('o', 'if', [[:<C-u>lua require('plugs.coc').textobj('func', true)<CR>]])
-    map('o', 'af', [[:<C-u>lua require('plugs.coc').textobj('func', false)<CR>]])
-
-    map('x', 'ik', [[:<C-u>lua require('plugs.coc').textobj('class', true, true)<CR>]])
-    map('x', 'ak', [[:<C-u>lua require('plugs.coc').textobj('class', false, true)<CR>]])
-    map('o', 'ik', [[:<C-u>lua require('plugs.coc').textobj('class', true)<CR>]])
-    map('o', 'ak', [[:<C-u>lua require('plugs.coc').textobj('class', false)<CR>]])
-
-    map('x', '<Leader>sr',
-        [[<Cmd>lua require('plugs.coc').enable_ultisnips()<CR><Plug>(coc-snippets-select)]], {})
+    map('x', '<Leader>sr', '<Plug>(coc-snippets-select)', {})
     map('x', '<Leader>sx', '<Plug>(coc-convert-snippet)', {})
 
-    cmd([[com! -nargs=0 OR call CocAction('runcom', 'editor.action.organizeImport')]])
-    map('n', '<Leader>qi', '<Cmd>OR<CR>')
+    map('n', '<Leader>qi', [[<Cmd>lua require('plugs.coc').organize_import()<CR>]])
     map('n', '<M-q>', [[<Cmd>echo CocAction('getCurrentFunctionSymbol')<CR>]])
     map('n', '<Leader>qd', [[<Cmd>lua require('plugs.coc').diagnostic()<CR>]])
+
+    map('i', '<C-l>', [[<Cmd>lua require('plugs.coc').complete_accpet()<CR>]])
 
     cmd([[com! -nargs=0 DiagnosticToggleBuffer call CocAction('diagnosticToggleBuffer')]])
     cmd([[com! -nargs=0 CocOutput CocCommand workspace.showOutput]])
     map('n', '<Leader>sh', '<Cmd>CocCommand clangd.switchSourceHeader<CR>')
-end
-
-function M.enable_ultisnips()
-    fn.CocAction('activeExtension', 'coc-snippets')
-    map('x', '<Leader>sr', '<Plug>(coc-snippets-select)', {})
-    cmd('au! Coc InsertCharPre *')
-    M.enable_ultisnips = nil
 end
 
 function M.go2def()
@@ -138,7 +118,7 @@ function M.show_documentation()
     if ft == 'vim' or ft == 'help' then
         cmd(('sil! h %s'):format(fn.expand('<cword>')))
     elseif api.nvim_eval([[CocAction('hasProvider', 'hover')]]) then
-        fn['CocActionAsync']('doHover')
+        fn.CocActionAsync('doHover')
     else
         cmd('norm! K')
     end
@@ -154,7 +134,7 @@ function M.diagnostic_change()
 end
 
 function M.diagnostic(winid, nr, keep)
-    fn['CocActionAsync']('diagnosticList', '', function(err, res)
+    fn.CocActionAsync('diagnosticList', '', function(err, res)
         if err == vim.NIL then
             local items, loc_ranges = {}, {}
             for _, d in ipairs(res) do
@@ -251,25 +231,65 @@ function M.hl_fallback()
     hl_fb_tbl = {m_id, winid}
 end
 
-function M.textobj(obj, inner, visual)
-    local symbols = {func = {'Method', 'Function'}, class = {'Interface', 'Struct', 'Class'}}
+function M.a2sync(action, args, time)
     local done = false
-    local err
-    fn['CocActionAsync']('selectSymbolRange', inner, visual and fn.visualmode() or '', symbols[obj],
-        function(e)
-            if e ~= vim.NIL then
-                err = true
-            end
-            done = true
-        end)
-    if not vim.wait(3200, function()
-        return done
-    end) or err then
-        if obj == 'func' then
-            obj = 'function'
+    local err = false
+    local res = ''
+    args = args or {''}
+    table.insert(args, function(e, r)
+        if e ~= vim.NIL then
+            err = true
         end
-        require('nvim-treesitter.textobjects.select').select_textobject(
-            ('@%s.%s'):format(obj, inner and 'inner' or 'outer'), visual and 'x' or 'o')
+        if r ~= vim.NIL then
+            res = r
+        end
+        done = true
+    end)
+    fn.CocActionAsync(action, unpack(args))
+    local wait_ret = vim.wait(time or 1000, function()
+        return done
+    end)
+    err, res = wait_ret and err, wait_ret and res or 'timeout'
+    return err, res
+end
+
+function M.code_action(...)
+    local actions = fn.CocAction('codeActions')
+    local argv = {...}
+    if #argv == 0 then
+        return actions
+    end
+    if #actions > 0 then
+        fn.CocActionAsync('codeAction', unpack(argv))
+    else
+        utils.cool_echo('No codeAction', 'WarningMsg')
+    end
+end
+
+function M.organize_import()
+    local err, ret = M.a2sync('organizeImport', {}, 1000)
+    if err then
+        if ret == 'timeout' then
+            utils.cool_echo('organizeImport timeout', 'ErrorMsg')
+        else
+            utils.cool_echo('No action for organizeImport', 'WarningMsg')
+        end
+    end
+end
+
+function M.complete_accpet()
+    local mode = api.nvim_get_mode().mode
+    if mode == 'i' then
+        -- C-l = 0x0c
+        api.nvim_feedkeys(('%c'):format(0x0c), 'n', false)
+    elseif mode == 'ic' and fn.pumvisible() == 1 then
+        local ei_bak = vim.o.ei
+        vim.o.ei = 'CompleteDone'
+        vim.schedule(function()
+            vim.o.ei = ei_bak
+        end)
+        -- C-y = 0x19
+        api.nvim_feedkeys(('%c'):format(0x19), 'n', false)
     end
 end
 

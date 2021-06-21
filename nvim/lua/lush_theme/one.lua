@@ -45,12 +45,12 @@ local theme = lush(function()
         -- EndOfBuffer {}, --
         TermCursor {fg = black1, bg = blue2}, --
         -- TermCursorNC {}, --
-        ErrorMsg {fg = red1}, --
+        ErrorMsg {fg = red2}, --
         VertSplit {fg = mono3}, --
         Folded {fg = white1, bg = mono3}, --
         FoldColumn {fg = mono2, bg = black1}, --
         SignColumn {bg = black1}, --
-        IncSearch {fg = yellow1, bg = black1, gui = 'reverse'}, --
+        IncSearch {fg = black1, bg = yellow1}, --
         -- Substitute {}, --
         LineNr {fg = mono2}, --
         CursorLineNr {fg = white1, bg = black2}, --
@@ -64,9 +64,9 @@ local theme = lush(function()
         -- NormalFloat {}, --
         -- NormalNC {}, --
         Pmenu {fg = white1, bg = mono4}, --
-        PmenuSel {fg = white1, bg = mono2}, --
+        PmenuSel {fg = white1, bg = blue4}, --
         PmenuSbar {bg = black1}, --
-        PmenuThumb {bg = white1}, --
+        PmenuThumb {bg = mono1}, --
         Question {fg = blue1}, --
         QuickFixLine {bg = blue3, gui = 'bold'}, --
         Search {fg = black1, bg = yellow2}, --
@@ -83,7 +83,7 @@ local theme = lush(function()
         Title {fg = white1, gui = 'bold'}, --
         Visual {bg = mono3}, --
         -- VisualNOS {}, --
-        WarningMsg {fg = red1}, --
+        WarningMsg {fg = yellow2}, --
         Whitespace {SpecialKey}, --
         WildMenu {fg = white1, bg = mono1}, --
         --

@@ -66,7 +66,7 @@ local function setup()
     local log_dir = fn.stdpath('cache')
     fn.mkdir(log_dir, 'p')
     levels = {TRACE = 0, DEBUG = 1, INFO = 2, WARN = 3, ERROR = 4}
-    level_default = 3
+    level_default = 2
     M.set_level(vim.env.KVNVIM_LOG)
 
     log_file = table.concat({log_dir, 'kvnvim.log'}, path_sep())

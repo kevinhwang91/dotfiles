@@ -26,8 +26,7 @@ end
 local function setup()
     _G.p = kprint
     local log = require('log')
-    log.set_level('debug')
-    _G.ldebug = log.debug
+    _G.info = log.info
 end
 
 function M.reload_module(m_name)

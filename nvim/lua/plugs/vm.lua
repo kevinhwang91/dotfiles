@@ -1,5 +1,7 @@
 local M = {}
-local hlslens = require('hlslens')
+local api = vim.api
+
+local hlslens
 local config
 local lens_backup
 
@@ -18,8 +20,14 @@ local override_lens = function(render, plist, nearest, idx, r_idx)
     render.set_virt(0, lnum - 1, col - 1, chunks, nearest)
 end
 
+local function setup()
+    local ok, msg = pcall(require, 'hlslens')
+    if ok then
+        hlslens = msg
+    end
+end
+
 function M.start()
-    vim.api.nvim_buf_set_keymap(0, 'n', 'n', '<C-n>', {silent = true})
     if hlslens then
         config = require('hlslens.config')
         lens_backup = config.override_lens
@@ -29,11 +37,18 @@ function M.start()
 end
 
 function M.exit()
-    vim.api.nvim_buf_del_keymap(0, 'n', 'n')
     if hlslens then
         config.override_lens = lens_backup
         hlslens.start()
     end
 end
+
+function M.mappings()
+    api.nvim_buf_set_keymap(0, 'n', 'n', '<C-n>', {silent = true})
+    api.nvim_buf_set_keymap(0, 'i', '<CR>', [[pumvisible() ? "\<C-y>" : "\<Plug>(VM-I-Return)"]],
+        {expr = true})
+end
+
+setup()
 
 return M

@@ -51,7 +51,12 @@ return require('packer').startup({
             requires = {{'haya14busa/vim-asterisk'}}
         }
 
-        use {'Krasjet/auto-pairs', event = 'InsertEnter', config = [[vim.fn['AutoPairsTryInit']()]]}
+        use {
+            'Krasjet/auto-pairs',
+            event = 'InsertEnter',
+            setup = [[vim.g.AutoPairsCenterLine = 0]],
+            config = [[vim.fn['AutoPairsTryInit']()]]
+        }
 
         use {
             'tpope/vim-surround',
@@ -146,7 +151,7 @@ return require('packer').startup({
 
         use {'editorconfig/editorconfig-vim'}
 
-        use {'honza/vim-snippets', opt = false}
+        use {'kevinhwang91/friendly-snippets', opt = false}
 
         use {'pseewald/vim-anyfold', cmd = 'AnyFoldActivate'}
 

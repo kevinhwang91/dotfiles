@@ -3,7 +3,6 @@ local cmd = vim.cmd
 local fn = vim.fn
 local api = vim.api
 
--- local parsers = require('nvim-treesitter.parsers')
 local utils = require('kutils')
 
 local bl_ft
@@ -15,7 +14,7 @@ local function setup()
     vim.g.anyfold_motion = 0
 
     bl_ft = {'', 'man', 'markdown', 'git'}
-    anyfold_prefer_ft = {'python'}
+    anyfold_prefer_ft = {'vim'}
     cmd([[
         aug FoldLoad
             au!
@@ -43,29 +42,29 @@ local function find_win_except_float(bufnr)
     return winid
 end
 
-function M.do_fold()
-    local ret = false
-    local fsize
-    local filename = api.nvim_buf_get_name(0)
-    if vim.tbl_contains(anyfold_prefer_ft, vim.bo.ft) then
-        fsize = fn.getfsize(filename)
-        if 0 < fsize and fsize < 524288 then
-            cmd('AnyFoldActivate')
-            ret = true
-        end
+local function use_anyfold(filename)
+    local fsize = fn.getfsize(filename)
+    if 0 < fsize and fsize < 524288 then
+        cmd('AnyFoldActivate')
     end
-    if not ret then
-        -- nvim_treesitter#foldexpr() format may block
-        -- if parsers.has_parser() then
-        --     vim.wo.foldmethod = 'expr'
-        --     vim.wo.foldexpr = 'nvim_treesitter#foldexpr()'
-        -- elseif not fsize then
-        if not fsize then
-            fsize = fn.getfsize(filename)
-            if 0 < fsize and fsize < 524288 then
-                cmd('AnyFoldActivate')
+end
+
+function M.do_fold()
+    local filename = api.nvim_buf_get_name(0)
+    if vim.g.coc_service_initialized == 1 and not vim.tbl_contains(anyfold_prefer_ft, vim.bo.ft) then
+        fn.CocActionAsync('hasProvider', 'foldingRange', function(e, r)
+            if e == vim.NIL and r then
+                fn.CocActionAsync('fold', '', function(e1, r1)
+                    if e1 ~= vim.NIL or not r1 then
+                        use_anyfold(filename)
+                    end
+                end)
+            else
+                use_anyfold(filename)
             end
-        end
+        end)
+    else
+        use_anyfold(filename)
     end
     vim.wo.foldenable = true
     vim.wo.foldlevel = 99
@@ -117,7 +116,7 @@ function M.foldtext()
     local gutter_size = fn.screenpos(0, api.nvim_win_get_cursor(0)[1], 1).curscol -
                             fn.win_screenpos(0)[2]
     local width = api.nvim_win_get_width(0) - gutter_size
-    local fold_info = (' %d lines %s'):format(1 + fe - fs, (' + '):rep(vim.v.foldlevel))
+    local fold_info = (' %d lines %s +- '):format(1 + fe - fs, vim.v.foldlevel)
     local spaces = pad:rep(width - #fold_info - api.nvim_strwidth(fs_line))
     return fs_line .. spaces .. fold_info
 end

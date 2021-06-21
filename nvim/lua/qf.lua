@@ -61,18 +61,22 @@ function M.close()
         if qf_winid == 0 then
             cmd('lcl')
         else
-            local prompt = ' ( [q]uickfix,[l]ocation )? '
+            local prompt = ' [q]uickfix, [l]ocation ? '
             local bufnr = api.nvim_create_buf(false, true)
-            api.nvim_open_win(bufnr, false, {
+            local winid = api.nvim_open_win(bufnr, false, {
                 relative = 'cursor',
                 width = #prompt,
                 height = 1,
                 row = 1,
                 col = 1,
                 style = 'minimal',
-                border = 'single'
+                border = 'single',
+                noautocmd = true
             })
             api.nvim_buf_set_lines(bufnr, 0, 1, false, {prompt})
+            -- (?<=\[)[^\[\]](?=\]) to \%(\[\)\@<=[^[\]]\%(\]\)\@=]== with E2v
+            -- I know \zs and \ze also work, but I prefer PCRE than vim regex
+            fn.matchadd('MatchParen', [==[\%(\[\)\@<=[^[\]]\%(\]\)\@=]==], 10, -1, {window = winid})
             vim.schedule(function()
                 local char = fn.getchar()
                 if type(char) == 'number' then
@@ -86,12 +90,6 @@ function M.close()
                 cmd(('noa bw %d'):format(bufnr))
             end)
         end
-    end
-end
-
-function M.detect_bt()
-    if vim.v.option_new == 'quickfix' then
-        git.cd_root(fn.bufname('#'), true)
     end
 end
 

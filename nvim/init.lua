@@ -6,7 +6,6 @@ local map = require('remap').map
 
 -- source filetype.vim later
 g.did_load_filetypes = 1
-cmd('syntax enable')
 
 wo.nu = true
 wo.rnu = true
@@ -49,7 +48,7 @@ o.title = true
 o.titlestring = '%(%m%)%(%{expand(\"%:~\")}%)'
 o.lazyredraw = true
 o.inccommand = 'nosplit'
-o.shortmess = o.shortmess .. 'acIS'
+o.shortmess = o.shortmess .. 'acsIS'
 o.confirm = true
 o.jumpoptions = 'stack'
 o.diffopt = o.diffopt .. ',vertical,internal,algorithm:patience'
@@ -153,8 +152,8 @@ map('x', 'd', '<C-d>')
 map('n', 'u', '<C-u>')
 map('x', 'u', '<C-u>')
 map('n', '<C-u>', 'u')
-map('n', 'k', [[(v:count > 1 ? "m'" . v:count : '') . 'k']], {noremap = true, expr = true})
-map('n', 'j', [[(v:count > 1 ? "m'" . v:count : '') . 'j']], {noremap = true, expr = true})
+map('n', 'k', [[(v:count > 1 ? 'm`' . v:count : '') . 'k']], {noremap = true, expr = true})
+map('n', 'j', [[(v:count > 1 ? 'm`' . v:count : '') . 'j']], {noremap = true, expr = true})
 
 map('n', [[']], [[`]])
 map('x', [[']], [[`]])
@@ -162,15 +161,6 @@ map('o', [[']], [[`]])
 map('n', [[`]], [[']])
 map('x', [[`]], [[']])
 map('o', [[`]], [[']])
-map('n', [[g']], [[g`]])
-map('x', [[g']], [[g`]])
-map('o', [[g']], [[g`]])
-map('n', [[g`]], [[g']])
-map('x', [[g`]], [[g']])
-map('n', [[m']], [[m`]])
-map('x', [[m']], [[m`]])
-map('n', [[m`]], [[m']])
-map('x', [[m`]], [[m']])
 
 map('n', [['0]], [[<Cmd>norm! `0<CR><Cmd>sil! CleanEmptyBuf<CR>]])
 map('n', '<Leader>i', '<Cmd>sil! norm! `^<CR>')
@@ -214,8 +204,18 @@ map('x', 'z', [[v:lua._G.prefix_timeout('z')]], {noremap = true, expr = true})
 map('n', 'z[', [[<Cmd>lua require('kutils').nav_fold(false, vim.v.count1)<CR>]])
 map('n', 'z]', [[<Cmd>lua require('kutils').nav_fold(true, vim.v.count1)<CR>]])
 
-map('x', 'iz', [[:<C-U>keepj norm [zv]zg_<CR>]])
+map('x', 'iz', [[:<C-u>keepj norm [zv]zg_<CR>]])
 map('o', 'iz', [[:norm viz<CR>]])
+
+map('x', 'if', [[:<C-u>lua require('plugs.textobj').action('func', true, true)<CR>]])
+map('x', 'af', [[:<C-u>lua require('plugs.textobj').action('func', false, true)<CR>]])
+map('o', 'if', [[:<C-u>lua require('plugs.textobj').action('func', true)<CR>]])
+map('o', 'af', [[:<C-u>lua require('plugs.textobj').action('func', false)<CR>]])
+
+map('x', 'ik', [[:<C-u>lua require('plugs.textobj').action('class', true, true)<CR>]])
+map('x', 'ak', [[:<C-u>lua require('plugs.textobj').action('class', false, true)<CR>]])
+map('o', 'ik', [[:<C-u>lua require('plugs.textobj').action('class', true)<CR>]])
+map('o', 'ak', [[:<C-u>lua require('plugs.textobj').action('class', false)<CR>]])
 
 -- https://github.com/neovim/neovim/issues/13862
 function _G.yank()
@@ -452,10 +452,34 @@ cmd([[
 
 map('n', '<Leader>jj', '<Cmd>Jumps<CR>')
 
+cmd([[
+    aug GoFormat
+        au!
+        au FileType go setl noexpandtab
+    aug end
+
+    aug SqlFormat
+        au!
+        au FileType sql setl tabstop=2 shiftwidth=2
+    aug end
+
+    aug MakeFileFormat
+        au!
+        au FileType make setl noexpandtab
+    aug end
+
+    aug PrettierFormat
+        au!
+        au FileType javascript,typescript,json setl noexpandtab
+        au FileType yaml setl tabstop=2 shiftwidth=2
+    aug end
+]])
+
 require('plugs.manual')
 
 vim.schedule(function()
     vim.defer_fn(function()
+        cmd('syntax enable')
         require('plugs.treesitter')
         cmd([[
             unlet g:did_load_filetypes
@@ -484,11 +508,11 @@ vim.schedule(function()
     end, 200)
 
     vim.defer_fn(function()
-        require('plugs.fold')
-    end, 500)
-
-    vim.defer_fn(function()
-        cmd('pa tmux-complete.vim')
+        -- cmd('pa tmux-complete.vim')
         cmd('pa coc.nvim')
     end, 1000)
+
+    vim.defer_fn(function()
+        require('plugs.fold')
+    end, 1500)
 end)

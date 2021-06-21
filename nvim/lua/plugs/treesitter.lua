@@ -5,13 +5,29 @@ local fn = vim.fn
 local map = require('remap').map
 
 local do_sy_tbl = {}
+local queries
 
 local function setup()
     local conf = {
-        ensure_installed = 'maintained',
-        highlight = {enable = true, disable = {'bash'}},
+        ensure_installed = {
+            'bash', 'cpp', 'css', 'cuda', 'dart', 'dockerfile', 'go', 'gomod', 'html', 'java',
+            'javascript', 'jsdoc', 'json', 'jsonc', 'julia', 'kotlin', 'lua', 'php', 'python',
+            'query', 'ruby', 'rust', 'scss', 'teal', 'toml', 'tsx', 'typescript', 'vue', 'yaml',
+            'zig'
+        },
+
+        highlight = {enable = true, disable = {'bash', 'python'}},
         textobjects = {
-            select = {enable = true, keymaps = {['ia'] = '@parameter.inner'}},
+            select = {
+                enable = true,
+                keymaps = {
+                    ['ia'] = '@parameter.inner'
+                    -- ['af'] = '@function.outer',
+                    -- ['if'] = '@function.inner',
+                    -- ['ac'] = '@class.outer',
+                    -- ['ic'] = '@class.inner'
+                }
+            },
             move = {
                 enable = true,
                 goto_next_start = {[']m'] = '@function.outer'},
@@ -44,6 +60,17 @@ local function setup()
             do_sy_tbl[lang] = true
         end
     end
+    queries = require 'nvim-treesitter.query'
+end
+
+function M.do_textobject(obj, inner, visual)
+    local ret = false
+    if queries.has_query_files(vim.bo.ft, 'textobjects') then
+        require('nvim-treesitter.textobjects.select').select_textobject(
+            ('@%s.%s'):format(obj, inner and 'inner' or 'outer'), visual and 'x' or 'o')
+        ret = true
+    end
+    return ret
 end
 
 function M.hijack_synset()
