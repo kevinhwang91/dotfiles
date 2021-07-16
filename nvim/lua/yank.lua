@@ -7,16 +7,6 @@ local last_wv
 local winid
 local bufnr
 
--- TODO, under test
-local function setup()
-    cmd([[
-        aug TextYank
-            au!
-            au TextYankPost * lua require('yank').restore()
-        aug END
-    ]])
-end
-
 function M.wrap()
     if api.nvim_get_mode().mode == 'n' then
         M.set_wv()
@@ -46,6 +36,15 @@ function M.restore()
     M.clear_wv()
 end
 
-setup()
+local function init()
+    cmd([[
+        aug TextYank
+            au!
+            au TextYankPost * lua require('yank').restore()
+        aug END
+    ]])
+end
+
+init()
 
 return M

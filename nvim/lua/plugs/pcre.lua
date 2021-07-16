@@ -28,14 +28,15 @@ function M.search_all(pattern, bufnr)
         end
         j = j + 1
     end
-    ldebug('find')
+
+    info('find')
     -- local text = table.concat(lines, '\n')
     -- rex.gsub(text, pattern, '', function(s, e, _)
     --     table.insert(pos, {s, e})
     --     return false, false
     -- end)
-    -- ldebug('gsub')
-    ldebug(vim.loop.hrtime() - start)
+    -- info('gsub')
+    info(vim.loop.hrtime() - start)
     return pos
 end
 

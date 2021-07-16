@@ -7,75 +7,6 @@ local map = require('remap').map
 local utils = require('kutils')
 local diag_qfid
 
-local function setup()
-    diag_qfid = -1
-
-    fn['coc#config']('languageserver.lua.settings.Lua.workspace', {
-        library = {
-            [vim.env.VIMRUNTIME .. '/lua'] = true,
-            [vim.env.VIMRUNTIME .. '/lua/treesitter'] = true
-        }
-    })
-
-    cmd([[
-        aug Coc
-            au!
-            au User CocLocationsChange ++nested lua require('plugs.coc').jump2loc()
-            au User CocDiagnosticChange ++nested lua require('plugs.coc').diagnostic_change()
-            au CursorHold * sil! call CocActionAsync('highlight', '', v:lua.require('plugs.coc').hl_fallback)
-            au User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
-            au VimLeavePre * if get(g:, 'coc_process_pid', 0) | call system('kill -9 -- -' . g:coc_process_pid) | endif
-        aug END
-    ]])
-
-    cmd('hi! link CocHighlightText CurrentWord')
-    if vim.g.colors_name == 'one' then
-        cmd('hi! CocErrorSign guifg=#be5046')
-        cmd('hi! CocWarningSign guifg=#e5c07b')
-    end
-
-    map('i', '<C-space>', 'coc#refresh()', {noremap = true, expr = true, silent = true})
-    map('n', '<C-f>', [[coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"]],
-        {noremap = true, expr = true, silent = true})
-    map('n', '<C-b>', [[coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"]],
-        {noremap = true, expr = true, silent = true})
-    map('v', '<C-f>', [[coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"]],
-        {noremap = true, expr = true, silent = true})
-    map('v', '<C-b>', [[coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"]],
-        {noremap = true, expr = true, silent = true})
-    map('i', '<C-f>', [[coc#float#has_scroll() ? "\<C-r>=coc#float#scroll(1)\<cr>" : "\<Right>"]],
-        {noremap = true, expr = true, silent = true})
-    map('i', '<C-b>', [[coc#float#has_scroll() ? "\<C-r>=coc#float#scroll(0)\<cr>" : "\<Left>"]],
-        {noremap = true, expr = true, silent = true})
-
-    map('n', '[d', '<Plug>(coc-diagnostic-prev)', {})
-    map('n', ']d', '<Plug>(coc-diagnostic-next)', {})
-
-    map('n', 'gd', [[<Cmd>lua require('plugs.coc').go2def()<CR>]])
-    map('n', 'gy', '<Plug>(coc-type-definition)', {})
-    map('n', 'gi', '<Plug>(coc-implementation)', {})
-    map('n', 'gr', '<Plug>(coc-references)', {})
-
-    map('n', 'K', [[<Cmd>lua require('plugs.coc').show_documentation()<CR>]])
-
-    map('n', '<Leader>ac', [[<Cmd>lua require('plugs.coc').code_action('')<CR>]])
-    map('n', '<M-CR>', [[<Cmd>lua require('plugs.coc').code_action('line')<CR>]])
-    map('x', '<M-CR>', [[:<C-u>lua require('plugs.coc').code_action(vim.fn.visualmode())<CR>]])
-
-    map('x', '<Leader>sr', '<Plug>(coc-snippets-select)', {})
-    map('x', '<Leader>sx', '<Plug>(coc-convert-snippet)', {})
-
-    map('n', '<Leader>qi', [[<Cmd>lua require('plugs.coc').organize_import()<CR>]])
-    map('n', '<M-q>', [[<Cmd>echo CocAction('getCurrentFunctionSymbol')<CR>]])
-    map('n', '<Leader>qd', [[<Cmd>lua require('plugs.coc').diagnostic()<CR>]])
-
-    map('i', '<C-l>', [[<Cmd>lua require('plugs.coc').complete_accpet()<CR>]])
-
-    cmd([[com! -nargs=0 DiagnosticToggleBuffer call CocAction('diagnosticToggleBuffer')]])
-    cmd([[com! -nargs=0 CocOutput CocCommand workspace.showOutput]])
-    map('n', '<Leader>sh', '<Cmd>CocCommand clangd.switchSourceHeader<CR>')
-end
-
 function M.go2def()
     local cur_bufnr = api.nvim_get_current_buf()
     local by
@@ -280,19 +211,88 @@ end
 function M.complete_accpet()
     local mode = api.nvim_get_mode().mode
     if mode == 'i' then
-        -- C-l = 0x0c
-        api.nvim_feedkeys(('%c'):format(0x0c), 'n', false)
+        api.nvim_feedkeys(api.nvim_replace_termcodes('<C-l>', true, false, true), 'n', false)
     elseif mode == 'ic' and fn.pumvisible() == 1 then
         local ei_bak = vim.o.ei
         vim.o.ei = 'CompleteDone'
         vim.schedule(function()
             vim.o.ei = ei_bak
         end)
-        -- C-y = 0x19
-        api.nvim_feedkeys(('%c'):format(0x19), 'n', false)
+        api.nvim_feedkeys(api.nvim_replace_termcodes('<C-y>', true, false, true), 'n', false)
+        if fn.pumvisible() == 1 then
+            fn.CocActionAsync('stopCompletion')
+        end
     end
 end
 
-setup()
+local function init()
+    diag_qfid = -1
+
+    fn['coc#config']('languageserver.lua.settings.Lua.workspace',
+        {library = {[vim.env.VIMRUNTIME .. '/lua'] = true}})
+
+    fn['coc#config']('snippets', {textmateSnippetsRoots = {fn.stdpath('config') .. '/snippets'}})
+    fn.CocActionAsync('reloadExtension', 'coc-snippets')
+
+    cmd([[
+        aug Coc
+            au!
+            au User CocLocationsChange ++nested lua require('plugs.coc').jump2loc()
+            au User CocDiagnosticChange ++nested lua require('plugs.coc').diagnostic_change()
+            au CursorHold * sil! call CocActionAsync('highlight', '', v:lua.require('plugs.coc').hl_fallback)
+            au User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
+            au VimLeavePre * if get(g:, 'coc_process_pid', 0) | call system('kill -9 -- -' . g:coc_process_pid) | endif
+        aug END
+    ]])
+
+    cmd('hi! link CocHighlightText CurrentWord')
+    if vim.g.colors_name == 'one' then
+        cmd('hi! CocErrorSign guifg=#be5046')
+        cmd('hi! CocWarningSign guifg=#e5c07b')
+    end
+
+    map('i', '<C-space>', 'coc#refresh()', {noremap = true, expr = true, silent = true})
+    map('n', '<C-f>', [[coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"]],
+        {noremap = true, expr = true, silent = true})
+    map('n', '<C-b>', [[coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"]],
+        {noremap = true, expr = true, silent = true})
+    map('v', '<C-f>', [[coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"]],
+        {noremap = true, expr = true, silent = true})
+    map('v', '<C-b>', [[coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"]],
+        {noremap = true, expr = true, silent = true})
+    map('i', '<C-f>', [[coc#float#has_scroll() ? "\<C-r>=coc#float#scroll(1)\<cr>" : "\<Right>"]],
+        {noremap = true, expr = true, silent = true})
+    map('i', '<C-b>', [[coc#float#has_scroll() ? "\<C-r>=coc#float#scroll(0)\<cr>" : "\<Left>"]],
+        {noremap = true, expr = true, silent = true})
+
+    map('n', '[d', '<Plug>(coc-diagnostic-prev)', {})
+    map('n', ']d', '<Plug>(coc-diagnostic-next)', {})
+
+    map('n', 'gd', [[<Cmd>lua require('plugs.coc').go2def()<CR>]])
+    map('n', 'gy', '<Plug>(coc-type-definition)', {})
+    map('n', 'gi', '<Plug>(coc-implementation)', {})
+    map('n', 'gr', '<Plug>(coc-references)', {})
+
+    map('n', 'K', [[<Cmd>lua require('plugs.coc').show_documentation()<CR>]])
+
+    map('n', '<Leader>ac', [[<Cmd>lua require('plugs.coc').code_action('')<CR>]])
+    map('n', '<M-CR>', [[<Cmd>lua require('plugs.coc').code_action('line')<CR>]])
+    map('x', '<M-CR>', [[:<C-u>lua require('plugs.coc').code_action(vim.fn.visualmode())<CR>]])
+
+    map('x', '<Leader>s', '<Plug>(coc-snippets-select)', {})
+    map('n', '<Leader>so', '<Cmd>CocCommand snippets.openSnippetFiles<CR>')
+
+    map('n', '<Leader>qi', [[<Cmd>lua require('plugs.coc').organize_import()<CR>]])
+    map('n', '<M-q>', [[<Cmd>echo CocAction('getCurrentFunctionSymbol')<CR>]])
+    map('n', '<Leader>qd', [[<Cmd>lua require('plugs.coc').diagnostic()<CR>]])
+
+    map('i', '<C-l>', [[<Cmd>lua require('plugs.coc').complete_accpet()<CR>]])
+
+    cmd([[com! -nargs=0 DiagnosticToggleBuffer call CocAction('diagnosticToggleBuffer')]])
+    cmd([[com! -nargs=0 CocOutput CocCommand workspace.showOutput]])
+    map('n', '<Leader>sh', '<Cmd>CocCommand clangd.switchSourceHeader<CR>')
+end
+
+init()
 
 return M

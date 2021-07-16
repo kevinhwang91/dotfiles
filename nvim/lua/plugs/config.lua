@@ -12,6 +12,7 @@ function M.bqf()
 
     require('bqf').setup({
         auto_enable = true,
+        auto_resize_height = true,
         preview = {auto_preview = true},
         func_map = {split = '<C-s>'},
         filter = {fzf = {action_for = {['ctrl-s'] = 'split'}}}
@@ -182,6 +183,13 @@ function M.matchup()
     map('o', 'i5', '<Plug>(matchup-i%)', {})
     map('n', 'cs5', '<plug>(matchup-cs%)', {})
     map('n', 'sd5', '<plug>(matchup-ds%)', {})
+
+    cmd([[
+        aug Mathup
+            au!
+            autocmd TermOpen * let [b:matchup_matchparen_enabled, b:matchup_matchparen_fallback] = [0, 0]
+        aug END
+    ]])
 end
 
 function M.cycle()

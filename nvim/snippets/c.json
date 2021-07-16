@@ -1,0 +1,128 @@
+{
+	"for": {
+		"prefix": "for",
+		"body": ["for (${size_t} ${i} = ${1:0}; ${i} < ${2:length}; ${i}++) {", "\t$3", "}"],
+		"description": "Code snippet for 'for' loop"
+	},
+	"forr": {
+		"prefix": "forr",
+		"body": ["for (int ${i} = ${1:length} - 1; ${i} >= ${2:0}; ${i}--) {", "\t$3", "}"],
+		"description": "Code snippet for reverse 'for' loop"
+	},
+	"while": {
+		"prefix": "while",
+		"body": ["while ($1) {", "\t$2", "}"],
+		"description": ""
+	},
+	"if": {
+		"prefix": "if",
+		"body": ["if ($1) {", "\t$2", "}"],
+		"description": "Code snippet for if statement"
+	},
+	"else": {
+		"prefix": "else",
+		"body": ["else {", "\t$1", "}"],
+		"description": "Code snippet for else statement"
+	},
+	"else if": {
+		"prefix": "else if",
+		"body": ["else if ($1) {", "\t$2", "}"],
+		"description": "Code snippet for else-if statement"
+	},
+	"enum": {
+		"prefix": "enum",
+		"body": ["enum ${MyEnum} {", "\t$1", "};"],
+		"description": "Code snippet for enum"
+	},
+	"#ifdef": {
+		"prefix": "#ifdef",
+		"body": ["#ifdef ${DEBUG}", "$1", "#endif // ${DEBUG}"],
+		"description": "Code snippet for #ifdef"
+	},
+	"#ifndef": {
+		"prefix": "#ifndef",
+		"body": ["#ifndef ${1:1}", "$2", "#endif // !$1"],
+		"description": "Code snippet for #ifndef"
+	},
+	"#if": {
+		"prefix": "#if",
+		"body": ["#ifdef ${1:0}", "$2", "#endif // $1"],
+		"description": "Code snippet for #if"
+	},
+	"struct": {
+		"prefix": "struct",
+		"body": ["struct ${MyStruct} {", "\t$1", "};"],
+		"description": "Code snippet for struct"
+	},
+	"switch": {
+		"prefix": "switch",
+		"body": ["switch (${switch_on}) {", "default:", "\tbreak;$1", "}"],
+		"description": "Code snippet for switch statement"
+	},
+	"union": {
+		"prefix": "union",
+		"body": ["union ${MyUnion} {", "\t$1", "};"],
+		"description": "Code snippet for union"
+	},
+	"#inc": {
+		"prefix": "#inc",
+		"body": ["#include \"$1\""],
+		"description": "Code snippet for #include \" \""
+	},
+	"#inc<": {
+		"prefix": "#inc<",
+		"body": ["#include <$1>"],
+		"description": "Code snippet for #include \" \""
+	},
+	"#def": {
+		"prefix": "def",
+		"body": ["#define $1 $2 "],
+		"description": "Code snippet for #define \" \""
+	},
+	"Standard Starter Template": {
+		"prefix": "sst",
+		"body": ["#include <stdio.h>", "", "int main (int argc, char *argv[]) {", "\treturn 0;", "}"],
+		"description": "A standard starter template for a C program"
+	},
+	"Do...while loop": {
+		"prefix": "do",
+		"body": ["do {", "\t$0", "} while($0)"],
+		"description": "Creates a do...while loop"
+	},
+	"Create linked list": {
+		"prefix": "clist",
+		"body": [
+			"typedef struct node * Link;",
+			"typedef struct node node;",
+			"struct node {",
+			"\tint value;",
+			"\tLink next;",
+			"};"
+		],
+		"description": "Creates a linked list template"
+	},
+	"Create function": {
+		"prefix": "fun",
+		"body": ["${3:int} $1 () {", "\t${3:int} $2;", "\t$4", "\treturn $2;", "}"],
+		"description": "Creates a function that returns the type"
+	},
+	"Print variable": {
+		"prefix": "pf",
+		"body": ["printf(\"$1\\n\", $2);"],
+		"description": "Calls printf() to log value of variable of type"
+	},
+	"Allocate memory using calloc": {
+		"prefix": "cal",
+		"body": [
+			"$1*ptr = ($1*)calloc($2, sizeof($1));",
+			"",
+			"if (ptr == NULL) {",
+			"\tprintf(\"Memory allocation failed!\\n\");",
+			"\texit(0);",
+			"}",
+			"",
+			"free(ptr);"
+		],
+		"description": "Allocates memory to a pointer variable using calloc(), then deallocates using free()."
+	}
+}

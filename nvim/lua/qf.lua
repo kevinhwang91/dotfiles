@@ -47,11 +47,6 @@ function _G.qftf(info)
     return ret
 end
 
-local function setup()
-    vim.g.qf_disable_statusline = true
-    vim.o.qftf = 'v:lua._G.qftf'
-end
-
 function M.close()
     local loc_winid = fn.getloclist(0, {winid = 0}).winid
     if loc_winid == 0 then
@@ -93,6 +88,11 @@ function M.close()
     end
 end
 
-setup()
+local function init()
+    vim.g.qf_disable_statusline = true
+    vim.o.qftf = '{info -> v:lua._G.qftf(info)}'
+end
+
+init()
 
 return M

@@ -20,13 +20,6 @@ local override_lens = function(render, plist, nearest, idx, r_idx)
     render.set_virt(0, lnum - 1, col - 1, chunks, nearest)
 end
 
-local function setup()
-    local ok, msg = pcall(require, 'hlslens')
-    if ok then
-        hlslens = msg
-    end
-end
-
 function M.start()
     if hlslens then
         config = require('hlslens.config')
@@ -49,6 +42,13 @@ function M.mappings()
         {expr = true})
 end
 
-setup()
+local function init()
+    local ok, msg = pcall(require, 'hlslens')
+    if ok then
+        hlslens = msg
+    end
+end
+
+init()
 
 return M

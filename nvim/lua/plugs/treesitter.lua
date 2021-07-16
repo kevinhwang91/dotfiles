@@ -7,7 +7,24 @@ local map = require('remap').map
 local do_sy_tbl = {}
 local queries
 
-local function setup()
+function M.do_textobject(obj, inner, visual)
+    local ret = false
+    if queries.has_query_files(vim.bo.ft, 'textobjects') then
+        require('nvim-treesitter.textobjects.select').select_textobject(
+            ('@%s.%s'):format(obj, inner and 'inner' or 'outer'), visual and 'x' or 'o')
+        ret = true
+    end
+    return ret
+end
+
+function M.hijack_synset()
+    local ft = fn.expand('<amatch>')
+    if not do_sy_tbl[ft] then
+        vim.bo.syntax = ft
+    end
+end
+
+local function init()
     local conf = {
         ensure_installed = {
             'bash', 'cpp', 'css', 'cuda', 'dart', 'dockerfile', 'go', 'gomod', 'html', 'java',
@@ -16,7 +33,7 @@ local function setup()
             'zig'
         },
 
-        highlight = {enable = true, disable = {'bash', 'python'}},
+        highlight = {enable = true, disable = {'bash'}},
         textobjects = {
             select = {
                 enable = true,
@@ -63,23 +80,6 @@ local function setup()
     queries = require 'nvim-treesitter.query'
 end
 
-function M.do_textobject(obj, inner, visual)
-    local ret = false
-    if queries.has_query_files(vim.bo.ft, 'textobjects') then
-        require('nvim-treesitter.textobjects.select').select_textobject(
-            ('@%s.%s'):format(obj, inner and 'inner' or 'outer'), visual and 'x' or 'o')
-        ret = true
-    end
-    return ret
-end
-
-function M.hijack_synset()
-    local ft = fn.expand('<amatch>')
-    if not do_sy_tbl[ft] then
-        vim.bo.syntax = ft
-    end
-end
-
-setup()
+init()
 
 return M

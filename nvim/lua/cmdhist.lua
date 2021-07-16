@@ -52,26 +52,6 @@ local function list(file, limit)
     return #hist_list == 0 and {''} or hist_list
 end
 
-local function setup()
-    local data_dir = fn.stdpath('data')
-    fn.mkdir(data_dir, 'p')
-    db = data_dir .. '/cmdhist'
-    max = 100000
-    hist_bufs = {}
-    hist_bufs_size = 50
-    M.reload()
-
-    cmd([[
-        aug CmdlHist
-            au!
-            au CmdlineLeave : lua require('cmdhist').fire_leave()
-            au VimLeavePre,VimSuspend * lua require('cmdhist').flush()
-            au FocusLost * lua require('cmdhist').flush()
-            au FocusGained * lua require('cmdhist').enable_reload()
-        aug END
-    ]])
-end
-
 function M.reload()
     local hist_list = list(db, hist_bufs_size)
     for i = #hist_list, 1, -1 do
@@ -125,6 +105,27 @@ function M.fire_leave()
     end
 end
 
-setup()
+local function init()
+    local data_dir = fn.stdpath('data')
+    fn.mkdir(data_dir, 'p')
+    db = data_dir .. '/cmdhist'
+    max = 100000
+    hist_bufs = {}
+    hist_bufs_size = 50
+    M.reload()
+
+    cmd([[
+        aug CmdlHist
+            au!
+            au CmdlineLeave : lua require('cmdhist').fire_leave()
+            au VimLeavePre,VimSuspend * lua require('cmdhist').flush()
+            au FocusLost * lua require('cmdhist').flush()
+            au FocusGained * lua require('cmdhist').enable_reload()
+        aug END
+    ]])
+end
+
+
+init()
 
 return M

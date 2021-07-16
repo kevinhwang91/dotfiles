@@ -3,14 +3,6 @@ local fn = vim.fn
 local api = vim.api
 local uv = vim.loop
 
-local function setup()
-    _G.statusline = M.statusline
-    vim.o.statusline = '%!v:lua.statusline()'
-
-    _G.tabline = M.tabline
-    vim.o.tabline = '%!v:lua.tabline()'
-end
-
 local mode_map = setmetatable({
     n = {'N', '%#StatusLineNormal#'},
     i = {'I', '%#StatusLineInsert#'},
@@ -275,6 +267,14 @@ function M.tabline()
     return table.concat(tl)
 end
 
-setup()
+local function init()
+    _G.statusline = M.statusline
+    vim.o.statusline = '%!v:lua.statusline()'
+
+    _G.tabline = M.tabline
+    vim.o.tabline = '%!v:lua.tabline()'
+end
+
+init()
 
 return M

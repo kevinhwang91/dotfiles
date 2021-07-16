@@ -23,12 +23,6 @@ local kprint = function(...)
     print(table.concat(msg_tbl, ' '))
 end
 
-local function setup()
-    _G.p = kprint
-    local log = require('log')
-    _G.info = log.info
-end
-
 function M.reload_module(m_name)
     for p in pairs(package.loaded) do
         if p:find('^' .. m_name) then
@@ -37,6 +31,14 @@ function M.reload_module(m_name)
     end
 end
 
-setup()
+local function init()
+    _G.p = kprint
+    local log = require('log')
+    _G.info = log.info
+    _G.ktime = vim.loop.hrtime
+end
+
+
+init()
 
 return M

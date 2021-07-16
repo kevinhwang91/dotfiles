@@ -9,33 +9,6 @@ end, function(mode, lhs)
     api.nvim_buf_del_keymap(0, mode, lhs)
 end
 
-local function setup()
-    vim.g.nvimgdb_disable_start_keymaps = 1
-    vim.g.nvimgdb_config_override = {
-        codewin_command = 'vnew',
-        sign_breakpoint_priority = 99,
-        set_keymaps = 'GdbSetKeymaps',
-        unset_keymaps = 'GdbUnsetKeymaps',
-        set_tkeymaps = 'GdbSetTKeymaps'
-    }
-
-    cmd([[
-        au User NvimGdbStart lua require('plugs.nvimgdb').start()
-
-        function! GdbSetKeymaps()
-            call v:lua.require('plugs.nvimgdb').set_keymaps()
-        endfunction
-
-        function! GdbUnsetKeymaps()
-            call v:lua.require('plugs.nvimgdb').unset_keymaps()
-        endfunction
-
-        function! GdbSetTKeymaps()
-            call v:lua.require('plugs.nvimgdb').set_tkeymaps()
-        endfunction
-    ]])
-end
-
 -- alacritty has remaped Control-([1-9]|[0]) to Control-[F1-F10] (F25-F34)
 function M.set_keymaps()
     bmap('n', '<F25>', '<Cmd>GdbRun<CR>')
@@ -81,7 +54,7 @@ function M.start()
     fn.sign_undefine('GdbCurrentLine')
     fn.sign_define('GdbCurrentLine', {linehl = 'QuickFixLine'})
     for i = 1, 9 do
-        fn.sign_define('GdbBreakpoint' .. i, {texthl = 'WarningMsg'})
+        fn.sign_define('GdbBreakpoint' .. i, {texthl = 'ErrorMsg'})
     end
     vim.wo.foldcolumn = '0'
     vim.wo.signcolumn = 'no'
@@ -89,6 +62,33 @@ function M.start()
     vim.wo.relativenumber = false
 end
 
-setup()
+local function init()
+    vim.g.nvimgdb_disable_start_keymaps = 1
+    vim.g.nvimgdb_config_override = {
+        codewin_command = 'vnew',
+        sign_breakpoint_priority = 99,
+        set_keymaps = 'GdbSetKeymaps',
+        unset_keymaps = 'GdbUnsetKeymaps',
+        set_tkeymaps = 'GdbSetTKeymaps'
+    }
+
+    cmd([[
+        au User NvimGdbStart lua require('plugs.nvimgdb').start()
+
+        function! GdbSetKeymaps()
+            call v:lua.require('plugs.nvimgdb').set_keymaps()
+        endfunction
+
+        function! GdbUnsetKeymaps()
+            call v:lua.require('plugs.nvimgdb').unset_keymaps()
+        endfunction
+
+        function! GdbSetTKeymaps()
+            call v:lua.require('plugs.nvimgdb').set_tkeymaps()
+        endfunction
+    ]])
+end
+
+init()
 
 return M

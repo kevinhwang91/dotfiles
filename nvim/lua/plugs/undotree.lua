@@ -2,19 +2,6 @@ local M = {}
 local cmd = vim.cmd
 local fn = vim.fn
 
-local function setup()
-    vim.g.undotree_SplitWidth = 45
-    vim.g.undotree_SetFocusWhenToggle = 1
-    cmd([[
-        function! Undotree_CustomMap()
-            nmap <buffer> <C-u> <Plug>UndotreeUndo
-            nunmap <buffer> u
-        endfunc
-
-        pa undotree
-    ]])
-end
-
 function M.toggle()
     fn['undotree#UndotreeToggle']()
     require('plugs.undotree').clean_undo()
@@ -33,6 +20,19 @@ function M.clean_undo()
     end
 end
 
-setup()
+local function init()
+    vim.g.undotree_SplitWidth = 45
+    vim.g.undotree_SetFocusWhenToggle = 1
+    cmd([[
+        function! Undotree_CustomMap()
+            nmap <buffer> <C-u> <Plug>UndotreeUndo
+            nunmap <buffer> u
+        endfunc
+
+        pa undotree
+    ]])
+end
+
+init()
 
 return M

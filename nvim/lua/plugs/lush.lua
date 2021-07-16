@@ -16,13 +16,6 @@ endif
 
 local colors_path
 
-local function setup()
-    cmd('pa lush.nvim')
-    lush = require('lush')
-    colors_path = ('%s/colors'):format(fn.stdpath('config'))
-    fn.mkdir(colors_path, 'p')
-end
-
 function M.dump(name)
     local theme_path = ('%s/%s.vim'):format(colors_path, name)
 
@@ -58,6 +51,13 @@ function M.write_post()
     end
 end
 
-setup()
+local function init()
+    cmd('pa lush.nvim')
+    lush = require('lush')
+    colors_path = ('%s/colors'):format(fn.stdpath('config'))
+    fn.mkdir(colors_path, 'p')
+end
+
+init()
 
 return M

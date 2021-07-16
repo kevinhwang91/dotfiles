@@ -41,6 +41,8 @@ return require('packer').startup({
 
         use {'kevinhwang91/rnvimr', opt = false}
 
+        use {'kevinhwang91/nvim-hclipboard'}
+
         use {'kevinhwang91/nvim-bqf', ft = 'qf', config = conf('bqf')}
 
         use {
@@ -51,12 +53,7 @@ return require('packer').startup({
             requires = {{'haya14busa/vim-asterisk'}}
         }
 
-        use {
-            'Krasjet/auto-pairs',
-            event = 'InsertEnter',
-            setup = [[vim.g.AutoPairsCenterLine = 0]],
-            config = [[vim.fn['AutoPairsTryInit']()]]
-        }
+        use {'Raimondi/delimitMate', event = 'InsertEnter'}
 
         use {
             'tpope/vim-surround',
@@ -77,7 +74,7 @@ return require('packer').startup({
             },
             cmd = {'VMSearch'},
             config = conf('visualmulti'),
-            wants = {'nvim-hlslens', 'auto-pairs', 'vim-surround'}
+            wants = {'nvim-hlslens', 'delimitMate', 'vim-surround'}
         }
 
         use {'rhysd/clever-f.vim', keys = {'f', 'F', 't', 'T'}, config = conf('cleverf')}
@@ -151,8 +148,6 @@ return require('packer').startup({
 
         use {'editorconfig/editorconfig-vim'}
 
-        use {'kevinhwang91/friendly-snippets', opt = false}
-
         use {'pseewald/vim-anyfold', cmd = 'AnyFoldActivate'}
 
         use {
@@ -210,7 +205,10 @@ return require('packer').startup({
 
         use {'nvim-treesitter/nvim-treesitter-textobjects'}
 
-        use {'nvim-treesitter/playground', cmd = 'TSHighlightCapturesUnderCursor'}
+        use {
+            'nvim-treesitter/playground',
+            cmd = {'TSPlaygroundToggle', 'TSHighlightCapturesUnderCursor'}
+        }
 
         use {'rktjmp/lush.nvim'}
 

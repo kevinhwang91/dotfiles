@@ -62,7 +62,7 @@ local function path_sep()
     return vim.loop.os_uname().sysname == 'Windows' and [[\]] or '/'
 end
 
-local function setup()
+local function init()
     local log_dir = fn.stdpath('cache')
     fn.mkdir(log_dir, 'p')
     levels = {TRACE = 0, DEBUG = 1, INFO = 2, WARN = 3, ERROR = 4}
@@ -85,6 +85,9 @@ local function setup()
             end
             local msg = table.concat(msg_tbl, ' ')
             local info = debug.getinfo(2, 'Sl')
+            if not info then
+                info = debug.getinfo(1, 'Sl')
+            end
             local linfo = info.short_src .. ':' .. info.currentline
 
             local fp = assert(io.open(log_file, 'a+'))
@@ -96,6 +99,6 @@ local function setup()
     end
 end
 
-setup()
+init()
 
 return M

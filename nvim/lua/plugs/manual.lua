@@ -1,18 +1,10 @@
 local M = {}
 local cmd = vim.cmd
+local api = vim.api
 
 local g = vim.g
 
 local gittool = require('gittool')
-
-local function setup()
-    cmd([[
-        aug FindGitForPlugs
-            au!
-            au BufRead * sil! lua require('plugs.manual').find_git()
-        aug END
-    ]])
-end
 
 function M.find_git()
     local root = gittool.root()
@@ -35,19 +27,25 @@ function M.git_relation()
         cmd('doautoall gitgutter BufEnter')
     end, 300)
 
-    vim.defer_fn(function()
+    local init_fugitive = function()
         local fugitive = _G.packer_plugins['vim-fugitive']
         if not fugitive.loaded then
             fugitive.loaded = true
+            require('plugs.fugitive')
             for _, del_cmd in ipairs(fugitive.commands) do
                 cmd('delc ' .. del_cmd)
             end
             cmd('pa vim-fugitive')
             cmd('doautoall fugitive BufReadCmd')
             cmd('doautoall fugitive BufRead')
-            require('plugs.fugitive')
         end
-    end, 1000)
+    end
+
+    if api.nvim_buf_get_name(0):find('/.git/index$') then
+        init_fugitive()
+    else
+        vim.defer_fn(init_fugitive, 1000)
+    end
 
     -- .editorconfig is almost in git repositories
     vim.defer_fn(function()
@@ -58,6 +56,15 @@ function M.git_relation()
     end, 1200)
 end
 
-setup()
+local function init()
+    cmd([[
+        aug FindGitForPlugs
+            au!
+            au BufRead * sil! lua require('plugs.manual').find_git()
+        aug END
+    ]])
+end
+
+init()
 
 return M

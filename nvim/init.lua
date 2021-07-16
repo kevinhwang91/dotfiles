@@ -73,32 +73,42 @@ g.loaded_2html_plugin = 1
 -- I haven't any remote plugins
 g.loaded_remote_plugins = 1
 
-if env.DISPLAY and fn.executable('xsel') then
-    g.clipboard = {
+local clipboard
+if env.DISPLAY and fn.executable('xsel') == 1 then
+    clipboard = {
         name = 'xsel',
-        copy = {['+'] = 'xsel --nodetach -i -b', ['*'] = 'xsel --nodetach -i -b'},
-        paste = {['+'] = 'xsel -o -b', ['*'] = 'xsel -o -b'},
+        copy = {
+            ['+'] = {'xsel', '--nodetach', '-i', '-b'},
+            ['*'] = {'xsel', '--nodetach', '-i', '-p'}
+        },
+        paste = {['+'] = {'xsel', '-o', '-b'}, ['*'] = {'xsel', '-o', '-p'}},
         cache_enabled = true
     }
 elseif env.TMUX then
-    g.clipboard = {
+    clipboard = {
         name = 'tmux',
-        copy = {['+'] = 'tmux load-buffer -w -', ['*'] = 'tmux load-buffer -w -'},
-        paste = {['+'] = 'tmux save-buffer -', ['*'] = 'tmux save-buffer -'},
-        cache_enabled = false
+        copy = {['+'] = {'tmux', 'load-buffer', '-w', '-'}},
+        paste = {['+'] = {'tmux', 'save-buffer', '-'}},
+        cache_enabled = true
     }
-elseif fn.executable('osc52send') then
-    g.clipboard = {
+    clipboard.copy['*'] = clipboard.copy['+']
+    clipboard.paste['*'] = clipboard.paste['+']
+elseif fn.executable('osc52send') == 1 then
+    clipboard = {
         name = 'osc52send',
-        copy = {['+'] = 'osc52send', ['*'] = 'osc52send'},
-        paste = {['+'] = '', ['*'] = ''},
+        copy = {['+'] = {'osc52send'}},
+        paste = {
+            ['+'] = function()
+                return {fn.getreg('0', 1, true), fn.getregtype('0')}
+            end
+        },
         cache_enabled = false
     }
-    cmd([[
-        let g:clipboard.paste['+'] = {-> [getreg('"', 1, 1), getregtype('"')]}
-        let g:clipboard.paste['*'] = g:clipboard.paste['+']
-    ]])
+    clipboard.copy['*'] = clipboard.copy['+']
+    clipboard.paste['*'] = clipboard.paste['+']
 end
+
+g.clipboard = clipboard
 
 -- map
 g.mapleader = ' '
@@ -113,6 +123,7 @@ map('n', 'y', [[v:lua._G.yank()]], {noremap = true, expr = true})
 map('n', 'Y', 'y$')
 map('n', 'v', 'm`v')
 map('n', 'V', 'm`V')
+map('x', 'p', [['""d' . v:count1 . 'P']], {noremap = true, expr = true})
 map('n', '<Leader>2;', '@:')
 map('x', '<Leader>2;', '@:')
 map('n', 'qq', '<Cmd>q<CR>')
@@ -162,6 +173,9 @@ map('n', [[`]], [[']])
 map('x', [[`]], [[']])
 map('o', [[`]], [[']])
 
+map('i', [[<C-r>']], [[<C-r>"]])
+map('c', [[<C-r>']], [[<C-r>"]])
+
 map('n', [['0]], [[<Cmd>norm! `0<CR><Cmd>sil! CleanEmptyBuf<CR>]])
 map('n', '<Leader>i', '<Cmd>sil! norm! `^<CR>')
 
@@ -201,8 +215,8 @@ map('x', 'zk', 'zk_')
 map('n', 'z', [[v:lua._G.prefix_timeout('z')]], {noremap = true, expr = true})
 map('x', 'z', [[v:lua._G.prefix_timeout('z')]], {noremap = true, expr = true})
 
-map('n', 'z[', [[<Cmd>lua require('kutils').nav_fold(false, vim.v.count1)<CR>]])
-map('n', 'z]', [[<Cmd>lua require('kutils').nav_fold(true, vim.v.count1)<CR>]])
+map('n', 'z[', [[<Cmd>lua require('plugs.fold').nav_fold(false, vim.v.count1)<CR>]])
+map('n', 'z]', [[<Cmd>lua require('plugs.fold').nav_fold(true, vim.v.count1)<CR>]])
 
 map('x', 'iz', [[:<C-u>keepj norm [zv]zg_<CR>]])
 map('o', 'iz', [[:norm viz<CR>]])
@@ -235,7 +249,7 @@ require('mru')
 require('stl')
 require('qf')
 
-if fn.glob(fn.stdpath('config') .. '/plugin/packer_compiled.vim') == '' then
+if fn.glob(fn.stdpath('config') .. '/plugin/packer_compiled.lua') == '' then
     require('plugs.packer').compile()
 else
     cmd([[
@@ -397,11 +411,11 @@ map('n', '<Leader>dp', ':GdbStartPDB python -m pdb<Space>', {silent = false})
 -- neoclide/coc.nvim
 g.coc_global_extensions = {
     'coc-clangd', 'coc-go', 'coc-html', 'coc-json', 'coc-pyright', 'coc-java', 'coc-rust-analyzer',
-    'coc-tsserver', 'coc-vimlsp', 'coc-xml', 'coc-yaml', 'coc-css', 'coc-diagnostic',
-    'coc-dictionary', 'coc-markdownlint', 'coc-snippets', 'coc-word'
+    'coc-tsserver', 'coc-vimlsp', 'coc-xml', 'coc-yaml', 'coc-css', 'coc-dictionary',
+    'coc-markdownlint', 'coc-snippets', 'coc-word'
 }
 g.coc_enable_locationlist = 0
-map('i', '<CR>', [[pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"]], {noremap = true, expr = true})
+g.coc_default_semantic_highlight_groups = 0
 cmd([[au User CocNvimInit ++once lua require('plugs.coc')]])
 
 -- kkoomen/vim-doge
@@ -419,6 +433,9 @@ g.NERDToggleCheckAllLines = 1
 g.NERDTrimTrailingWhitespace = 1
 g.NERDCustomDelimiters = {lua = {left = '--', leftAlt = '', rightAlt = ''}}
 map('', '<C-_>', '<Plug>NERDCommenterToggle', {})
+
+-- delimitMate
+map('i', '<CR>', [[pumvisible() ? "\<C-y>" : "<Plug>delimitMateCR"]], {noremap = false, expr = true})
 
 cmd([[
     com! -range=% -nargs=0 RmAnsi <line1>,<line2>s/\%x1b\[[0-9;]*[Km]//g
@@ -446,7 +463,7 @@ cmd([[
 
     aug TermFix
         au!
-        au TermEnter * call clearmatches()
+        au TermEnter * lua vim.schedule(function() vim.cmd('noh') vim.fn.clearmatches() end)
     aug END
 ]])
 
@@ -491,6 +508,9 @@ vim.schedule(function()
     end, 30)
 
     vim.defer_fn(function()
+        cmd('pa nvim-hclipboard')
+        require('hclipboard').start()
+
         require('plugs.config').matchup()
         cmd('pa vim-matchup')
         fn['matchup#loader#init_buffer']()

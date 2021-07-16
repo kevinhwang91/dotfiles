@@ -10,23 +10,6 @@ local max
 local bufs
 local tmp_prefix
 
-local function setup()
-    db = vim.env.HOME .. '/.mru_file'
-    max = 1000
-    bufs = {}
-    tmp_prefix = fn.tempname()
-
-    M.store_buf(0)
-    cmd([[
-        aug Mru
-            au!
-            au BufEnter,BufAdd,FocusGained * lua require('mru').store_buf()
-            au VimLeavePre,VimSuspend * lua require('mru').flush()
-            au FocusLost * lua require('mru').flush()
-        aug END
-    ]])
-end
-
 local function list(file)
     local mru_list = {}
     local fname_set = {[''] = true}
@@ -92,6 +75,24 @@ M.store_buf = (function()
     end
 end)()
 
-setup()
+local function init()
+    db = vim.env.HOME .. '/.mru_file'
+    max = 1000
+    bufs = {}
+    tmp_prefix = fn.tempname()
+
+    M.store_buf(0)
+    cmd([[
+        aug Mru
+            au!
+            au BufEnter,BufAdd,FocusGained * lua require('mru').store_buf()
+            au VimLeavePre,VimSuspend * lua require('mru').flush()
+            au FocusLost * lua require('mru').flush()
+        aug END
+    ]])
+end
+
+
+init()
 
 return M

@@ -10,6 +10,7 @@ do_install() {
     link_file "$src_conf/after" "$dst_conf/after"
     link_file "$src_conf/lua" "$dst_conf/lua"
     link_file "$src_conf/init.lua" "$dst_conf/init.lua"
+    link_file "$src_conf/snippets" "$dst_conf/snippets"
     link_file "$src_conf/coc-settings.json" "$dst_conf/coc-settings.json"
 
     info "Installing nvim's plugins......"

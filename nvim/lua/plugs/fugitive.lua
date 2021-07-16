@@ -3,7 +3,32 @@ local cmd = vim.cmd
 local api = vim.api
 local fn = vim.fn
 
-local function setup()
+function M.index()
+    local bufname = api.nvim_buf_get_name(0)
+    if fn.winnr('$') == 1 and bufname == '' then
+        cmd('Git')
+    else
+        cmd('tab Git')
+    end
+    if bufname == '' then
+        cmd('sil! noa bw #')
+    end
+end
+
+-- placeholder for Git difftool --name-only :)
+function M.diff_hist()
+    local info = fn.getqflist({idx = 0, context = 0})
+    local idx, ctx = info.idx, info.context
+    if idx and ctx and type(ctx.items) == 'table' then
+        local diff = ctx.items[idx].diff or {}
+        if #diff == 1 then
+            cmd('abo vert diffs ' .. diff[1].filename)
+            cmd('winc p')
+        end
+    end
+end
+
+local function init()
     vim.g.nremap = {
         ['d?'] = 's?',
         dv = 'sv',
@@ -32,31 +57,6 @@ local function setup()
     ]])
 end
 
-function M.index()
-    local bufname = api.nvim_buf_get_name(0)
-    if fn.winnr('$') == 1 and bufname == '' then
-        cmd('Git')
-    else
-        cmd('tab Git')
-    end
-    if bufname == '' then
-        cmd('sil! noa bw #')
-    end
-end
-
--- placeholder for Git difftool --name-only :)
-function M.diff_hist()
-    local info = fn.getqflist({idx = 0, context = 0})
-    local idx, ctx = info.idx, info.context
-    if idx and ctx and type(ctx.items) == 'table' then
-        local diff = ctx.items[idx].diff or {}
-        if #diff == 1 then
-            cmd('abo vert diffs ' .. diff[1].filename)
-            cmd('winc p')
-        end
-    end
-end
-
-setup()
+init()
 
 return M

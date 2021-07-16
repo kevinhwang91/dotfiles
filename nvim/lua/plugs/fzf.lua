@@ -7,27 +7,6 @@ local default_preview_window
 local mru = require('mru')
 local cmdhist = require('cmdhist')
 
-local function setup()
-    vim.g.fzf_action = {['ctrl-t'] = 'tabedit', ['ctrl-s'] = 'split', ['ctrl-v'] = 'vsplit'}
-    vim.g.fzf_layout = {window = {width = 0.7, height = 0.7}}
-    cmd([[
-        function! FzfWrapper(opts) abort
-            call fzf#run(fzf#wrap(a:opts))
-        endfunction
-
-        aug Fzf
-            au!
-            au VimResized * lua require('plugs.fzf').resize_preview_layout()
-        aug END
-    ]])
-
-    vim.g.loaded_fzf = nil
-    cmd('pa fzf')
-    cmd('pa fzf.vim')
-    default_preview_window = {'right:50%,border-left', 'ctrl-/'}
-    M.resize_preview_layout()
-end
-
 local function run_wrapper(opts)
     local sink = opts['sink*']
     if sink then
@@ -104,6 +83,27 @@ function M.resize_preview_layout()
     end)
 end
 
-setup()
+local function init()
+    vim.g.fzf_action = {['ctrl-t'] = 'tabedit', ['ctrl-s'] = 'split', ['ctrl-v'] = 'vsplit'}
+    vim.g.fzf_layout = {window = {width = 0.7, height = 0.7}}
+    cmd([[
+        function! FzfWrapper(opts) abort
+            call fzf#run(fzf#wrap(a:opts))
+        endfunction
+
+        aug Fzf
+            au!
+            au VimResized * lua require('plugs.fzf').resize_preview_layout()
+        aug END
+    ]])
+
+    vim.g.loaded_fzf = nil
+    cmd('pa fzf')
+    cmd('pa fzf.vim')
+    default_preview_window = {'right:50%,border-left', 'ctrl-/'}
+    M.resize_preview_layout()
+end
+
+init()
 
 return M

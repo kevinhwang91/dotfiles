@@ -63,31 +63,6 @@ function M.close_diff()
     end
 end
 
-function M.nav_fold(forward, cnt)
-    local wv = fn.winsaveview()
-    cmd([[norm! m`]])
-    local cur_l, cur_c
-    while cnt > 0 do
-        if forward then
-            cmd('keepj norm! ]z')
-        else
-            cmd('keepj norm! zk')
-        end
-        cur_l, cur_c = unpack(api.nvim_win_get_cursor(0))
-        if forward then
-            cmd('keepj norm! zj_')
-        else
-            cmd('keepj norm! [z_')
-        end
-        cnt = cnt - 1
-    end
-
-    local cur_l1, cur_c1 = unpack(api.nvim_win_get_cursor(0))
-    if cur_l == cur_l1 and cur_c == cur_c1 then
-        fn.winrestview(wv)
-    end
-end
-
 -- My eyes can't get along with 2 spaces indent!
 function M.kill2spaces()
     cmd('sil! GitGutterBufferDisable')
@@ -130,11 +105,15 @@ M.cool_echo = (function()
     local timer
     return function(msg, hl, history, delay)
         -- TODO without schedule wrapper may echo prefix spaces
+        local lastmsg
         vim.schedule(function()
             api.nvim_echo({{msg, hl}}, history, {})
+            lastmsg = api.nvim_exec('5message', true)
         end)
         timer = M.killable_defer(timer, function()
-            api.nvim_echo({{'', ''}}, false, {})
+            if lastmsg == api.nvim_exec('5message', true) then
+                api.nvim_echo({{'', ''}}, false, {})
+            end
         end, delay or 2500)
     end
 end)()
