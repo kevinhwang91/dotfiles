@@ -43,4 +43,12 @@ function M.split_lastbuf(vertical)
     cmd(sp .. ' sb ' .. (last_buf_info and last_buf_info.bufnr or ''))
 end
 
+-- https://github.com/neovim/neovim/issues/11440
+function M.fix_quit()
+    local ok, msg = pcall(cmd, 'q')
+    if not ok and msg:match(':E5601:') then
+        cmd('1only | q')
+    end
+end
+
 return M

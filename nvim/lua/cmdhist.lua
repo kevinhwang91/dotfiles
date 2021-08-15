@@ -63,8 +63,8 @@ end
 function M.enable_reload()
     if api.nvim_get_mode().mode == 'c' then
         vim.defer_fn(M.reload, 50)
-    elseif fn.exists('#CmdlHist#CmdlineEnter#:') == 0 then
-        cmd([[au CmdlHist CmdlineEnter : ++once lua vim.schedule(require('cmdhist').reload)]])
+    elseif fn.exists('#CmdHist#CmdlineEnter#:') == 0 then
+        cmd([[au CmdHist CmdlineEnter : ++once lua vim.schedule(require('cmdhist').reload)]])
     end
 end
 
@@ -115,7 +115,7 @@ local function init()
     M.reload()
 
     cmd([[
-        aug CmdlHist
+        aug CmdHist
             au!
             au CmdlineLeave : lua require('cmdhist').fire_leave()
             au VimLeavePre,VimSuspend * lua require('cmdhist').flush()
@@ -124,7 +124,6 @@ local function init()
         aug END
     ]])
 end
-
 
 init()
 

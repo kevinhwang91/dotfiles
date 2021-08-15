@@ -4,8 +4,9 @@ local fn = vim.fn
 
 local map = require('remap').map
 
-local do_sy_tbl = {}
+local ft_enabled = {}
 local queries
+local parsers
 
 function M.do_textobject(obj, inner, visual)
     local ret = false
@@ -19,7 +20,7 @@ end
 
 function M.hijack_synset()
     local ft = fn.expand('<amatch>')
-    if not do_sy_tbl[ft] then
+    if not ft_enabled[ft] then
         vim.bo.syntax = ft
     end
 end
@@ -27,13 +28,12 @@ end
 local function init()
     local conf = {
         ensure_installed = {
-            'bash', 'cpp', 'css', 'cuda', 'dart', 'dockerfile', 'go', 'gomod', 'html', 'java',
-            'javascript', 'jsdoc', 'json', 'jsonc', 'julia', 'kotlin', 'lua', 'php', 'python',
-            'query', 'ruby', 'rust', 'scss', 'teal', 'toml', 'tsx', 'typescript', 'vue', 'yaml',
-            'zig'
+            'bash', 'c', 'cpp', 'css', 'cuda', 'dart', 'dockerfile', 'go', 'gomod', 'html', 'java',
+            'javascript', 'jsdoc', 'json', 'jsonc', 'kotlin', 'lua', 'php', 'python', 'query',
+            'ruby', 'rust', 'scss', 'teal', 'toml', 'tsx', 'typescript', 'vue', 'yaml', 'zig'
         },
 
-        highlight = {enable = true, disable = {'bash'}},
+        highlight = {enable = true, disable = {'bash', 'html'}},
         textobjects = {
             select = {
                 enable = true,
@@ -70,14 +70,21 @@ local function init()
     require('iswap').setup {grey = 'disable', hl_snipe = 'IncSearch', hl_selection = 'MatchParen'}
     map('n', '<Leader>sp', '<Cmd>ISwap<CR>')
 
-    local parsers = require('nvim-treesitter.parsers')
+    parsers = require('nvim-treesitter.parsers')
+    queries = require('nvim-treesitter.query')
     local hl_disabled = conf.highlight.disable
-    for lang in pairs(parsers.list) do
+    for _, lang in ipairs(conf.ensure_installed) do
         if not vim.tbl_contains(hl_disabled, lang) then
-            do_sy_tbl[lang] = true
+            local ft_tbl = parsers.list[lang].used_by
+            if ft_tbl then
+                for _, ft in ipairs(ft_tbl) do
+                    ft_enabled[ft] = true
+                end
+            else
+                ft_enabled[lang] = true
+            end
         end
     end
-    queries = require 'nvim-treesitter.query'
 end
 
 init()

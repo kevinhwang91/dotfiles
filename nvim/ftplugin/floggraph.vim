@@ -19,6 +19,7 @@ nnoremap <buffer> <Leader>gs :Flogsetargs -- <C-r>=flog#get_commit_at_line().sho
 nnoremap <buffer> <Leader>gp :Flogsetargs -raw-args=--first-parent --<Space>
 nnoremap <buffer> <Leader>gr :Flogsetargs -raw-args=
 nnoremap <buffer> <Leader>gj :Flogjump<Space>
+nnoremap <buffer> <Leader>gb :GBrowse <C-r>=flog#get_commit_at_line().short_commit_hash<CR><CR>
 
 function s:scroll(direction) abort
     let winnr = winnr('$')

@@ -4,37 +4,62 @@ if vim.fn.glob(install_path) == '' then
 end
 vim.cmd('pa packer.nvim')
 
-local function conf(name)
-    return ([[require('plugs.config').%s()]]):format(name)
+local packer = require('packer')
+packer.on_compile_done = function()
+    local fp = assert(io.open(packer.config.compile_path, 'rw+'))
+    local wbuf = {}
+    local key_state = 0
+    for line in fp:lines() do
+        if key_state == 0 then
+            table.insert(wbuf, line)
+            if line:find('Keymap lazy%-loads') then
+                key_state = 1
+                table.insert(wbuf, [[vim.schedule(function() vim.defer_fn(function()]])
+            end
+        elseif key_state == 1 then
+            if line == '' then
+                key_state = 2
+                table.insert(wbuf, ('end, %d) end)'):format(100))
+            end
+            local _, e1 = line:find('vim%.cmd')
+            if line:find('vim%.cmd') then
+                local s2, e2 = line:find('%S+%s', e1 + 1)
+                line = ('pcall(vim.cmd, %s<unique>%s)'):format(line:sub(s2, e2), line:sub(e2 + 1))
+            end
+            table.insert(wbuf, line)
+        else
+            table.insert(wbuf, line)
+        end
+    end
+
+    if key_state == 2 then
+        fp:seek('set')
+        fp:write(table.concat(wbuf, '\n'))
+    end
+
+    fp:close()
 end
 
-return require('packer').startup({
+return packer.startup({
     config = {
         opt_default = true,
         display = {open_cmd = 'tabedit', keybindings = {prompt_revert = 'R', diff = 'D'}}
     },
     function(use, use_rocks)
+        local function conf(name)
+            return ([[require('plugs.config').%s()]]):format(name)
+        end
+
         use {
             'wbthomason/packer.nvim',
             setup = function()
-                -- below plugins will define commands or keymaps, should clear their loaded
-                -- variables after packer reload
-                for _, flag in ipairs({
-                    'loaded_clever_f', 'loaded_grepper', 'loaded_eregex', 'loaded_slime',
-                    'loaded_nerd_comments', 'loaded_suda', 'vcoolor_loaded', 'loaded_choosewin',
-                    'loaded_cycle', 'loaded_doge', 'loaded_gh_line', 'loaded_hexokinase',
-                    'loaded_targets', 'loaded_surround', 'loaded_fugitive', 'loaded_flog',
-                    'loaded_git_messenger'
-                }) do
-                    if vim.g[flag] ~= nil then
-                        vim.g[flag] = nil
-                    end
+                if vim.g['loaded_nerd_comments'] ~= nil then
+                    vim.g['loaded_nerd_comments'] = nil
                 end
                 if vim.g.loaded_visual_multi == 1 then
                     vim.schedule(function()
                         vim.fn['vm#plugs#permanent']()
                     end)
-
                 end
             end
         }
@@ -43,10 +68,11 @@ return require('packer').startup({
 
         use {'kevinhwang91/nvim-hclipboard'}
 
-        use {'kevinhwang91/nvim-bqf', ft = 'qf', config = conf('bqf')}
+        use {'kevinhwang91/nvim-bqf', ft = 'qf', config = conf('bqf'), branch = 'dev'}
 
         use {
             'kevinhwang91/nvim-hlslens',
+            branch = 'dev',
             setup = [[vim.g.loaded_nvim_hlslens = 1]],
             keys = {'n', 'N', '/', '?', '*', '#', 'g*', 'g#'},
             config = conf('hlslens'),
@@ -129,6 +155,8 @@ return require('packer').startup({
             config = [[require('plugs.fugitive')]]
         }
 
+        use {'tpope/vim-rhubarb'}
+
         use {'rbong/vim-flog', cmd = {'Flog', 'Flogsplit'}, requires = {{'tpope/vim-fugitive'}}}
 
         use {'airblade/vim-gitgutter'}
@@ -179,13 +207,15 @@ return require('packer').startup({
         use {
             'KabbAmine/vCoolor.vim',
             keys = {{'n', '<Leader>pc'}, {'n', '<Leader>yb'}, {'n', '<Leader>yr'}},
-            setup = [[vim.vcoolor_disable_mappings = 1 vim.vcoolor_lowercase = 1]],
+            setup = [[vim.g.vcoolor_disable_mappings = 1 vim.g.vcoolor_lowercase = 1]],
             config = conf('vcoolor')
         }
 
         use {'kevinhwang91/suda.vim', keys = {{'n', '<Leader>W'}}, config = conf('suda')}
 
         use {'neoclide/coc.nvim', branch = 'master', run = 'yarn install --frozen-lockfile'}
+
+        use {'kevinhwang91/coc-kvs', run = 'yarn install --frozen-lockfile'}
 
         use {'wellle/tmux-complete.vim'}
 

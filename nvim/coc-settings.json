@@ -3,12 +3,14 @@
 	"coc.preferences.colorSupport": false,
 	"coc.preferences.extensionUpdateCheck": "weekly",
 	"coc.preferences.messageLevel": "error",
+	"coc.preferences.semanticTokensHighlights": false,
 	"suggest.enablePreselect": true,
 	"suggest.noselect": false,
 	"suggest.defaultSortMethod": "none",
 	"suggest.snippetIndicator": "",
 	"suggest.languageSourcePriority": 99,
 	"suggest.triggerCompletionWait": 50,
+	"suggest.acceptSuggestionOnCommitCharacter": true,
 	"suggest.completionItemKindLabels": {
 		"keyword": "",
 		"variable": "",
@@ -44,6 +46,7 @@
 	"diagnostic.maxWindowWidth": 100,
 	"diagnostic.signPriority": 20,
 	"diagnostic.enableHighlightLineNumber": false,
+	"diagnostic.locationlistUpdate": false,
 	"hover.floatMaxWidth": 100,
 	"signature.maxWindowWidth": 100,
 	"languageserver": {
@@ -66,7 +69,6 @@
 					"diagnostics": {
 						"enable": true,
 						"globals": [
-							"hs",
 							"vim",
 							"jit",
 							"it",

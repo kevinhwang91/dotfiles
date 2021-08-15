@@ -107,13 +107,13 @@
 		"description": "For-Of Loop"
 	},
 	"For-Await-Of Loop": {
-		"prefix": "forawaitof",
+		"prefix": "foraof",
 		"body": ["for await (const ${1:iterator} of ${2:object}) {", "\t$0", "}"],
 		"description": "For-Await-Of Loop"
 	},
 	"Function Statement": {
-		"prefix": "function",
-		"body": ["function ${1:name}(${2:params}:${3:type}) {", "\t$0", "}"],
+		"prefix": "fun",
+		"body": ["function ${1:name}(${2:params}: ${3:type}) {", "\t$0", "}"],
 		"description": "Function Statement"
 	},
 	"If Statement": {
@@ -128,7 +128,7 @@
 	},
 	"New Statement": {
 		"prefix": "new",
-		"body": ["const ${1:name} = new ${2:type}(${3:arguments});$0"],
+		"body": ["const ${1:name} = new ${2:type}(${3:arguments})"],
 		"description": "New Statement"
 	},
 	"Switch Statement": {
@@ -182,12 +182,12 @@
 	},
 	"Async Function Statement": {
 		"prefix": "async function",
-		"body": ["async function ${1:name}(${2:params}:${3:type}) {", "\t$0", "}"],
+		"body": ["async function ${1:name}(${2:params}: ${3:type}) {", "\t$0", "}"],
 		"description": "Async Function Statement"
 	},
 	"Async Function Expression": {
 		"prefix": "async arrow function",
-		"body": ["async (${1:params}:${2:type}) => {", "\t$0", "}"],
+		"body": ["async (${1:params}: ${2:type}) => {", "\t$0", "}"],
 		"description": "Async Function Expression"
 	}
 }

@@ -4,12 +4,17 @@ local fn = vim.fn
 local env, g, o, wo, bo = vim.env, vim.g, vim.o, vim.wo, vim.bo
 local map = require('remap').map
 
+local is_master = fn.has('nvim-0.6') == 1
+
 -- source filetype.vim later
 g.did_load_filetypes = 1
 
 wo.nu = true
 wo.rnu = true
 wo.cul = true
+if is_master then
+    wo.culopt = 'number,screenline'
+end
 wo.scl = 'yes:1'
 wo.foldcolumn = '1'
 wo.foldenable = true
@@ -52,8 +57,9 @@ o.shortmess = o.shortmess .. 'acsIS'
 o.confirm = true
 o.jumpoptions = 'stack'
 o.diffopt = o.diffopt .. ',vertical,internal,algorithm:patience'
-o.shada = [['10,<50,s10,/20,@20,:0,h]]
+o.shada = [['20,<50,s10,/20,@20,:0,h]]
 o.termguicolors = true
+o.fillchars = 'eob: '
 
 -- undo
 bo.undofile = true
@@ -123,10 +129,11 @@ map('n', 'y', [[v:lua._G.yank()]], {noremap = true, expr = true})
 map('n', 'Y', 'y$')
 map('n', 'v', 'm`v')
 map('n', 'V', 'm`V')
-map('x', 'p', [['""d' . v:count1 . 'P']], {noremap = true, expr = true})
+map('x', 'p', [[p<Cmd>let @+ = @0<CR><Cmd>let @" = @0<CR>]])
+map('x', 'P', [[P<Cmd>let @+ = @0<CR><Cmd>let @" = @0<CR>]])
 map('n', '<Leader>2;', '@:')
 map('x', '<Leader>2;', '@:')
-map('n', 'qq', '<Cmd>q<CR>')
+map('n', 'qq', [[<Cmd>lua require('builtin').fix_quit()<CR>]])
 map('n', 'qa', '<Cmd>qa<CR>')
 map('n', 'qt', '<Cmd>tabc<CR>')
 map('n', 'qc', [[<Cmd>lua require('qf').close()<CR>]])
@@ -148,8 +155,8 @@ map('t', [[<M-\>]], [[<C-\><C-n>]])
 
 map('n', '<C-w><C-t>', '<Cmd>tab sp<CR>')
 map('n', '<Leader>3', '<Cmd>b #<CR>')
-map('n', '<C-w>s', [[<Cmd>lua require('bultin').split_lastbuf()<CR>]])
-map('n', '<C-w>v', [[<Cmd>lua require('bultin').split_lastbuf(true)<CR>]])
+map('n', '<C-w>s', [[<Cmd>lua require('builtin').split_lastbuf()<CR>]])
+map('n', '<C-w>v', [[<Cmd>lua require('builtin').split_lastbuf(true)<CR>]])
 map('n', '<C-w>O', '<Cmd>tabo<CR>')
 
 map('n', '<M-a>', 'VggoG')
@@ -194,8 +201,8 @@ map('n', '[', [[v:lua._G.prefix_timeout('[')]], {noremap = true, expr = true})
 map('x', '[', [[v:lua._G.prefix_timeout('[')]], {noremap = true, expr = true})
 map('n', ']', [[v:lua._G.prefix_timeout(']')]], {noremap = true, expr = true})
 map('x', ']', [[v:lua._G.prefix_timeout(']')]], {noremap = true, expr = true})
-map('n', '[b', '<Cmd>bp<CR>')
-map('n', ']b', '<Cmd>bn<CR>')
+map('n', '[b', [[<Cmd>execute(v:count1 . 'bp')<CR>]])
+map('n', ']b', [[<Cmd>execute(v:count1 . 'bn')<CR>]])
 map('n', '[q', [[<Cmd>execute(v:count1 . 'cp')<CR>]])
 map('n', ']q', [[<Cmd>execute(v:count1 . 'cn')<CR>]])
 map('n', '[Q', '<Cmd>cfir<CR>')
@@ -215,8 +222,14 @@ map('x', 'zk', 'zk_')
 map('n', 'z', [[v:lua._G.prefix_timeout('z')]], {noremap = true, expr = true})
 map('x', 'z', [[v:lua._G.prefix_timeout('z')]], {noremap = true, expr = true})
 
-map('n', 'z[', [[<Cmd>lua require('plugs.fold').nav_fold(false, vim.v.count1)<CR>]])
-map('n', 'z]', [[<Cmd>lua require('plugs.fold').nav_fold(true, vim.v.count1)<CR>]])
+map('n', 'za', [[<Cmd>lua require('plugs.fold').toggle_fold('a')<CR>]])
+map('n', 'zA', [[<Cmd>lua require('plugs.fold').toggle_fold('A')<CR>]])
+map('n', 'zo', [[<Cmd>lua require('plugs.fold').toggle_fold('o')<CR>]])
+map('n', 'zO', [[<Cmd>lua require('plugs.fold').toggle_fold('O')<CR>]])
+map('n', 'zv', [[<Cmd>lua require('plugs.fold').toggle_fold('v')<CR>]])
+
+map('n', 'z[', [[<Cmd>lua require('plugs.fold').nav_fold(false)<CR>]])
+map('n', 'z]', [[<Cmd>lua require('plugs.fold').nav_fold(true)<CR>]])
 
 map('x', 'iz', [[:<C-u>keepj norm [zv]zg_<CR>]])
 map('o', 'iz', [[:norm viz<CR>]])
@@ -249,7 +262,8 @@ require('mru')
 require('stl')
 require('qf')
 
-if fn.glob(fn.stdpath('config') .. '/plugin/packer_compiled.lua') == '' then
+local conf_dir = fn.stdpath('config')
+if fn.glob(conf_dir .. '/plugin/packer_compiled.lua') == '' then
     require('plugs.packer').compile()
 else
     cmd([[
@@ -257,31 +271,11 @@ else
         com! PackerUpdate lua require('plugs.packer').update()
         com! PackerSync lua require('plugs.packer').sync()
         com! PackerClean lua require('plugs.packer').clean()
-        com! PackerCompile lua require('plugs.packer').compile()
         com! PackerStatus lua require('plugs.packer').status()
+        com! -nargs=? PackerCompile lua require('plugs.packer').compile(<q-args>)
+        com! -nargs=+ PackerLoad lua require('plugs.packer').loader(<q-args>)
     ]])
 end
-
-cmd(([[
-    aug Packer
-        au!
-        au BufWritePost */plugs/packer.lua call execute([%s, %s])
-    aug END
-]]):format([['luafile ' . expand('<afile>')]], [['PackerCompile']]))
-
-cmd([[
-    aug LushTheme
-        au!
-        au BufWritePost */lua/lush_theme/*.lua lua require('plugs.lush').write_post()
-    aug END
-]])
-
-cmd([[
-    aug CmdlHist
-        au!
-        au CmdlineEnter : lua require('cmdhist')
-    aug END
-]])
 
 local theme = 'one'
 if not pcall(cmd, ('color %s'):format(theme)) then
@@ -317,6 +311,10 @@ cmd([[
     com! -bar -bang Helptags call fzf#vim#helptags(<bang>0)
 ]])
 
+-- Man
+g.no_man_maps = 1
+cmd([[cabbrev man <C-r>=(getcmdtype() == ':' && getcmdpos() == 1 ? 'Man' : 'man')<CR>]])
+
 -- kevinhwang91/rnvimr
 g.rnvimr_enable_ex = 1
 g.rnvimr_enable_bw = 1
@@ -337,8 +335,13 @@ g.rnvimr_ranger_views = {
 }
 
 cmd('hi! link RnvimrNormal CursorLine')
-map('t', '<M-i>', [[<C-\><C-n><Cmd>RnvimrResize<CR>]])
-map('t', '<M-o>', [[<C-\><C-n><Cmd>RnvimrToggle<CR>]])
+cmd([[
+    aug RnvimrKeyMap
+        au!
+        au FileType rnvimr tnoremap <silent><buffer> <M-i> <Cmd>RnvimrResize<CR>
+        au FileType rnvimr tnoremap <silent><buffer> <M-o> <Cmd>RnvimrToggle<CR>
+    aug END
+]])
 map('n', '<M-o>', '<Cmd>RnvimrToggle<CR>')
 
 -- tpope/vim-repeat
@@ -358,14 +361,6 @@ map('o', 'i', [[targets#e('o', 'I', 'i')]], {expr = true})
 map('x', 'i', [[targets#e('o', 'I', 'i')]], {expr = true})
 map('o', 'A', [[targets#e('o', 'A', 'A')]], {expr = true})
 map('x', 'A', [[targets#e('o', 'A', 'A')]], {expr = true})
-
--- highlight syntax
-cmd(([[
-    aug LuaHighlight
-        au!
-        au TextYankPost * lua if not vim.b.visual_multi then %s end
-    aug END
-]]):format([[pcall(vim.highlight.on_yank, {higroup='IncSearch', timeout=500})]]))
 
 -- mbbill/undotree
 g.undotree_WindowLayout = 3
@@ -405,18 +400,9 @@ g.vim_markdown_emphasis_multiline = 0
 g.vim_markdown_edit_url_in = 'current'
 
 -- sakhnik/nvim-gdb
+g.nvimgdb_disable_start_keymaps = 1
 map('n', '<Leader>dd', ':GdbStart gdb -q<Space>', {silent = false})
 map('n', '<Leader>dp', ':GdbStartPDB python -m pdb<Space>', {silent = false})
-
--- neoclide/coc.nvim
-g.coc_global_extensions = {
-    'coc-clangd', 'coc-go', 'coc-html', 'coc-json', 'coc-pyright', 'coc-java', 'coc-rust-analyzer',
-    'coc-tsserver', 'coc-vimlsp', 'coc-xml', 'coc-yaml', 'coc-css', 'coc-dictionary',
-    'coc-markdownlint', 'coc-snippets', 'coc-word'
-}
-g.coc_enable_locationlist = 0
-g.coc_default_semantic_highlight_groups = 0
-cmd([[au User CocNvimInit ++once lua require('plugs.coc')]])
 
 -- kkoomen/vim-doge
 g.doge_enable_mappings = 0
@@ -442,7 +428,7 @@ cmd([[
     com! -nargs=? -complete=buffer FollowSymlink lua require('kutils').follow_symlink(<f-args>)
     com! -nargs=0 CleanEmptyBuf lua require('kutils').clean_empty_bufs()
     com! -nargs=0 Kill2Spaces lua require('kutils').kill2spaces()
-    com! -nargs=0 Jumps lua require('bultin').jumps2qf()
+    com! -nargs=0 Jumps lua require('builtin').jumps2qf()
 ]])
 map('n', '<Leader>2p', '<Cmd>Kill2Spaces<CR>')
 
@@ -494,10 +480,16 @@ cmd([[
 
 require('plugs.manual')
 
+-- defer loading
+g.loaded_clipboard_provider = 1
+
 vim.schedule(function()
     vim.defer_fn(function()
-        cmd('syntax enable')
         require('plugs.treesitter')
+
+        if not is_master then
+            cmd('syntax on')
+        end
         cmd([[
             unlet g:did_load_filetypes
             au! syntaxset
@@ -508,8 +500,46 @@ vim.schedule(function()
     end, 30)
 
     vim.defer_fn(function()
+        g.loaded_clipboard_provider = nil
+        cmd('runtime autoload/provider/clipboard.vim')
         cmd('pa nvim-hclipboard')
         require('hclipboard').start()
+
+        cmd([[
+            aug Packer
+                au!
+                au BufWritePost */plugs/packer.lua so <afile> | PackerCompile
+            aug END
+        ]])
+
+        cmd([[
+            aug LushTheme
+                au!
+                au BufWritePost */lua/lush_theme/*.lua lua require('plugs.lush').write_post()
+            aug END
+        ]])
+
+        cmd([[
+            aug CmdHist
+                au!
+                au CmdlineEnter : lua require('cmdhist')
+            aug END
+        ]])
+
+        cmd([[
+            aug CmdHijack
+                au!
+                au CmdlineEnter : lua require('cmdhijack')
+            aug END
+        ]])
+
+        -- highlight syntax
+        cmd(([[
+            aug LuaHighlight
+                au!
+                au TextYankPost * lua if not vim.b.visual_multi then %s end
+            aug END
+        ]]):format([[pcall(vim.highlight.on_yank, {higroup='IncSearch', timeout=500})]]))
 
         require('plugs.config').matchup()
         cmd('pa vim-matchup')
@@ -528,7 +558,17 @@ vim.schedule(function()
     end, 200)
 
     vim.defer_fn(function()
+        g.coc_global_extensions = {
+            'coc-clangd', 'coc-go', 'coc-html', 'coc-json', 'coc-pyright', 'coc-java',
+            'coc-rust-analyzer', 'coc-tsserver', 'coc-vimlsp', 'coc-xml', 'coc-yaml', 'coc-css',
+            'coc-dictionary', 'coc-markdownlint', 'coc-snippets', 'coc-word'
+        }
+        g.coc_enable_locationlist = 0
+        g.coc_default_semantic_highlight_groups = 0
+        cmd([[au User CocNvimInit ++once lua require('plugs.coc')]])
+
         -- cmd('pa tmux-complete.vim')
+        cmd('pa coc-kvs')
         cmd('pa coc.nvim')
     end, 1000)
 

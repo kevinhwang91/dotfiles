@@ -188,6 +188,7 @@ function M.matchup()
         aug Mathup
             au!
             autocmd TermOpen * let [b:matchup_matchparen_enabled, b:matchup_matchparen_fallback] = [0, 0]
+            autocmd FileType qf let [b:matchup_matchparen_enabled, b:matchup_matchparen_fallback] = [0, 0]
         aug END
     ]])
 end

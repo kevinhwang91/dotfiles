@@ -3,6 +3,10 @@ local cmd = vim.cmd
 local api = vim.api
 local fn = vim.fn
 
+local bmap = function(...)
+    require('remap').bmap(0, ...)
+end
+
 function M.index()
     local bufname = api.nvim_buf_get_name(0)
     if fn.winnr('$') == 1 and bufname == '' then
@@ -28,6 +32,12 @@ function M.diff_hist()
     end
 end
 
+function M.map()
+    bmap('n', 'st', ':Gtabedit <Plug><cfile><Bar>Gdiffsplit! @<CR>',
+        {noremap = false, silent = true})
+    bmap('n', '<Leader>gb', '<Cmd>GBrowse<CR>')
+end
+
 local function init()
     vim.g.nremap = {
         ['d?'] = 's?',
@@ -42,19 +52,24 @@ local function init()
         s = '<C-s>',
         u = '<C-u>',
         O = 'T',
+        a = '',
+        X = 'x',
+        ['-'] = 'a',
         ['*'] = '',
         ['#'] = '',
         ['<C-W>gf'] = 'gF',
         ['[m'] = '[f',
         [']m'] = ']f'
     }
-    vim.g.xremap = {s = 'S', u = '<C-u>'}
+    vim.g.xremap = {s = 'S', u = '<C-u>', ['-'] = 'a', X = 'x'}
     cmd([[
         aug FugitiveCustom
             au!
-            au User FugitiveIndex nmap <silent><buffer> st :Gtabedit <Plug><cfile><Bar>Gdiffsplit!<CR>
+            au User FugitiveIndex,FugitiveCommit lua require('plugs.fugitive').map()
         aug end
     ]])
+
+    cmd('pa vim-rhubarb')
 end
 
 init()

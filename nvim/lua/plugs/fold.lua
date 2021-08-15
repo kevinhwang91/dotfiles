@@ -40,7 +40,7 @@ function M.do_fold()
                     if e1 ~= vim.NIL or not r1 then
                         use_anyfold(filename)
                     else
-                        api.nvim_buf_set_var(bufnr, 'loaded_fold', 'coc')
+                        pcall(api.nvim_buf_set_var, bufnr, 'loaded_fold', 'coc')
                         cmd(('au FoldLoad BufWritePost <buffer=%d> %s'):format(bufnr,
                             [[call CocActionAsync('fold')]]))
                     end
@@ -130,7 +130,8 @@ function M.foldtext()
     return fs_line .. spaces .. fold_info
 end
 
-function M.nav_fold(forward, cnt)
+function M.nav_fold(forward)
+    local cnt = vim.v.count1
     local wv = fn.winsaveview()
     cmd([[norm! m`]])
     local cur_l, cur_c
@@ -154,6 +155,23 @@ function M.nav_fold(forward, cnt)
         if forward or fn.foldclosed(cur_l) == -1 then
             fn.winrestview(wv)
         end
+    end
+end
+
+function M.toggle_fold(c)
+    local cnt = vim.v.count1
+    local ok = pcall(cmd, ('norm! m`V%dz%s%c'):format(cnt, c, 0x1b))
+    if ok and fn.foldclosed('.') == -1 then
+        cmd(('norm! %c'):format(0x1b))
+        local t
+        t = api.nvim_buf_get_mark(0, '<')
+        local start = {t[1] - 1, t[2]}
+        t = api.nvim_buf_get_mark(0, '>')
+        local finish = {t[1] - 1, t[2]}
+
+        utils.highlight(0, 'Visual', start, finish, 500)
+
+        cmd('norm! ``')
     end
 end
 

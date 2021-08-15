@@ -1,12 +1,12 @@
 {
 	"for": {
 		"prefix": "for",
-		"body": ["for (${size_t} ${i} = ${1:0}; ${i} < ${2:length}; ${i}++) {", "\t$3", "}"],
+		"body": ["for (${5:size_t} ${1:i} = ${2:0}; $1 < ${3:length}; $1++) {", "\t$4", "}"],
 		"description": "Code snippet for 'for' loop"
 	},
 	"forr": {
 		"prefix": "forr",
-		"body": ["for (int ${i} = ${1:length} - 1; ${i} >= ${2:0}; ${i}--) {", "\t$3", "}"],
+		"body": ["for (${5:size_t} ${1:i} = ${2:length} - 1; $1 >= ${3:0}; $1--) {", "\t$4", "}"],
 		"description": "Code snippet for reverse 'for' loop"
 	},
 	"while": {
@@ -34,24 +34,9 @@
 		"body": ["enum ${MyEnum} {", "\t$1", "};"],
 		"description": "Code snippet for enum"
 	},
-	"#ifdef": {
-		"prefix": "#ifdef",
-		"body": ["#ifdef ${DEBUG}", "$1", "#endif // ${DEBUG}"],
-		"description": "Code snippet for #ifdef"
-	},
-	"#ifndef": {
-		"prefix": "#ifndef",
-		"body": ["#ifndef ${1:1}", "$2", "#endif // !$1"],
-		"description": "Code snippet for #ifndef"
-	},
-	"#if": {
-		"prefix": "#if",
-		"body": ["#ifdef ${1:0}", "$2", "#endif // $1"],
-		"description": "Code snippet for #if"
-	},
 	"struct": {
-		"prefix": "struct",
-		"body": ["struct ${MyStruct} {", "\t$1", "};"],
+		"prefix": "st",
+		"body": ["struct ${1:Struct} {", "\t$0", "};"],
 		"description": "Code snippet for struct"
 	},
 	"switch": {
@@ -63,26 +48,6 @@
 		"prefix": "union",
 		"body": ["union ${MyUnion} {", "\t$1", "};"],
 		"description": "Code snippet for union"
-	},
-	"#inc": {
-		"prefix": "#inc",
-		"body": ["#include \"$1\""],
-		"description": "Code snippet for #include \" \""
-	},
-	"#inc<": {
-		"prefix": "#inc<",
-		"body": ["#include <$1>"],
-		"description": "Code snippet for #include \" \""
-	},
-	"#def": {
-		"prefix": "def",
-		"body": ["#define $1 $2 "],
-		"description": "Code snippet for #define \" \""
-	},
-	"Standard Starter Template": {
-		"prefix": "sst",
-		"body": ["#include <stdio.h>", "", "int main (int argc, char *argv[]) {", "\treturn 0;", "}"],
-		"description": "A standard starter template for a C program"
 	},
 	"Do...while loop": {
 		"prefix": "do",
@@ -103,12 +68,22 @@
 	},
 	"Create function": {
 		"prefix": "fun",
-		"body": ["${3:int} $1 () {", "\t${3:int} $2;", "\t$4", "\treturn $2;", "}"],
+		"body": ["${1:void} ${2:func}($3) {", "\t$0", "}"],
 		"description": "Creates a function that returns the type"
+	},
+	"Surround function": {
+		"prefix": "sfun",
+		"body": ["${1:void} ${2:func}($3) {", "\t$TM_SELECTED_TEXT", "\t$0", "}"],
+		"description": "Surround a function that returns the type"
+	},
+	"Main": {
+		"prefix": "main",
+		"body": ["int main(int argc, char *argv[]) {", "\t$0", "\treturn 0;", "}"],
+		"description": "Creates a main function that returns the type"
 	},
 	"Print variable": {
 		"prefix": "pf",
-		"body": ["printf(\"$1\\n\", $2);"],
+		"body": ["printf(\"$0\");"],
 		"description": "Calls printf() to log value of variable of type"
 	},
 	"Allocate memory using calloc": {

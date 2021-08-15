@@ -13,26 +13,30 @@ function M.go2def()
     if vim.bo.ft == 'help' then
         api.nvim_feedkeys(api.nvim_replace_termcodes('<C-]>', true, false, true), 'n', false)
         by = 'tag'
-    elseif api.nvim_exec([[echo CocAction('jumpDefinition')]], true):match('v:true$') then
-        by = 'coc'
     else
-        local cword = fn.expand('<cword>')
-        if not pcall(function()
-            local wv = fn.winsaveview()
-            cmd('ltag ' .. cword)
-            local def_size = fn.getloclist(0, {size = 0}).size
-            by = 'ltag'
-            if def_size > 1 then
-                api.nvim_set_current_buf(cur_bufnr)
-                fn.winrestview(wv)
-                cmd('abo lw')
-            elseif def_size == 1 then
-                cmd('lcl')
-                fn.search(cword, 'cs')
+        local err = M.a2sync('definitions')
+        if not err then
+            fn.CocAction('jumpDefinition')
+            by = 'coc'
+        else
+            local cword = fn.expand('<cword>')
+            if not pcall(function()
+                local wv = fn.winsaveview()
+                cmd('ltag ' .. cword)
+                local def_size = fn.getloclist(0, {size = 0}).size
+                by = 'ltag'
+                if def_size > 1 then
+                    api.nvim_set_current_buf(cur_bufnr)
+                    fn.winrestview(wv)
+                    cmd('abo lw')
+                elseif def_size == 1 then
+                    cmd('lcl')
+                    fn.search(cword, 'cs')
+                end
+            end) then
+                fn.searchdecl(cword)
+                by = 'search'
             end
-        end) then
-            fn.searchdecl(cword)
-            by = 'search'
         end
     end
     if api.nvim_get_current_buf() ~= cur_bufnr then
@@ -180,21 +184,19 @@ function M.a2sync(action, args, time)
     local wait_ret = vim.wait(time or 1000, function()
         return done
     end)
-    err, res = wait_ret and err, wait_ret and res or 'timeout'
+    err, res = err or not wait_ret, wait_ret and res or 'timeout'
     return err, res
 end
 
 function M.code_action(...)
-    local actions = fn.CocAction('codeActions')
     local argv = {...}
-    if #argv == 0 then
-        return actions
-    end
-    if #actions > 0 then
-        fn.CocActionAsync('codeAction', unpack(argv))
-    else
-        utils.cool_echo('No codeAction', 'WarningMsg')
-    end
+    fn.CocActionAsync('codeActions', unpack(argv), function(err, res)
+        if err == vim.NIL and type(res) == 'table' and #res > 0 then
+            fn.CocActionAsync('codeAction', unpack(argv))
+        else
+            utils.cool_echo('No codeAction', 'WarningMsg')
+        end
+    end)
 end
 
 function M.organize_import()
@@ -208,7 +210,7 @@ function M.organize_import()
     end
 end
 
-function M.complete_accpet()
+function M.accept_complete()
     local mode = api.nvim_get_mode().mode
     if mode == 'i' then
         api.nvim_feedkeys(api.nvim_replace_termcodes('<C-l>', true, false, true), 'n', false)
@@ -247,6 +249,7 @@ local function init()
 
     cmd('hi! link CocHighlightText CurrentWord')
     if vim.g.colors_name == 'one' then
+        cmd('hi! CocFadeOut guifg=#928374')
         cmd('hi! CocErrorSign guifg=#be5046')
         cmd('hi! CocWarningSign guifg=#e5c07b')
     end
@@ -271,7 +274,7 @@ local function init()
     map('n', 'gd', [[<Cmd>lua require('plugs.coc').go2def()<CR>]])
     map('n', 'gy', '<Plug>(coc-type-definition)', {})
     map('n', 'gi', '<Plug>(coc-implementation)', {})
-    map('n', 'gr', '<Plug>(coc-references)', {})
+    map('n', 'gr', '<Plug>(coc-references-used)', {})
 
     map('n', 'K', [[<Cmd>lua require('plugs.coc').show_documentation()<CR>]])
 
@@ -286,7 +289,7 @@ local function init()
     map('n', '<M-q>', [[<Cmd>echo CocAction('getCurrentFunctionSymbol')<CR>]])
     map('n', '<Leader>qd', [[<Cmd>lua require('plugs.coc').diagnostic()<CR>]])
 
-    map('i', '<C-l>', [[<Cmd>lua require('plugs.coc').complete_accpet()<CR>]])
+    map('i', '<C-l>', [[<Cmd>lua require('plugs.coc').accept_complete()<CR>]])
 
     cmd([[com! -nargs=0 DiagnosticToggleBuffer call CocAction('diagnosticToggleBuffer')]])
     cmd([[com! -nargs=0 CocOutput CocCommand workspace.showOutput]])

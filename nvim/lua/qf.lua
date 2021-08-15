@@ -3,20 +3,18 @@ local api = vim.api
 local cmd = vim.cmd
 local fn = vim.fn
 
-local git = require('gittool')
-
 function _G.qftf(info)
     local items
     local ret = {}
-    git.cd_root(fn.bufname('#'), true)
+    require('gittool').cd_root(fn.bufname('#'), true)
     if info.quickfix == 1 then
         items = fn.getqflist({id = info.id, items = 0}).items
     else
         items = fn.getloclist(info.winid, {id = info.id, items = 0}).items
     end
-    local limit = 27
+    local limit = 31
     local fname_fmt1, fname_fmt2 = '%-' .. limit .. 's', '…%.' .. (limit - 1) .. 's'
-    local valid_fmt, unvalid_fmt = '%s |%5d:%-3d|%s %s', '%s'
+    local valid_fmt = '%s |%5d:%-3d|%s %s'
     for i = info.start_idx, info.end_idx do
         local e = items[i]
         local fname = ''
@@ -40,7 +38,7 @@ function _G.qftf(info)
             local qtype = e.type == '' and '' or ' ' .. e.type:sub(1, 1):upper()
             str = valid_fmt:format(fname, lnum, col, qtype, e.text)
         else
-            str = unvalid_fmt:format(e.text)
+            str = e.text
         end
         table.insert(ret, str)
     end

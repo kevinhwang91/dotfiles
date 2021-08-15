@@ -257,11 +257,10 @@ function M.tabline()
         else
             name = vim.bo[bufnr].ft
         end
-        if name and name ~= '' then
-            table.insert(tl, name .. ' ')
-        else
-            table.insert(tl, '[No Name] ')
+        if not name or name == '' then
+            name = '[No Name]'
         end
+        table.insert(tl, name .. ' ')
     end
     table.insert(tl, '%#TabLineFill#%T')
     return table.concat(tl)

@@ -139,4 +139,14 @@ function M.expandtab(str, bufnr)
     return new
 end
 
+M.highlight = (function()
+    local ns = api.nvim_create_namespace('k-highlight')
+    return function(bufnr, higroup, start, finish, delay)
+        vim.highlight.range(bufnr, ns, higroup, start, finish)
+        vim.defer_fn(function()
+            pcall(api.nvim_buf_clear_namespace, bufnr, ns, 0, -1)
+        end, delay or 200)
+    end
+end)()
+
 return M
