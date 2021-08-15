@@ -1,3 +1,4 @@
+# vim: ft=systemd
 [Unit]
 Description=Start tmux server, require to set server option exit-empty off
 
