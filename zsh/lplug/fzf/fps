@@ -10,7 +10,7 @@ _fps() {
         render='cat'
     fi
 
-    ps -eo user,pid,ppid,pgid,stat,command | awk '
+    ps -eo user,pid,ppid,pgid,tname,stat,command | awk '
     BEGIN { "ps -p $$ -o pgid= | tr -d \"[:blank:]\"" | getline pgid } {
         if ($4 != pgid || $2 == pgid)
             print

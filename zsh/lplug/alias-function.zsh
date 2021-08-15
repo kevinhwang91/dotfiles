@@ -3,7 +3,7 @@ if [[ ! $- =~ i ]]; then
 fi
 
 if (( $+commands[exa] )); then
-    alias ls='exa -gH --time-style=iso '
+    alias ls='exa -gH --time-style=iso'
     alias la='ls -a -a'
     alias ll='ls -al -a'
 else
@@ -24,6 +24,7 @@ alias gss='git status'
 alias ga='git add'
 alias grm='git rm'
 alias gd='git diff'
+alias gd2='git diff @'
 alias gdc='git diff --cached'
 alias gdt='git difftool'
 alias glt='git log --no-walk --tags --pretty="%h %ci %d %s"'
@@ -146,8 +147,14 @@ alias dklf='docker log -f'
 alias dkbt='docker build -t'
 alias dkis='docker inspect'
 
-alias gor='go run'
-alias gob='go build'
+# personal go version for suppressing 'declared but not used' and 'imported and not used'
+if (( $+commands[kgo] )); then
+    alias gor='kgo run'
+    alias gob='kgo build'
+else
+    alias gor='go run'
+    alias gob='go build'
+fi
 
 alias cco='gcc -o'
 
@@ -195,8 +202,7 @@ if (( $+commands[nvim] )); then
     alias nrg='_nrg'
     compdef __nrg_compdef _nrg
     _nrg() {
-        opts=$(printf '%q ' "$@")
-        nvim +"Grepper -noprompt -dir cwd -grepprg rg $opts -H --no-heading --vimgrep -C0 --color=never"
+        nvim +"Grepper -noprompt -dir cwd -grepprg rg $* -H --no-heading --vimgrep -C0 --color=never ."
     }
     __nrg_compdef() {
         _rg
