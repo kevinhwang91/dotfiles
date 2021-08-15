@@ -29,7 +29,7 @@ unmap q
 unmap <C-n>
 map qq quit
 map u scroll half-up
-map e scroll half-up
+map w scroll half-up
 map d scroll half-down
 map <C-p> toggle_page_mode
 map <C-g> toggle_statusbar

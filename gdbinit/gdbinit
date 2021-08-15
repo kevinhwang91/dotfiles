@@ -1,3 +1,4 @@
+set pagination off
 set prompt \001\033[34m\002gdb \001\033[0m\002
 set history expansion on
 set history save on
@@ -8,6 +9,8 @@ set print pretty on
 set print object on
 set print array-indexes on
 
+# set detach-on-fork off
+# set schedule-multiple on
 # set follow-fork-mode child
 set follow-exec-mode same
 
