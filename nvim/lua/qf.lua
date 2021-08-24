@@ -27,7 +27,9 @@ function _G.qftf(info)
                 else
                     fname = fname:gsub('^' .. vim.env.HOME, '~')
                 end
-                if fn.strwidth(fname) <= limit then
+                -- char in fname may occur more than 1 width, ignore this issue in order to keep
+                -- performance
+                if #fname <= limit then
                     fname = fname_fmt1:format(fname)
                 else
                     fname = fname_fmt2:format(fname:sub(1 - limit))

@@ -2,6 +2,7 @@ local M = {}
 local cmd = vim.cmd
 local fn = vim.fn
 local api = vim.api
+local uv = vim.loop
 
 local utils = require('kutils')
 
@@ -24,9 +25,12 @@ local function find_win_except_float(bufnr)
 end
 
 local function use_anyfold(filename)
-    local fsize = fn.getfsize(filename)
-    if 0 < fsize and fsize < 131072 then
-        cmd('AnyFoldActivate')
+    local st = uv.fs_stat(filename)
+    if st then
+        local fsize = st.size
+        if 0 < fsize and fsize < 131072 then
+            cmd('AnyFoldActivate')
+        end
     end
 end
 

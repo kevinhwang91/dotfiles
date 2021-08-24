@@ -28,9 +28,10 @@ end
 local function init()
     local conf = {
         ensure_installed = {
-            'bash', 'c', 'cpp', 'css', 'cuda', 'dart', 'dockerfile', 'go', 'gomod', 'html', 'java',
-            'javascript', 'jsdoc', 'json', 'jsonc', 'kotlin', 'lua', 'php', 'python', 'query',
-            'ruby', 'rust', 'scss', 'teal', 'toml', 'tsx', 'typescript', 'vue', 'yaml', 'zig'
+            'bash', 'c', 'cpp', 'cmake', 'css', 'cuda', 'dart', 'dockerfile', 'go', 'gomod', 'html',
+            'java', 'javascript', 'jsdoc', 'json', 'jsonc', 'kotlin', 'lua', 'php', 'python',
+            'query', 'ruby', 'rust', 'scss', 'teal', 'toml', 'tsx', 'typescript', 'vim', 'vue',
+            'yaml', 'zig'
         },
 
         highlight = {enable = true, disable = {'bash', 'html'}},
@@ -67,7 +68,12 @@ local function init()
     require('nvim-treesitter.configs').setup(conf)
 
     cmd('pa iswap.nvim')
-    require('iswap').setup {grey = 'disable', hl_snipe = 'IncSearch', hl_selection = 'MatchParen'}
+    require('iswap').setup {
+        grey = 'disable',
+        hl_snipe = 'IncSearch',
+        hl_selection = 'MatchParen',
+        autoswap = true
+    }
     map('n', '<Leader>sp', '<Cmd>ISwap<CR>')
 
     parsers = require('nvim-treesitter.parsers')

@@ -1,5 +1,5 @@
 local install_path = vim.fn.stdpath('data') .. '/site/pack/packer/opt/packer.nvim'
-if vim.fn.glob(install_path) == '' then
+if not vim.loop.fs_stat(install_path) then
     vim.cmd('!git clone https://github.com/wbthomason/packer.nvim ' .. install_path)
 end
 vim.cmd('pa packer.nvim')
@@ -216,8 +216,6 @@ return packer.startup({
         use {'neoclide/coc.nvim', branch = 'master', run = 'yarn install --frozen-lockfile'}
 
         use {'kevinhwang91/coc-kvs', run = 'yarn install --frozen-lockfile'}
-
-        use {'wellle/tmux-complete.vim'}
 
         use {
             'kkoomen/vim-doge',

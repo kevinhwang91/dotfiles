@@ -26,7 +26,7 @@ local mode_map = setmetatable({
 local function readonly(bufnr)
     local ret
     if vim.bo[bufnr].readonly then
-        ret = fn.filereadable(api.nvim_buf_get_name(bufnr or 0)) == 1 and '' or ''
+        ret = uv.fs_stat(api.nvim_buf_get_name(bufnr or 0)) and '' or ''
     end
     return ret
 end

@@ -4,34 +4,37 @@ local fn = vim.fn
 local cmd = vim.cmd
 local uv = vim.loop
 
-function M.file_exists(name)
-    local f = io.open(name, 'r')
-    if f ~= nil then
-        f:close()
-        return true
+function M.write_file(path, data, sync)
+    local path_ = path .. '_'
+    if sync then
+        local fd = assert(uv.fs_open(path_, 'w', 438))
+        assert(uv.fs_write(fd, data))
+        assert(uv.fs_close(fd))
+        uv.fs_rename(path_, path)
     else
-        return false
-    end
-end
-
-function M.write_file(file_path, lines)
-    local file_path_ = file_path .. '_'
-    local fd_ = io.open(file_path_, 'w')
-    if fd_ then
-        for _, line in ipairs(lines) do
-            fd_:write(line, '\n')
-        end
-        fd_:close()
-        os.rename(file_path_, file_path)
+        uv.fs_open(path_, 'w', 438, function(err_open, fd)
+            assert(not err_open, err_open)
+            uv.fs_write(fd, data, nil, function(err_write)
+                assert(not err_write, err_write)
+                uv.fs_close(fd, function(err_close, succ)
+                    assert(not err_close, err_close)
+                    if succ then
+                        -- may rename by other syn write
+                        uv.fs_rename(path_, path, function()
+                        end)
+                    end
+                end)
+            end)
+        end)
     end
 end
 
 function M.follow_symlink(fname)
     fname = fname and fn.fnamemodify(fname, ':p') or api.nvim_buf_get_name(0)
-    if fn.getftype(fname) ~= 'link' then
-        return
+    local linked_path = uv.fs_readlink(fname)
+    if linked_path then
+        cmd(('keepalt file %s'):format(linked_path))
     end
-    cmd(('keepalt file %s'):format(fn.fnameescape(fn.resolve(fname))))
 end
 
 function M.clean_empty_bufs()

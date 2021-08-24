@@ -39,6 +39,11 @@
 		"body": ["struct ${1:Struct} {", "\t$0", "};"],
 		"description": "Code snippet for struct"
 	},
+	"typedef struct": {
+		"prefix": "tys",
+		"body": ["typedef struct $1 {", "\t$3", "} ${2:name};"],
+		"description": "Code snippet for struct"
+	},
 	"switch": {
 		"prefix": "switch",
 		"body": ["switch (${switch_on}) {", "default:", "\tbreak;$1", "}"],

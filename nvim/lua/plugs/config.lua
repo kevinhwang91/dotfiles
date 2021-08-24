@@ -76,7 +76,6 @@ function M.visualmulti()
     map('n', '<Leader>/', '<Plug>(VM-Start-Regex-Search)', {})
     map('n', '<Leader>A', '<Plug>(VM-Select-All)', {})
     map('x', '<Leader>A', '<Plug>(VM-Visual-All)', {})
-    map('x', '<Leader>c', '<Plug>(VM-Visual-Cursors)', {})
     map('n', '<Leader>gs', '<Plug>(VM-Reselect-Last)', {})
     map('n', '<M-C-k>', '<Plug>(VM-Select-Cursor-Up)', {})
     map('n', '<M-C-j>', '<Plug>(VM-Select-Cursor-Down)', {})
@@ -120,7 +119,7 @@ function M.grepper()
         highlight = 0,
         stop = 10000,
         rg = {
-            grepprg = 'rg -H --no-heading --vimgrep --smart-case $* .',
+            grepprg = 'rg -H --no-heading --vimgrep --smart-case',
             grepformat = '%f:%l:%c:%m,%f:%l:%m'
         }
     }
@@ -137,8 +136,7 @@ function M.grepper()
         'bo cope'))
 
     -- if fn.executable('rg') then
-    --     vim.bo.grepprg = [[rg --vimgrep --no-heading --smart-case $* .]]
-    --     vim.o.grepprg = vim.bo.grepprg
+    --     vim.o.grepprg = [[rg --vimgrep --no-heading --smart-case]]
     --     vim.o.grepformat = [[%f:%l:%c:%m,%f:%l:%m]]
     -- end
 end
@@ -156,7 +154,7 @@ function M.matchup()
     g.matchup_matchparen_deferred = 1
     g.matchup_matchparen_deferred_show_delay = 50
     g.matchup_matchparen_deferred_hide_delay = 300
-    g.matchup_matchparen_hi_surround_always = 2
+    g.matchup_matchparen_hi_surround_always = 1
     g.matchup_matchparen_offscreen = {method = 'popup', highlight = 'CurrentWord'}
     g.matchup_delim_start_plaintext = 1
     g.matchup_motion_override_Npercent = 0
@@ -286,7 +284,7 @@ function M.neoformat()
 
     -- sql
     g.neoformat_enabled_sql = {'sqlformatter'}
-    g.neoformat_sql_sqlformatter = {exe = 'sql-formatter', stdin = 1}
+    g.neoformat_sql_sqlformatter = {exe = 'sql-formatter', args = {'--indent', '4'}, stdin = 1}
 end
 
 function M.slime()

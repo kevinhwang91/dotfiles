@@ -79,7 +79,7 @@ end
 
 function M.flush()
     if #hist_bufs > 0 then
-        utils.write_file(db, list(db))
+        utils.write_file(db, table.concat(list(db), '\n'))
         hist_bufs = {}
     end
 end

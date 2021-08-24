@@ -1,47 +1,39 @@
 local cmd = vim.cmd
 local fn = vim.fn
+local uv = vim.loop
 
-local env, g, o, wo, bo = vim.env, vim.g, vim.o, vim.wo, vim.bo
-local map = require('remap').map
+local env, g, o = vim.env, vim.g, vim.o
 
 local is_master = fn.has('nvim-0.6') == 1
 
--- source filetype.vim later
-g.did_load_filetypes = 1
-
-wo.nu = true
-wo.rnu = true
-wo.cul = true
+o.nu = true
+o.rnu = true
+o.cul = true
 if is_master then
-    wo.culopt = 'number,screenline'
+    o.culopt = 'number,screenline'
 end
-wo.scl = 'yes:1'
-wo.foldcolumn = '1'
-wo.foldenable = true
-wo.list = true
-bo.ts = 4
-o.ts = bo.ts
-bo.sw = 4
-o.sw = bo.sw
-bo.et = true
-o.et = bo.et
-bo.softtabstop = -1
-o.softtabstop = bo.softtabstop
-bo.autoindent = true
-o.autoindent = bo.autoindent
-bo.smartindent = true
-o.smartindent = bo.smartindent
+o.scl = 'yes:1'
+o.foldcolumn = '1'
+o.foldenable = true
+o.list = true
+o.ts = 4
+o.sw = 4
+o.et = true
+o.softtabstop = -1
+-- o.autoindent = true
+o.smartindent = true
 o.synmaxcol = 300
-bo.synmaxcol = o.synmaxcol
 o.textwidth = 100
-bo.textwidth = o.textwidth
 o.clipboard = 'unnamedplus'
-o.timeout = true
+-- o.timeout = true
 o.timeoutlen = 500
 o.ignorecase = true
 o.smartcase = true
 o.updatetime = 200
-o.hidden = true
+if not is_master then
+    o.hidden = true
+    o.inccommand = 'nosplit'
+end
 o.fileencodings = 'utf-8,gb2312,gb18030,gbk,ucs-bom,cp936,latin1'
 o.showmode = false
 o.cedit = '<C-x>'
@@ -52,7 +44,6 @@ o.foldlevelstart = 99
 o.title = true
 o.titlestring = '%(%m%)%(%{expand(\"%:~\")}%)'
 o.lazyredraw = true
-o.inccommand = 'nosplit'
 o.shortmess = o.shortmess .. 'acsIS'
 o.confirm = true
 o.jumpoptions = 'stack'
@@ -62,14 +53,15 @@ o.termguicolors = true
 o.fillchars = 'eob: '
 
 -- undo
-bo.undofile = true
-o.undofile = bo.undofile
+o.undofile = true
 o.undolevels = 1000
 
 -- no backup
 o.backup = false
-bo.swapfile = false
-o.swapfile = bo.swapfile
+o.swapfile = false
+
+-- source filetype.vim later
+g.did_load_filetypes = 1
 
 g.loaded_netrwPlugin = 1
 g.loaded_matchparen = 1
@@ -117,6 +109,12 @@ end
 g.clipboard = clipboard
 
 -- map
+-- push parameters to list and defer mapping
+local paras_tbl = {}
+local function map(mode, lhs, rhs, opts)
+    table.insert(paras_tbl, {mode, lhs, rhs, opts})
+end
+
 g.mapleader = ' '
 map('n', '<Space>', '')
 map('x', '<Space>', '')
@@ -129,6 +127,7 @@ map('n', 'y', [[v:lua._G.yank()]], {noremap = true, expr = true})
 map('n', 'Y', 'y$')
 map('n', 'v', 'm`v')
 map('n', 'V', 'm`V')
+map('n', '<C-v>', 'm`<C-v>')
 map('x', 'p', [[p<Cmd>let @+ = @0<CR><Cmd>let @" = @0<CR>]])
 map('x', 'P', [[P<Cmd>let @+ = @0<CR><Cmd>let @" = @0<CR>]])
 map('n', '<Leader>2;', '@:')
@@ -141,8 +140,11 @@ map('n', 'qd', [[<Cmd>lua require('kutils').close_diff()<CR>]])
 map('n', 'qD', [[<Cmd>tabdo lua require('kutils').close_diff()<CR><Cmd>noa tabe<Bar> noa bw<CR>]])
 map('n', '<Leader>w', '<Cmd>up<CR>')
 map('n', '<Leader>;w', '<Cmd>wq<CR>')
-map('n', '<C-g>', '1<C-g>')
+map('n', '<C-g>', '2<C-g>')
 map('n', '<Leader>l', ':noh<CR>')
+if is_master then
+    map('n', '<C-l>', '<C-l>')
+end
 map('c', '<C-b>', '<Left>')
 map('c', '<C-f>', '<Right>')
 map('c', '<C-a>', '<Home>')
@@ -195,7 +197,9 @@ map('x', '<M-k>', [[:m '<-2<CR>gv=gv]])
 map('n', 'yd', [[<Cmd>call setreg(v:register, expand('%:p:h'))<CR>:echo expand('%:p:h')<CR>]])
 map('n', 'yn', [[<Cmd>call setreg(v:register, expand('%:t'))<CR>:echo expand('%:t')<CR>]])
 map('n', 'yp', [[<Cmd>call setreg(v:register, expand('%:p'))<CR>:echo expand('%:p')<CR>]])
-map('n', 'Y', 'y$')
+if not is_master then
+    map('n', 'Y', 'y$')
+end
 
 map('n', '[', [[v:lua._G.prefix_timeout('[')]], {noremap = true, expr = true})
 map('x', '[', [[v:lua._G.prefix_timeout('[')]], {noremap = true, expr = true})
@@ -263,18 +267,18 @@ require('stl')
 require('qf')
 
 local conf_dir = fn.stdpath('config')
-if fn.glob(conf_dir .. '/plugin/packer_compiled.lua') == '' then
-    require('plugs.packer').compile()
-else
+if uv.fs_stat(conf_dir .. '/plugin/packer_compiled.lua') then
     cmd([[
-        com! PackerInstall lua require('plugs.packer').install()
-        com! PackerUpdate lua require('plugs.packer').update()
-        com! PackerSync lua require('plugs.packer').sync()
-        com! PackerClean lua require('plugs.packer').clean()
-        com! PackerStatus lua require('plugs.packer').status()
-        com! -nargs=? PackerCompile lua require('plugs.packer').compile(<q-args>)
-        com! -nargs=+ PackerLoad lua require('plugs.packer').loader(<q-args>)
+    com! PackerInstall lua require('plugs.packer').install()
+    com! PackerUpdate lua require('plugs.packer').update()
+    com! PackerSync lua require('plugs.packer').sync()
+    com! PackerClean lua require('plugs.packer').clean()
+    com! PackerStatus lua require('plugs.packer').status()
+    com! -nargs=? PackerCompile lua require('plugs.packer').compile(<q-args>)
+    com! -nargs=+ PackerLoad lua require('plugs.packer').loader(<q-args>)
     ]])
+else
+    require('plugs.packer').compile()
 end
 
 local theme = 'one'
@@ -285,7 +289,10 @@ end
 -- junegunn/fzf.vim
 -- `pacman -S fzf` will force nvim load plugin in /usr/share/vim/vimfiles/plugin/fzf.vim
 g.loaded_fzf = true
-env.FZF_DEFAULT_OPTS = env.FZF_DEFAULT_OPTS .. ' --reverse --info=inline --border'
+local fzf_opts = env.FZF_DEFAULT_OPTS
+if fzf_opts then
+    env.FZF_DEFAULT_OPTS = fzf_opts .. ' --reverse --info=inline --border'
+end
 env.BAT_STYLE = 'numbers'
 map('n', '<Leader>f', '')
 map('n', '<Leader>ff', '<Cmd>FZF<CR>')
@@ -390,7 +397,7 @@ g.git_messenger_always_into_popup = 1
 map('n', '<Leader>gm', '<Cmd>GitMessenger<CR>')
 
 -- sbdchd/neoformat
-map('n', '<M-C-l>', [[<Cmd>lua require('gittool').root_exe('Neoformat')<CR>]])
+map('n', '<M-C-l>', [[<Cmd>lua require('gittool').root_exe('Neoformat')<CR><Cmd>up<CR>]])
 
 -- plasticboy/vim-markdown
 g.vim_markdown_toc_autofit = 1
@@ -423,16 +430,16 @@ map('', '<C-_>', '<Plug>NERDCommenterToggle', {})
 -- delimitMate
 map('i', '<CR>', [[pumvisible() ? "\<C-y>" : "<Plug>delimitMateCR"]], {noremap = false, expr = true})
 
+map('n', '<Leader>2p', '<Cmd>Kill2Spaces<CR>')
+map('n', '<Leader>jj', '<Cmd>Jumps<CR>')
+
 cmd([[
     com! -range=% -nargs=0 RmAnsi <line1>,<line2>s/\%x1b\[[0-9;]*[Km]//g
     com! -nargs=? -complete=buffer FollowSymlink lua require('kutils').follow_symlink(<f-args>)
     com! -nargs=0 CleanEmptyBuf lua require('kutils').clean_empty_bufs()
     com! -nargs=0 Kill2Spaces lua require('kutils').kill2spaces()
     com! -nargs=0 Jumps lua require('builtin').jumps2qf()
-]])
-map('n', '<Leader>2p', '<Cmd>Kill2Spaces<CR>')
 
-cmd([[
     aug RnuColumn
         au!
         au FocusLost * lua require('rnu').focus(false)
@@ -451,19 +458,10 @@ cmd([[
         au!
         au TermEnter * lua vim.schedule(function() vim.cmd('noh') vim.fn.clearmatches() end)
     aug END
-]])
 
-map('n', '<Leader>jj', '<Cmd>Jumps<CR>')
-
-cmd([[
     aug GoFormat
         au!
         au FileType go setl noexpandtab
-    aug end
-
-    aug SqlFormat
-        au!
-        au FileType sql setl tabstop=2 shiftwidth=2
     aug end
 
     aug MakeFileFormat
@@ -485,6 +483,13 @@ g.loaded_clipboard_provider = 1
 
 vim.schedule(function()
     vim.defer_fn(function()
+        local m = require('remap').map
+        for _, paras in ipairs(paras_tbl) do
+            m(unpack(paras))
+        end
+    end, 20)
+
+    vim.defer_fn(function()
         require('plugs.treesitter')
 
         if not is_master then
@@ -503,7 +508,17 @@ vim.schedule(function()
         g.loaded_clipboard_provider = nil
         cmd('runtime autoload/provider/clipboard.vim')
         cmd('pa nvim-hclipboard')
-        require('hclipboard').start()
+        require('hclipboard').setup({
+            should_bypass_cb = function(regname, ev)
+                local ret = false
+                if ev.operator == 'c' then
+                    if ev.regname == '' or ev.regname == regname then
+                        ret = true
+                    end
+                end
+                return ret
+            end
+        }).start()
 
         cmd([[
             aug Packer
@@ -554,7 +569,7 @@ vim.schedule(function()
         g.Hexokinase_ftOptOutPatterns = {css = all_hexokinase_pat, scss = all_hexokinase_pat}
         g.Hexokinase_termDisabled = 1
         cmd('pa vim-hexokinase')
-        cmd('HexokinaseTurnOn')
+        cmd('doautoall hexokinase_autocmds BufRead')
     end, 200)
 
     vim.defer_fn(function()
@@ -567,7 +582,6 @@ vim.schedule(function()
         g.coc_default_semantic_highlight_groups = 0
         cmd([[au User CocNvimInit ++once lua require('plugs.coc')]])
 
-        -- cmd('pa tmux-complete.vim')
         cmd('pa coc-kvs')
         cmd('pa coc.nvim')
     end, 1000)

@@ -227,6 +227,29 @@ function M.accept_complete()
     end
 end
 
+function M.rename()
+    vim.g.coc_jump_locations = nil
+    fn.CocActionAsync('rename', '', function(err, res)
+        info(err, res)
+        if err == vim.NIL and res then
+            local loc = vim.g.coc_jump_locations
+            if loc then
+                local uri = vim.uri_from_bufnr()
+                local open = false
+                for _, lo in ipairs(loc) do
+                    if lo.uri ~= uri then
+                        open = true
+                        break
+                    end
+                end
+                if open then
+                    M.jump2loc(loc)
+                end
+            end
+        end
+    end)
+end
+
 local function init()
     diag_qfid = -1
 
@@ -277,6 +300,8 @@ local function init()
     map('n', 'gr', '<Plug>(coc-references-used)', {})
 
     map('n', 'K', [[<Cmd>lua require('plugs.coc').show_documentation()<CR>]])
+
+    map('n', '<Leader>rn', [[<Cmd>lua require('plugs.coc').rename()<CR>]])
 
     map('n', '<Leader>ac', [[<Cmd>lua require('plugs.coc').code_action('')<CR>]])
     map('n', '<M-CR>', [[<Cmd>lua require('plugs.coc').code_action('line')<CR>]])

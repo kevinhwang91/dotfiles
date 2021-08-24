@@ -3,6 +3,7 @@
 	"coc.preferences.colorSupport": false,
 	"coc.preferences.extensionUpdateCheck": "weekly",
 	"coc.preferences.messageLevel": "error",
+	"coc.preferences.listOfWorkspaceEdit": "location",
 	"coc.preferences.semanticTokensHighlights": false,
 	"suggest.enablePreselect": true,
 	"suggest.noselect": false,

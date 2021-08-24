@@ -164,13 +164,6 @@ local theme = lush(function()
         markdownCodeBlock {Identifier}, --
         markdownListMarker {Identifier}, --
         markdownHeadingDelimiter {Special}, --
-        -- vim
-        vimCommentTitle {NonText}, --
-        vimHighlight {Function}, --
-        vimFunction {Function}, --
-        vimUserFunc {Function}, --
-        vimNotation {Special}, --
-        vimFuncSID {Special}, --
         -- xml
         xmlTag {Identifier}, --
         xmlTagName {Identifier}, --

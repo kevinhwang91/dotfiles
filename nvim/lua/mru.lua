@@ -2,6 +2,7 @@ local M = {}
 local api = vim.api
 local fn = vim.fn
 local cmd = vim.cmd
+local uv = vim.loop
 
 local utils = require('kutils')
 
@@ -17,7 +18,7 @@ local function list(file)
     local add_list = function(name)
         if not fname_set[name] then
             fname_set[name] = true
-            if utils.file_exists(name) then
+            if uv.fs_stat(name) then
                 if #mru_list < max then
                     table.insert(mru_list, name)
                 else
@@ -54,12 +55,12 @@ end
 
 function M.list()
     local mru_list = list(db)
-    utils.write_file(db, mru_list)
+    utils.write_file(db, table.concat(mru_list, '\n'))
     return mru_list
 end
 
-function M.flush()
-    utils.write_file(db, list(db))
+function M.flush(sync)
+    utils.write_file(db, table.concat(list(db), '\n'), sync)
 end
 
 M.store_buf = (function()
@@ -79,19 +80,19 @@ local function init()
     db = vim.env.HOME .. '/.mru_file'
     max = 1000
     bufs = {}
-    tmp_prefix = fn.tempname()
+    tmp_prefix = uv.os_tmpdir()
 
-    M.store_buf(0)
+    M.store_buf()
     cmd([[
         aug Mru
             au!
             au BufEnter,BufAdd,FocusGained * lua require('mru').store_buf()
-            au VimLeavePre,VimSuspend * lua require('mru').flush()
+            au VimLeavePre * lua require('mru').flush(true)
+            au VimSuspend * lua require('mru').flush()
             au FocusLost * lua require('mru').flush()
         aug END
     ]])
 end
-
 
 init()
 

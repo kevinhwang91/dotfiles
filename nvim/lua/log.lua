@@ -91,8 +91,8 @@ local function init()
             local linfo = info.short_src .. ':' .. info.currentline
 
             local fp = assert(io.open(log_file, 'a+'))
-            local str = string.format('>%s [%s] [%s] %s : %s\n', tty or load_tty(),
-                os.date(log_date_fmt), l, linfo, msg)
+            local str = ('>%s [%s] [%s] %s : %s\n'):format(tty or load_tty(), os.date(log_date_fmt),
+                l, linfo, msg)
             fp:write(str)
             fp:close()
         end

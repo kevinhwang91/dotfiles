@@ -2,6 +2,7 @@ local M = {}
 local api = vim.api
 local fn = vim.fn
 local cmd = vim.cmd
+local uv = vim.loop
 
 function M.root(path)
     if path then
@@ -19,8 +20,9 @@ function M.root(path)
     while path ~= prev do
         prev = path
         path = fn.fnamemodify(path, ':h')
-        local t = path .. '/.git'
-        if fn.isdirectory(t) == 1 then
+        local st = uv.fs_stat(path .. '/.git')
+        local stt = st and st.type
+        if stt == 'directory' or stt == 'file' then
             ret = path
             break
         end
@@ -39,7 +41,7 @@ end
 
 function M.root_exe(exec)
     local cur_winid
-    local old_cwd = fn.getcwd()
+    local old_cwd = uv.cwd()
 
     local r = M.cd_root(nil, true)
     if r ~= '' then
