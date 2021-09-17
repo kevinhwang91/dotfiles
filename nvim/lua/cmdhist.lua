@@ -77,12 +77,23 @@ function M.list()
     return hist_list
 end
 
-function M.flush()
-    if #hist_bufs > 0 then
-        utils.write_file(db, table.concat(list(db), '\n'))
-        hist_bufs = {}
+M.flush = (function()
+    local timer
+    return function(force)
+        if #hist_bufs > 0 then
+            if force then
+                utils.write_file(db, table.concat(list(db), '\n'), true)
+            else
+                utils.killable_defer(timer, function()
+                    if #hist_bufs > 0 then
+                        utils.write_file(db, table.concat(list(db), '\n'))
+                        hist_bufs = {}
+                    end
+                end, 50)
+            end
+        end
     end
-end
+end)()
 
 M.store = (function()
     local count = 0
@@ -118,7 +129,7 @@ local function init()
         aug CmdHist
             au!
             au CmdlineLeave : lua require('cmdhist').fire_leave()
-            au VimLeavePre,VimSuspend * lua require('cmdhist').flush()
+            au VimLeavePre,VimSuspend * lua require('cmdhist').flush(true)
             au FocusLost * lua require('cmdhist').flush()
             au FocusGained * lua require('cmdhist').enable_reload()
         aug END

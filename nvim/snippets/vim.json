@@ -30,8 +30,14 @@
 		"description": "for [k, v] in loop"
 	},
 	"while": {
-		"prefix": "wh",
+		"prefix": "whi",
 		"body": ["while $1", "\t$0", "endwhile"],
+		"description": "while loop"
+	},
+
+	"catch": {
+		"prefix": "catch",
+		"body": ["catch /.*/"],
 		"description": "while loop"
 	}
 }

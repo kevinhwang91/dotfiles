@@ -10,28 +10,28 @@
 		"description": "Code snippet for reverse 'for' loop"
 	},
 	"while": {
-		"prefix": "while",
-		"body": ["while ($1) {", "\t$2", "}"],
+		"prefix": "whi",
+		"body": ["while ($1) {", "\t$0", "}"],
 		"description": ""
 	},
 	"if": {
 		"prefix": "if",
-		"body": ["if ($1) {", "\t$2", "}"],
+		"body": ["if ($1) {", "\t$0", "}"],
 		"description": "Code snippet for if statement"
 	},
 	"else": {
 		"prefix": "else",
-		"body": ["else {", "\t$1", "}"],
+		"body": ["else {", "\t$0", "}"],
 		"description": "Code snippet for else statement"
 	},
 	"else if": {
-		"prefix": "else if",
-		"body": ["else if ($1) {", "\t$2", "}"],
+		"prefix": "elseif",
+		"body": ["else if ($1) {", "\t$0", "}"],
 		"description": "Code snippet for else-if statement"
 	},
 	"enum": {
 		"prefix": "enum",
-		"body": ["enum ${MyEnum} {", "\t$1", "};"],
+		"body": ["enum ${MyEnum} {", "\t$0", "};"],
 		"description": "Code snippet for enum"
 	},
 	"struct": {
@@ -41,11 +41,11 @@
 	},
 	"typedef struct": {
 		"prefix": "tys",
-		"body": ["typedef struct $1 {", "\t$3", "} ${2:name};"],
+		"body": ["typedef struct $1 {", "\t$0", "} ${2:name};"],
 		"description": "Code snippet for struct"
 	},
 	"switch": {
-		"prefix": "switch",
+		"prefix": "swi",
 		"body": ["switch (${switch_on}) {", "default:", "\tbreak;$1", "}"],
 		"description": "Code snippet for switch statement"
 	},
@@ -56,7 +56,7 @@
 	},
 	"Do...while loop": {
 		"prefix": "do",
-		"body": ["do {", "\t$0", "} while($0)"],
+		"body": ["do {", "\t$0", "} while ($1)"],
 		"description": "Creates a do...while loop"
 	},
 	"Create linked list": {

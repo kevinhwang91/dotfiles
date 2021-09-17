@@ -175,6 +175,9 @@ map('n', '<C-u>', 'u')
 map('n', 'k', [[(v:count > 1 ? 'm`' . v:count : '') . 'k']], {noremap = true, expr = true})
 map('n', 'j', [[(v:count > 1 ? 'm`' . v:count : '') . 'j']], {noremap = true, expr = true})
 
+map('n', 'U', [[<Cmd>execute('earlier ' . v:count1 . 'f')<CR>]], {noremap = true, silent = false})
+map('n', '<M-r>', [[<Cmd>execute('later ' . v:count1 . 'f')<CR>]], {noremap = true, silent = false})
+
 map('n', [[']], [[`]])
 map('x', [[']], [[`]])
 map('o', [[']], [[`]])
@@ -187,6 +190,13 @@ map('c', [[<C-r>']], [[<C-r>"]])
 
 map('n', [['0]], [[<Cmd>norm! `0<CR><Cmd>sil! CleanEmptyBuf<CR>]])
 map('n', '<Leader>i', '<Cmd>sil! norm! `^<CR>')
+
+map('n', '0', [[getline('.')[:col('.') - 2] =~ '^\s\+$' ? '0' : 'm`^']],
+    {noremap = true, expr = true})
+map('x', '0', [[getline('.')[:col('.') - 2] =~ '^\s\+$' ? '0' : 'm`^']],
+    {noremap = true, expr = true})
+map('o', '0', [[getline('.')[:col('.') - 2] =~ '^\s\+$' ? '0' : 'm`^']],
+    {noremap = true, expr = true})
 
 map('n', '<M-j>', '<Cmd>m +1<CR>')
 map('n', '<M-k>', '<Cmd>m -2<CR>')
@@ -352,7 +362,8 @@ cmd([[
 map('n', '<M-o>', '<Cmd>RnvimrToggle<CR>')
 
 -- tpope/vim-repeat
-map('n', 'U', '<Plug>(RepeatUndo)', {})
+map('n', '<Plug>DummyRepeatUndo', '<Plug>(RepeatUndo)', {})
+map('n', '<Plug>DummyRepeatRedo', '<Plug>(RepeatRedo)', {})
 
 -- wellle/targets.vim
 g.targets_aiAI = 'aIAi'
@@ -428,7 +439,9 @@ g.NERDCustomDelimiters = {lua = {left = '--', leftAlt = '', rightAlt = ''}}
 map('', '<C-_>', '<Plug>NERDCommenterToggle', {})
 
 -- delimitMate
-map('i', '<CR>', [[pumvisible() ? "\<C-y>" : "<Plug>delimitMateCR"]], {noremap = false, expr = true})
+map('i', '<CR>',
+    [[pumvisible() ? "\<C-y>" : (getline('.')[:col('.') - 2] =~ '^\s*$' ? '' : "\<C-g>u") . "<Plug>delimitMateCR"]],
+    {noremap = false, expr = true})
 
 map('n', '<Leader>2p', '<Cmd>Kill2Spaces<CR>')
 map('n', '<Leader>jj', '<Cmd>Jumps<CR>')
@@ -575,11 +588,11 @@ vim.schedule(function()
     vim.defer_fn(function()
         g.coc_global_extensions = {
             'coc-clangd', 'coc-go', 'coc-html', 'coc-json', 'coc-pyright', 'coc-java',
-            'coc-rust-analyzer', 'coc-tsserver', 'coc-vimlsp', 'coc-xml', 'coc-yaml', 'coc-css',
-            'coc-dictionary', 'coc-markdownlint', 'coc-snippets', 'coc-word'
+            'coc-rust-analyzer', 'coc-tsserver', 'coc-eslint', 'coc-vimlsp', 'coc-xml', 'coc-yaml',
+            'coc-css', 'coc-dictionary', 'coc-markdownlint', 'coc-snippets', 'coc-word'
         }
         g.coc_enable_locationlist = 0
-        g.coc_default_semantic_highlight_groups = 0
+        g.coc_default_semantic_highlight_groups = 1
         cmd([[au User CocNvimInit ++once lua require('plugs.coc')]])
 
         cmd('pa coc-kvs')

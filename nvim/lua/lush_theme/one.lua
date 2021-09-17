@@ -19,6 +19,7 @@ local blue4 = '#31435e'
 local purple1 = '#c678dd'
 local purple2 = '#8075f1'
 local cyan1 = '#56b6c2'
+local cyan2 = '#1a9992'
 local white1 = '#abb2bf'
 local mono1 = '#5c6370'
 local mono2 = '#4b5263'
@@ -124,6 +125,8 @@ local theme = lush(function()
         Todo {fg = purple1, gui = 'italic'}, --
         -- extra
         Parameter {fg = green2}, --
+        NameSpace {fg = cyan2}, --
+        Enum {Namespaces}, --
         CurrentWord {bg = blue4, gui = 'bold'}, --
         -- statusline
         StatusLineNormal {fg = mono5, bg = green1, gui = 'bold'}, --

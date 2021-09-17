@@ -21,7 +21,7 @@ function M.action(obj, inner, visual)
             obj = 'function'
         end
         if require('plugs.treesitter').do_textobject(obj, inner, visual) then
-            utils.cool_echo([[textobjects: treesitter]], 'WarningMsg')
+            utils.cool_echo('textobjects: treesitter', 'WarningMsg')
         end
     else
         if obj == 'func' then

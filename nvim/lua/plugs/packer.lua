@@ -73,7 +73,6 @@ return packer.startup({
         use {
             'kevinhwang91/nvim-hlslens',
             branch = 'dev',
-            setup = [[vim.g.loaded_nvim_hlslens = 1]],
             keys = {'n', 'N', '/', '?', '*', '#', 'g*', 'g#'},
             config = conf('hlslens'),
             requires = {{'haya14busa/vim-asterisk'}}
@@ -143,7 +142,7 @@ return packer.startup({
             'bootleq/vim-cycle',
             keys = {'<C-a>', '<C-x>'},
             setup = [[vim.g.cycle_no_mappings = 1]],
-            config = conf('cycle')
+            config = [[require('plugs.cycle')]]
         }
 
         use {'mbbill/undotree'}
@@ -250,5 +249,6 @@ return packer.startup({
         use {'nvim-lua/plenary.nvim'}
 
         use_rocks {'lrexlib-PCRE2'}
+        use_rocks {'luautf8'}
     end
 })

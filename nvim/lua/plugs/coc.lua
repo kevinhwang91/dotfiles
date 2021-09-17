@@ -6,6 +6,7 @@ local cmd = vim.cmd
 local map = require('remap').map
 local utils = require('kutils')
 local diag_qfid
+local sign_icons
 
 function M.go2def()
     local cur_bufnr = api.nvim_get_current_buf()
@@ -53,11 +54,15 @@ function M.show_documentation()
     if ft == 'vim' or ft == 'help' then
         cmd(('sil! h %s'):format(fn.expand('<cword>')))
     elseif api.nvim_eval([[CocAction('hasProvider', 'hover')]]) then
-        fn.CocActionAsync('doHover')
+        fn.CocActionAsync('definitionHover')
     else
         cmd('norm! K')
     end
 end
+
+-- function M.outline()
+--     local o = fn.CocAction('listLoadItems', 'outline')
+-- end
 
 function M.diagnostic_change()
     if vim.v.exiting == vim.NIL then
@@ -117,7 +122,7 @@ function M.diagnostic(winid, nr, keep)
     end)
 end
 
-function M.jump2loc(locs)
+function M.jump2loc(locs, skip)
     locs = locs or vim.g.coc_jump_locations
     local loc_ranges = vim.tbl_map(function(val)
         return val.range
@@ -127,11 +132,13 @@ function M.jump2loc(locs)
         items = locs,
         context = {bqf = {lsp_ranges_hl = loc_ranges}}
     })
-    local winid = fn.getloclist(0, {winid = 0}).winid
-    if winid == 0 then
-        cmd('abo lw')
-    else
-        api.nvim_set_current_win(winid)
+    if not skip then
+        local winid = fn.getloclist(0, {winid = 0}).winid
+        if winid == 0 then
+            cmd('abo lw')
+        else
+            api.nvim_set_current_win(winid)
+        end
     end
 end
 
@@ -230,34 +237,52 @@ end
 function M.rename()
     vim.g.coc_jump_locations = nil
     fn.CocActionAsync('rename', '', function(err, res)
-        info(err, res)
         if err == vim.NIL and res then
             local loc = vim.g.coc_jump_locations
             if loc then
                 local uri = vim.uri_from_bufnr()
-                local open = false
+                local dont_open = true
                 for _, lo in ipairs(loc) do
                     if lo.uri ~= uri then
-                        open = true
+                        dont_open = false
                         break
                     end
                 end
-                if open then
-                    M.jump2loc(loc)
-                end
+                M.jump2loc(loc, dont_open)
             end
         end
     end)
 end
 
+function M.skip_snippet()
+    fn.CocActionAsync('snippetNext')
+    return api.nvim_replace_termcodes([[\<BS>]], true, false, true)
+end
+
+function M.sign_icons(level)
+    return sign_icons[level]
+end
+
 local function init()
     diag_qfid = -1
+
+    cmd('hi link CocSem_parameter Parameter')
+    cmd('hi link CocSem_variable NONE')
+    cmd('hi link CocSem_namespace Namespace')
 
     fn['coc#config']('languageserver.lua.settings.Lua.workspace',
         {library = {[vim.env.VIMRUNTIME .. '/lua'] = true}})
 
     fn['coc#config']('snippets', {textmateSnippetsRoots = {fn.stdpath('config') .. '/snippets'}})
     fn.CocActionAsync('reloadExtension', 'coc-snippets')
+
+    local diag_config = fn['coc#util#get_config']('diagnostic')
+    sign_icons = {
+        hint = diag_config.hintSign,
+        info = diag_config.infoSign,
+        warning = diag_config.warningSign,
+        error = diag_config.errorSign
+    }
 
     cmd([[
         aug Coc
@@ -290,6 +315,11 @@ local function init()
         {noremap = true, expr = true, silent = true})
     map('i', '<C-b>', [[coc#float#has_scroll() ? "\<C-r>=coc#float#scroll(0)\<cr>" : "\<Left>"]],
         {noremap = true, expr = true, silent = true})
+
+    _G.coc_skip_snippet = M.skip_snippet
+    map('s', '<C-]>', [[!get(b:, 'coc_snippet_active') ? "\<C-]>" : v:lua._G.coc_skip_snippet()]],
+        {noremap = true, expr = true})
+    map('s', '<C-w>', '<Esc>a')
 
     map('n', '[d', '<Plug>(coc-diagnostic-prev)', {})
     map('n', ']d', '<Plug>(coc-diagnostic-next)', {})

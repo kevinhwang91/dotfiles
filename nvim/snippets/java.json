@@ -39,11 +39,6 @@
 		"body": ["if (${1:condition}) {", "\t$0", "}"],
 		"description": "if statement"
 	},
-	"ifelse": {
-		"prefix": "ifelse",
-		"body": ["if (${1:condition}) {", "\t$2", "} else {", "\t$0", "}"],
-		"description": "if/else statement"
-	},
 	"ifnull": {
 		"prefix": "ifnull",
 		"body": ["if (${1:condition} == null) {", "\t$0", "}"],
@@ -101,7 +96,7 @@
 		"description": "Protected method"
 	},
 	"Switch Statement": {
-		"prefix": "switch",
+		"prefix": "swi",
 		"body": [
 			"switch (${1:key}) {",
 			"\tcase ${2:value}:",
@@ -115,12 +110,12 @@
 		"description": "Switch Statement"
 	},
 	"While Statement": {
-		"prefix": "while",
+		"prefix": "whi",
 		"body": ["while (${1:condition}) {", "\t$0", "}"],
 		"description": "While Statement"
 	},
 	"Do-While Statement": {
-		"prefix": "dowhile",
+		"prefix": "do",
 		"body": ["do {", "\t$0", "} while (${1:condition});"],
 		"description": "Do-While Statement"
 	},

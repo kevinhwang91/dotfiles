@@ -170,8 +170,8 @@ end
 local coc_diagnostic = (function()
     local coc_signs = setmetatable({}, {
         __index = function(t, k)
-            local sign = fn['coc#util#get_config']('diagnostic')[k .. 'Sign']
-            t[k] = '%#StatusLine' .. k:upper():sub(1, 1) .. k:sub(2) .. '#' .. sign
+            local icon = require('plugs.coc').sign_icons(k)
+            t[k] = '%#StatusLine' .. k:sub(1, 1):upper() .. k:sub(2) .. '#' .. icon
             return t[k]
         end
     })
@@ -252,11 +252,7 @@ function M.tabline()
         table.insert(tl, ' ' .. i .. ' ')
         local name
         local bufnr = api.nvim_win_get_buf(api.nvim_tabpage_get_win(tp))
-        if vim.bo[bufnr].modifiable then
-            name = fn.fnamemodify(api.nvim_buf_get_name(bufnr), ':t')
-        else
-            name = vim.bo[bufnr].ft
-        end
+        name = fn.fnamemodify(api.nvim_buf_get_name(bufnr), ':t')
         if not name or name == '' then
             name = '[No Name]'
         end

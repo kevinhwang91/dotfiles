@@ -59,8 +59,15 @@ function M.list()
     return mru_list
 end
 
-function M.flush(sync)
-    utils.write_file(db, table.concat(list(db), '\n'), sync)
+M.flush = function()
+    return function(sync)
+        local timer
+        return function()
+            utils.killable_defer(timer, function()
+                utils.write_file(db, table.concat(list(db), '\n'), sync)
+            end, 50)
+        end
+    end
 end
 
 M.store_buf = (function()

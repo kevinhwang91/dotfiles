@@ -14,7 +14,7 @@ function M.write_file(path, data, sync)
     else
         uv.fs_open(path_, 'w', 438, function(err_open, fd)
             assert(not err_open, err_open)
-            uv.fs_write(fd, data, nil, function(err_write)
+            uv.fs_write(fd, data, -1, function(err_write)
                 assert(not err_write, err_write)
                 uv.fs_close(fd, function(err_close, succ)
                     assert(not err_close, err_close)

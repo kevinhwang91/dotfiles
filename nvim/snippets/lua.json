@@ -49,7 +49,7 @@
 		"body": ["function $1($2)", "\t$0", "end"]
 	},
 	"inline-function": {
-		"prefix": "fu=",
+		"prefix": "ful",
 		"body": ["local ${1:name} = function($2)", "\t${0:-- code}", "end"]
 	},
 	"print": {
@@ -61,7 +61,7 @@
 		"body": ["function self:${1:methodName}($2)", "\t$0", "end"]
 	},
 	"while": {
-		"prefix": "wh",
+		"prefix": "whi",
 		"body": ["while ${1:true} do", "\t$0", "end"]
 	},
 	"surround-function": {

@@ -29,7 +29,7 @@ local function init()
     local conf = {
         ensure_installed = {
             'bash', 'c', 'cpp', 'cmake', 'css', 'cuda', 'dart', 'dockerfile', 'go', 'gomod', 'html',
-            'java', 'javascript', 'jsdoc', 'json', 'jsonc', 'kotlin', 'lua', 'php', 'python',
+            'java', 'javascript', 'json', 'jsonc', 'kotlin', 'lua', 'php', 'python',
             'query', 'ruby', 'rust', 'scss', 'teal', 'toml', 'tsx', 'typescript', 'vim', 'vue',
             'yaml', 'zig'
         },

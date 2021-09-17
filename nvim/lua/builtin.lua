@@ -51,4 +51,8 @@ function M.fix_quit()
     end
 end
 
+function M.insert_reg(regname)
+    api.nvim_paste(fn.getreg(regname), true, -1)
+end
+
 return M

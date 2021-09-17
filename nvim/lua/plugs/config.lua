@@ -149,7 +149,6 @@ function M.exchange()
 end
 
 function M.matchup()
-    g.matchup_surround_enabled = 1
     g.matchup_matchparen_timeout = 100
     g.matchup_matchparen_deferred = 1
     g.matchup_matchparen_deferred_show_delay = 50
@@ -179,8 +178,6 @@ function M.matchup()
     map('o', 'a5', '<Plug>(matchup-a%)', {})
     map('x', 'i5', '<Plug>(matchup-i%)', {})
     map('o', 'i5', '<Plug>(matchup-i%)', {})
-    map('n', 'cs5', '<plug>(matchup-cs%)', {})
-    map('n', 'sd5', '<plug>(matchup-ds%)', {})
 
     cmd([[
         aug Mathup
@@ -189,35 +186,6 @@ function M.matchup()
             autocmd FileType qf let [b:matchup_matchparen_enabled, b:matchup_matchparen_fallback] = [0, 0]
         aug END
     ]])
-end
-
-function M.cycle()
-    g.cycle_default_groups = {
-        {{'true', 'false'}}, {{'enable', 'disable'}}, {{'yes', 'no'}}, {{'on', 'off'}},
-        {{'and', 'or'}}, {{'up', 'down'}}, {{'left', 'right'}}, {{'top', 'bottom'}},
-        {{'before', 'after'}}, {{'width', 'height'}}, {{'push', 'pull'}}, {{'max', 'min'}},
-        {{'&&', '||'}}, {{'++', '--'}}, {{',', '，'}}, {{'.', '。'}}, {{'?', '？'}},
-        {{'是', '否'}}, {{'(:)', '（:）'}, 'sub_pairs'}, {
-            {'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'},
-            'hard_case', {name = 'Days'}
-        }, {
-            {
-                'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
-                'September', 'October', 'November', 'December'
-            }, 'hard_case', {name = 'Months'}
-        }
-    }
-    g.cycle_default_groups_for_python = {{{'elif', 'else'}}}
-    g.cycle_default_groups_for_sh = {{{'elif', 'else'}}}
-    g.cycle_default_groups_for_zsh = g.cycle_default_groups_for_sh
-    g.cycle_default_groups_for_vim = {{{'elseif', 'else'}}}
-    g.cycle_default_groups_for_lua = {{{'elseif', 'else'}}}
-    map('n', '<Plug>CycleFallbackNext', '<C-a>')
-    map('n', '<Plug>CycleFallbackPrev', '<C-x>')
-    map('n', '<C-a>', '<Plug>CycleNext', {})
-    map('v', '<C-a>', '<Plug>CycleNext', {})
-    map('n', '<C-x>', '<Plug>CyclePrev', {})
-    map('v', '<C-x>', '<Plug>CyclePrev', {})
 end
 
 function M.gitgutter()
