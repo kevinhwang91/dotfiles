@@ -9,7 +9,7 @@ if (( $(printf %s "$buf" | wc -c) > maxlen )); then
     exit 1
 fi
 if [[ -n $TMUX ]]; then
-    otty=$(tmux list-panes -F '#{pane_active} #{pane_tty}' | awk '$1==1 { print $2 }')
+    otty=$(tmux list-panes -F '#{pane_tty}' -f '#{pane_active}')
 else
     otty=${TTY:-$SSH_TTY}
     if [[ -z $otty ]]; then
