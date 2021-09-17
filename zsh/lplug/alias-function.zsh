@@ -129,6 +129,11 @@ alias gsu='git submodule update'
 alias gsco='git submodule foreach git checkout'
 alias gsl='git submodule foreach git pull'
 
+alias gw='git worktree'
+alias gwl='git worktree list'
+alias gwa='git worktree add'
+alias gwr='git worktree remove'
+
 alias rg5='rg -C 5'
 
 alias umb='udisksctl mount -b'

@@ -1,9 +1,9 @@
-if (( ! $+commands[fzf] )) || [[ ! $- =~ i ]]; then
+if (( ! $+commands[fzf] )); then
     return
 fi
 
 FZF_DEFAULT_OPTS="--preview-window=border-left --height=60% \
---color=fg:-1,bg:-1,hl:#c3d82c,fg+:15,bg+:#31435e,hl+:#c3d82c \
+--color=fg:-1,bg:-1,hl:#c3d82c,fg+:15,bg+:#31435e,hl+:#c3d82c:reverse \
 --color=gutter:-1,info:2,prompt:12,pointer:1,marker:3,spinner:5,header:12,border:#b3c0ce \
 --bind=alt-,:first,alt-.:last,change:first,ctrl-o:toggle-all,\
 alt-k:preview-up,alt-j:preview-down,alt-p:toggle-preview"
@@ -21,6 +21,10 @@ if [[ -n $TMUX_PANE ]] && (( $+commands[tmux] )) && (( $+commands[fzfp] )); then
     FZF_CMD="$commands[fzfp]"
 else
     FZF_CMD=$commands[fzf]
+fi
+
+if [[ ! $- =~ i ]]; then
+    return
 fi
 
 _fzf_fpath=${0:h}/fzf

@@ -1,3 +1,5 @@
+export COLORTERM=truecolor
+
 if [[ ! $- =~ i ]]; then
     return
 fi
@@ -31,6 +33,7 @@ if (( $+commands[grc] )); then
         lsmod
         lsattr
         vmstat
+        free
         nmap
         uptime
         trash-list
@@ -51,7 +54,6 @@ rmc() {
 }
 
 # color
-export COLORTERM=truecolor
 
 autoload -U colors && colors
 
