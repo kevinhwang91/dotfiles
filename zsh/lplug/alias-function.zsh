@@ -45,7 +45,11 @@ _grmsu() {
     if [[ $o_url =~ ^git ]]; then
         n_url=$(sed -E 's|^git@(.*):/*(.*).git|https://\1/\2.git|' <<<$o_url)
     elif [[ $o_url =~ ^https ]]; then
-        n_url=$(sed -E 's|^https://(.*)/(.*)/(.*).git|git@\1:\2/\3.git|' <<<$o_url)
+        if [[ $o_url =~ \.git$ ]]; then
+            n_url=$(sed -E 's|^https://(.*)/(.*)/(.*)|git@\1:\2/\3|' <<<$o_url)
+        else
+            n_url=$(sed -E 's|^https://(.*)/(.*)/(.*)|git@\1:\2/\3.git|' <<<$o_url)
+        fi
     fi
     print "remote: $remote\nold url: $o_url\nnew url: $n_url"
     read -sk 1 "?(y/N)"
@@ -72,6 +76,7 @@ alias gmt='git mergetool'
 
 alias gp='git push'
 alias gpd='git push -d'
+alias gps='git push --set-upstream'
 alias gb='git branch'
 alias gba='git branch -a'
 alias gbd='git branch -D'
@@ -154,12 +159,14 @@ alias dkis='docker inspect'
 
 # personal go version for suppressing 'declared but not used' and 'imported and not used'
 if (( $+commands[kgo] )); then
-    alias gor='kgo run'
-    alias gob='kgo build'
-else
-    alias gor='go run'
-    alias gob='go build'
+    alias go='kgo'
 fi
+alias gor='go run'
+alias gob='go build'
+alias got='go test'
+alias gotv='go test -v'
+alias gomi='go mod init'
+alias gomt='go mod tidy'
 
 alias cco='gcc -o'
 
@@ -172,6 +179,8 @@ alias ipy='ipython'
 alias pluo='pip list --user --outdated --format=freeze'
 
 alias mux="tmux new -A -s $USER"
+alias mlog="tmux new -A -s log"
+alias mssh="tmux new -A -s ssh"
 
 alias rr='ranger'
 
@@ -207,7 +216,12 @@ if (( $+commands[nvim] )); then
     alias nrg='_nrg'
     compdef __nrg_compdef _nrg
     _nrg() {
-        nvim +"Grepper -noprompt -dir cwd -grepprg rg $* -H --no-heading --vimgrep -C0 --color=never ."
+        if [[ $* ]]; then
+            nvim +'pa nvim-treesitter' \
+                +"Grepper -noprompt -dir cwd -grepprg rg ${(qq)*} -H --no-heading --vimgrep -C0 --color=never ."
+        else
+            rg
+        fi
     }
     __nrg_compdef() {
         _rg
@@ -221,7 +235,7 @@ if (( $+commands[nvim] )); then
     alias ngl='_ngl'
     compdef __ngl_compdef _ngl
     _ngl() {
-        git rev-parse >/dev/null 2>&1 && nvim +"Flog -raw-args=$*" +'bw 1'
+        git rev-parse >/dev/null 2>&1 && nvim +"Flog -raw-args=${*:+${(q)*}}" +'bw 1'
     }
     __ngl_compdef() {
         (( $+functions[_git-log] )) || _git
@@ -231,7 +245,7 @@ if (( $+commands[nvim] )); then
     alias ngdt='_ngdt'
     compdef __ngdt_compdef _ngdt
     _ngdt() {
-        git rev-parse >/dev/null 2>&1 && nvim +"Git difftool -y $*" +'bw 1'
+        git rev-parse >/dev/null 2>&1 && nvim +"Git difftool -y $*"
     }
     __ngdt_compdef() {
         (( $+functions[_git-difftool] )) || _git
@@ -252,7 +266,7 @@ if (( $+commands[nvim] )); then
     if (( $+commands[python] )); then
         alias npdb='_npdb'
         _npdb() {
-            nvim +"GdbStartPDB python -m pdb $*" +'bw 1'
+            nvim +"GdbStartPDB python -m pdb $*"
         }
     fi
 fi
