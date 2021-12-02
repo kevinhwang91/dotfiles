@@ -24,8 +24,9 @@ local kprint = function(...)
 end
 
 function M.reload_module(m_name)
+    m_name = vim.trim(m_name)
     for p in pairs(package.loaded) do
-        if p:find('^' .. m_name) then
+        if p:sub(1, #m_name) == m_name then
             package.loaded[p] = nil
         end
     end
@@ -37,7 +38,6 @@ local function init()
     _G.info = log.info
     _G.ktime = vim.loop.hrtime
 end
-
 
 init()
 

@@ -4,9 +4,16 @@ local cmd = vim.cmd
 local api = vim.api
 
 local mods_action
+local hijacked
 
 function M.do_action()
     if vim.v.event.abort then
+        return
+    end
+
+    if hijacked then
+        hijacked = false
+        api.nvim_echo({{'', ''}}, false, {})
         return
     end
 
@@ -15,19 +22,17 @@ function M.do_action()
     for c, mod in pairs(mods_action) do
         if c:match(com_pat) then
             cmd('let v:event.abort = v:true')
-            vim.schedule(function()
-                local ok, msg = pcall(cmd, ('%s %s'):format(mod, raw_cmd))
-                if not ok then
-                    _, _, msg = msg:find([[Vim%(.*%):(.*)$]])
-                    api.nvim_err_writeln(msg)
-                end
-            end)
+            local wrapped_cmd = (':%s %s<CR>'):format(mod, raw_cmd)
+            local w_cmd = api.nvim_replace_termcodes(wrapped_cmd, true, false, true)
+            api.nvim_feedkeys(w_cmd, 't', true)
+            hijacked = true
             break
         end
     end
 end
 
 local function init()
+    hijacked = false
     mods_action = {
         ['Man'] = 'tab',
         ['cwindow'] = 'bo',

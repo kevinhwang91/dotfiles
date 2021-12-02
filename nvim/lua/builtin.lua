@@ -3,6 +3,26 @@ local api = vim.api
 local fn = vim.fn
 local cmd = vim.cmd
 
+function M.prefix_timeout(prefix)
+    local char = fn.getchar(0)
+    if type(char) == 'number' then
+        char = fn.nr2char(char)
+    end
+    return char == '' and [[\<Ignore>]] or prefix .. char
+end
+
+-- once
+function M.wipe_empty_buf()
+    local bufnr = api.nvim_get_current_buf()
+    vim.schedule(function()
+        M.wipe_empty_buf = nil
+        if api.nvim_buf_is_valid(bufnr) and api.nvim_buf_get_name(bufnr) == '' and
+            api.nvim_buf_get_offset(bufnr, 1) <= 0 then
+            api.nvim_buf_delete(bufnr, {})
+        end
+    end)
+end
+
 function M.jumps2qf()
     local locs, pos = unpack(fn.getjumplist())
     local items, idx = {}, 1

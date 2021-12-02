@@ -4,14 +4,10 @@ local uv = vim.loop
 
 local env, g, o = vim.env, vim.g, vim.o
 
-local is_master = fn.has('nvim-0.6') == 1
-
 o.nu = true
 o.rnu = true
 o.cul = true
-if is_master then
-    o.culopt = 'number,screenline'
-end
+o.culopt = 'number,screenline'
 o.scl = 'yes:1'
 o.foldcolumn = '1'
 o.foldenable = true
@@ -30,16 +26,15 @@ o.timeoutlen = 500
 o.ignorecase = true
 o.smartcase = true
 o.updatetime = 200
-if not is_master then
-    o.hidden = true
-    o.inccommand = 'nosplit'
-end
+-- o.hidden = true
+-- o.inccommand = 'nosplit'
 o.fileencodings = 'utf-8,gb2312,gb18030,gbk,ucs-bom,cp936,latin1'
 o.showmode = false
 o.cedit = '<C-x>'
 o.listchars = 'tab:▏ ,trail:•,precedes:<,extends:>'
 o.sidescrolloff = 5
-o.showbreak = '╰─➤'
+o.showbreak = '╰─➤ '
+o.cpo = o.cpo .. 'n'
 o.foldlevelstart = 99
 o.title = true
 o.titlestring = '%(%m%)%(%{expand(\"%:~\")}%)'
@@ -51,6 +46,7 @@ o.diffopt = o.diffopt .. ',vertical,internal,algorithm:patience'
 o.shada = [['20,<50,s10,/20,@20,:0,h]]
 o.termguicolors = true
 o.fillchars = 'eob: '
+o.pumblend = 8
 
 -- undo
 o.undofile = true
@@ -123,7 +119,23 @@ map('x', 'q', '')
 map('n', 'Q', '')
 map('n', '-', '"_')
 map('x', '-', '"_')
-map('n', 'y', [[v:lua._G.yank()]], {noremap = true, expr = true})
+map('n', 'qq', [[<Cmd>lua require('builtin').fix_quit()<CR>]])
+map('n', 'qa', '<Cmd>qa<CR>')
+map('n', 'qt', '<Cmd>tabc<CR>')
+map('n', 'qc', [[<Cmd>lua require('qf').close()<CR>]])
+map('n', 'qd', [[<Cmd>lua require('kutils').close_diff()<CR>]])
+map('n', 'qD', [[<Cmd>tabdo lua require('kutils').close_diff()<CR><Cmd>noa tabe<Bar> noa bw<CR>]])
+
+map('n', 's', 'd')
+map('x', 's', 'd')
+map('o', 's', 'd')
+map('n', 'd', '<C-d>')
+map('x', 'd', '<C-d>')
+map('n', 'u', '<C-u>')
+map('x', 'u', '<C-u>')
+map('n', '<C-u>', 'u')
+
+map('n', 'y', [[v:lua.require'yank'.wrap()]], {noremap = true, expr = true})
 map('n', 'Y', 'y$')
 map('n', 'v', 'm`v')
 map('n', 'V', 'm`V')
@@ -132,19 +144,12 @@ map('x', 'p', [[p<Cmd>let @+ = @0<CR><Cmd>let @" = @0<CR>]])
 map('x', 'P', [[P<Cmd>let @+ = @0<CR><Cmd>let @" = @0<CR>]])
 map('n', '<Leader>2;', '@:')
 map('x', '<Leader>2;', '@:')
-map('n', 'qq', [[<Cmd>lua require('builtin').fix_quit()<CR>]])
-map('n', 'qa', '<Cmd>qa<CR>')
-map('n', 'qt', '<Cmd>tabc<CR>')
-map('n', 'qc', [[<Cmd>lua require('qf').close()<CR>]])
-map('n', 'qd', [[<Cmd>lua require('kutils').close_diff()<CR>]])
-map('n', 'qD', [[<Cmd>tabdo lua require('kutils').close_diff()<CR><Cmd>noa tabe<Bar> noa bw<CR>]])
+map('n', '<Leader>3', '<Cmd>b #<CR>')
 map('n', '<Leader>w', '<Cmd>up<CR>')
 map('n', '<Leader>;w', '<Cmd>wq<CR>')
 map('n', '<C-g>', '2<C-g>')
 map('n', '<Leader>l', ':noh<CR>')
-if is_master then
-    map('n', '<C-l>', '<C-l>')
-end
+map('n', '<C-l>', '<C-l>')
 map('c', '<C-b>', '<Left>')
 map('c', '<C-f>', '<Right>')
 map('c', '<C-a>', '<Home>')
@@ -156,7 +161,6 @@ map('c', '<CR>', [[pumvisible() ? "\<C-y>" : "\<CR>"]], {noremap = true, expr = 
 map('t', [[<M-\>]], [[<C-\><C-n>]])
 
 map('n', '<C-w><C-t>', '<Cmd>tab sp<CR>')
-map('n', '<Leader>3', '<Cmd>b #<CR>')
 map('n', '<C-w>s', [[<Cmd>lua require('builtin').split_lastbuf()<CR>]])
 map('n', '<C-w>v', [[<Cmd>lua require('builtin').split_lastbuf(true)<CR>]])
 map('n', '<C-w>O', '<Cmd>tabo<CR>')
@@ -164,14 +168,6 @@ map('n', '<C-w>O', '<Cmd>tabo<CR>')
 map('n', '<M-a>', 'VggoG')
 map('i', '<M-;>', '<END>')
 
-map('n', 's', 'd')
-map('x', 's', 'd')
-map('o', 's', 'd')
-map('n', 'd', '<C-d>')
-map('x', 'd', '<C-d>')
-map('n', 'u', '<C-u>')
-map('x', 'u', '<C-u>')
-map('n', '<C-u>', 'u')
 map('n', 'k', [[(v:count > 1 ? 'm`' . v:count : '') . 'k']], {noremap = true, expr = true})
 map('n', 'j', [[(v:count > 1 ? 'm`' . v:count : '') . 'j']], {noremap = true, expr = true})
 
@@ -188,7 +184,7 @@ map('o', [[`]], [[']])
 map('i', [[<C-r>']], [[<C-r>"]])
 map('c', [[<C-r>']], [[<C-r>"]])
 
-map('n', [['0]], [[<Cmd>norm! `0<CR><Cmd>sil! CleanEmptyBuf<CR>]])
+map('n', [['0]], [[<Cmd>norm! `0<CR>]])
 map('n', '<Leader>i', '<Cmd>sil! norm! `^<CR>')
 
 map('n', '0', [[getline('.')[:col('.') - 2] =~ '^\s\+$' ? '0' : 'm`^']],
@@ -207,14 +203,11 @@ map('x', '<M-k>', [[:m '<-2<CR>gv=gv]])
 map('n', 'yd', [[<Cmd>call setreg(v:register, expand('%:p:h'))<CR>:echo expand('%:p:h')<CR>]])
 map('n', 'yn', [[<Cmd>call setreg(v:register, expand('%:t'))<CR>:echo expand('%:t')<CR>]])
 map('n', 'yp', [[<Cmd>call setreg(v:register, expand('%:p'))<CR>:echo expand('%:p')<CR>]])
-if not is_master then
-    map('n', 'Y', 'y$')
-end
 
-map('n', '[', [[v:lua._G.prefix_timeout('[')]], {noremap = true, expr = true})
-map('x', '[', [[v:lua._G.prefix_timeout('[')]], {noremap = true, expr = true})
-map('n', ']', [[v:lua._G.prefix_timeout(']')]], {noremap = true, expr = true})
-map('x', ']', [[v:lua._G.prefix_timeout(']')]], {noremap = true, expr = true})
+map('n', '[', [[v:lua.require'builtin'.prefix_timeout('[')]], {noremap = true, expr = true})
+map('x', '[', [[v:lua.require'builtin'.prefix_timeout('[')]], {noremap = true, expr = true})
+map('n', ']', [[v:lua.require'builtin'.prefix_timeout(']')]], {noremap = true, expr = true})
+map('x', ']', [[v:lua.require'builtin'.prefix_timeout(']')]], {noremap = true, expr = true})
 map('n', '[b', [[<Cmd>execute(v:count1 . 'bp')<CR>]])
 map('n', ']b', [[<Cmd>execute(v:count1 . 'bn')<CR>]])
 map('n', '[q', [[<Cmd>execute(v:count1 . 'cp')<CR>]])
@@ -233,8 +226,8 @@ map('n', 'zj', 'zj_')
 map('x', 'zj', 'zj_')
 map('n', 'zk', 'zk_')
 map('x', 'zk', 'zk_')
-map('n', 'z', [[v:lua._G.prefix_timeout('z')]], {noremap = true, expr = true})
-map('x', 'z', [[v:lua._G.prefix_timeout('z')]], {noremap = true, expr = true})
+map('n', 'z', [[v:lua.require'builtin'.prefix_timeout('z')]], {noremap = true, expr = true})
+map('x', 'z', [[v:lua.require'builtin'.prefix_timeout('z')]], {noremap = true, expr = true})
 
 map('n', 'za', [[<Cmd>lua require('plugs.fold').toggle_fold('a')<CR>]])
 map('n', 'zA', [[<Cmd>lua require('plugs.fold').toggle_fold('A')<CR>]])
@@ -258,19 +251,6 @@ map('x', 'ak', [[:<C-u>lua require('plugs.textobj').action('class', false, true)
 map('o', 'ik', [[:<C-u>lua require('plugs.textobj').action('class', true)<CR>]])
 map('o', 'ak', [[:<C-u>lua require('plugs.textobj').action('class', false)<CR>]])
 
--- https://github.com/neovim/neovim/issues/13862
-function _G.yank()
-    return require('yank').wrap()
-end
-
-function _G.prefix_timeout(prefix)
-    local char = fn.getchar(0)
-    if type(char) == 'number' then
-        char = fn.nr2char(char)
-    end
-    return char == '' and [[\<Ignore>]] or prefix .. char
-end
-
 require('dev')
 require('mru')
 require('stl')
@@ -279,13 +259,13 @@ require('qf')
 local conf_dir = fn.stdpath('config')
 if uv.fs_stat(conf_dir .. '/plugin/packer_compiled.lua') then
     cmd([[
-    com! PackerInstall lua require('plugs.packer').install()
-    com! PackerUpdate lua require('plugs.packer').update()
-    com! PackerSync lua require('plugs.packer').sync()
-    com! PackerClean lua require('plugs.packer').clean()
-    com! PackerStatus lua require('plugs.packer').status()
-    com! -nargs=? PackerCompile lua require('plugs.packer').compile(<q-args>)
-    com! -nargs=+ PackerLoad lua require('plugs.packer').loader(<q-args>)
+        com! PackerInstall lua require('plugs.packer').install()
+        com! PackerUpdate lua require('plugs.packer').update()
+        com! PackerSync lua require('plugs.packer').sync()
+        com! PackerClean lua require('plugs.packer').clean()
+        com! PackerStatus lua require('plugs.packer').status()
+        com! -nargs=? PackerCompile lua require('plugs.packer').compile(<q-args>)
+        com! -nargs=+ PackerLoad lua require('plugs.packer').loader(<q-args>)
     ]])
 else
     require('plugs.packer').compile()
@@ -398,13 +378,13 @@ map('n', '<Leader>gd', ':Gdiffsplit!<Space>', {silent = false})
 map('n', '<Leader>gt', ':Git difftool -y<Space>', {silent = false})
 
 -- rbong/vim-flog
-g.flog_default_arguments = {max_count = 1000}
 map('n', '<Leader>gl', '<Cmd>Flog<CR>')
-map('n', '<Leader>gf', '<Cmd>Flog -path=%<CR>')
+map('n', '<Leader>gf', [[<Cmd>lua require('plugs.flog').cur_file()<CR>]])
 
 -- rhysd/git-messenger.vim
 g.git_messenger_no_default_mappings = 0
 g.git_messenger_always_into_popup = 1
+g.git_messenger_date_format = '%Y-%m-%d %H:%M:%S'
 map('n', '<Leader>gm', '<Cmd>GitMessenger<CR>')
 
 -- sbdchd/neoformat
@@ -436,11 +416,14 @@ g.NERDDefaultAlign = 'left'
 g.NERDToggleCheckAllLines = 1
 g.NERDTrimTrailingWhitespace = 1
 g.NERDCustomDelimiters = {lua = {left = '--', leftAlt = '', rightAlt = ''}}
+g.NERDAltDelims_c = 1
+g.NERDAltDelims_cpp = 1
+
 map('', '<C-_>', '<Plug>NERDCommenterToggle', {})
 
 -- delimitMate
-map('i', '<CR>',
-    [[pumvisible() ? "\<C-y>" : (getline('.')[:col('.') - 2] =~ '^\s*$' ? '' : "\<C-g>u") . "<Plug>delimitMateCR"]],
+map('i', '<CR>', ('%s ? %s : %s . "<Plug>delimitMateCR"'):format('pumvisible()', [["\<C-y>"]],
+    [[(getline('.')[:col('.') - 2] =~ '^\s*$' ? col('.') == 1 ? '' : "\<Bs>" : "\<C-g>u")]]),
     {noremap = false, expr = true})
 
 map('n', '<Leader>2p', '<Cmd>Kill2Spaces<CR>')
@@ -475,18 +458,23 @@ cmd([[
     aug GoFormat
         au!
         au FileType go setl noexpandtab
-    aug end
+    aug END
 
     aug MakeFileFormat
         au!
         au FileType make setl noexpandtab
-    aug end
+    aug END
 
     aug PrettierFormat
         au!
-        au FileType javascript,typescript,json setl noexpandtab
+        au FileType javascript,typescript,json,jsonc setl noexpandtab
         au FileType yaml setl tabstop=2 shiftwidth=2
-    aug end
+    aug END
+
+    aug FirstBuf
+        au!
+        au BufHidden <buffer> ++once lua require('builtin').wipe_empty_buf()
+    aug END
 ]])
 
 require('plugs.manual')
@@ -505,9 +493,6 @@ vim.schedule(function()
     vim.defer_fn(function()
         require('plugs.treesitter')
 
-        if not is_master then
-            cmd('syntax on')
-        end
         cmd([[
             unlet g:did_load_filetypes
             au! syntaxset
@@ -538,23 +523,17 @@ vim.schedule(function()
                 au!
                 au BufWritePost */plugs/packer.lua so <afile> | PackerCompile
             aug END
-        ]])
 
-        cmd([[
             aug LushTheme
                 au!
                 au BufWritePost */lua/lush_theme/*.lua lua require('plugs.lush').write_post()
             aug END
-        ]])
 
-        cmd([[
             aug CmdHist
                 au!
                 au CmdlineEnter : lua require('cmdhist')
             aug END
-        ]])
 
-        cmd([[
             aug CmdHijack
                 au!
                 au CmdlineEnter : lua require('cmdhijack')
@@ -592,7 +571,8 @@ vim.schedule(function()
             'coc-css', 'coc-dictionary', 'coc-markdownlint', 'coc-snippets', 'coc-word'
         }
         g.coc_enable_locationlist = 0
-        g.coc_default_semantic_highlight_groups = 1
+        g.coc_default_semantic_highlight_groups = 0
+        g.coc_selectmode_mapping = 0
         cmd([[au User CocNvimInit ++once lua require('plugs.coc')]])
 
         cmd('pa coc-kvs')

@@ -22,7 +22,7 @@ local function init()
                 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
                 'September', 'October', 'November', 'December'
             }, 'hard_case', {name = 'Months'}
-        }
+        }, {'zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'}
     }
     g.cycle_default_groups_for_python = {{{'elif', 'if'}}}
     g.cycle_default_groups_for_sh = {{{'elif', 'if'}}}

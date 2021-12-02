@@ -20,7 +20,7 @@
 		"description": "for key in loop"
 	},
 	"forv": {
-		"prefix": "fork",
+		"prefix": "forv",
 		"body": ["for ${1:v} in values(${2:dict})", "\t$0", "endfor"],
 		"description": "for value in loop"
 	},
@@ -34,10 +34,13 @@
 		"body": ["while $1", "\t$0", "endwhile"],
 		"description": "while loop"
 	},
-
 	"catch": {
 		"prefix": "catch",
 		"body": ["catch /.*/"],
-		"description": "while loop"
+		"description": "catch exception"
+	},
+	"surround-reltimestr": {
+		"prefix": "skt",
+		"body": ["let ${1:rt} = reltime()", "$TM_SELECTED_TEXT", "${0:echom} reltimestr(reltime($1))"]
 	}
 }

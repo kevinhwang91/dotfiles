@@ -121,24 +121,34 @@ M.cool_echo = (function()
     end
 end)()
 
-function M.expandtab(str, bufnr)
-    bufnr = bufnr or 0
-    local ts = vim.bo[bufnr].ts
-    local new = ''
+function M.expandtab(str, ts, start)
+    start = start or 1
+    local new = str:sub(1, start - 1)
+    -- without check type to improve performance
+    -- if str and type(str) == 'string' then
     local pad = ' '
-    local ti = 0
-    local i = 1
+    local ti = start - 1
+    local i = start
     while true do
-        i = str:find('\t', i)
+        i = str:find('\t', i, true)
         if not i then
-            new = new .. str:sub(ti + 1)
+            if ti == 0 then
+                new = str
+            else
+                new = new .. str:sub(ti + 1)
+            end
             break
         end
-        new = new .. str:sub(ti + 1, i - 1)
-        new = new .. pad:rep(ts - #new % ts)
+        if ti + 1 == i then
+            new = new .. pad:rep(ts)
+        else
+            local append = str:sub(ti + 1, i - 1)
+            new = new .. append .. pad:rep(ts - api.nvim_strwidth(append) % ts)
+        end
         ti = i
         i = i + 1
     end
+    -- end
     return new
 end
 

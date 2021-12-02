@@ -14,7 +14,7 @@ local function find_win_except_float(bufnr)
     if fn.win_gettype(winid) == 'popup' then
         local f_winid = winid
         winid = 0
-        for _, wid in pairs(api.nvim_list_wins()) do
+        for _, wid in ipairs(api.nvim_list_wins()) do
             if f_winid ~= wid and api.nvim_win_get_buf(wid) == bufnr then
                 winid = wid
                 break
@@ -24,17 +24,17 @@ local function find_win_except_float(bufnr)
     return winid
 end
 
-local function use_anyfold(filename)
+local function use_anyfold(filename, force)
     local st = uv.fs_stat(filename)
     if st then
         local fsize = st.size
-        if 0 < fsize and fsize < 131072 then
+        if force or 0 < fsize and fsize < 131072 then
             cmd('AnyFoldActivate')
         end
     end
 end
 
-function M.do_fold()
+function M.do_fold(force)
     local bufnr = api.nvim_get_current_buf()
     local filename = api.nvim_buf_get_name(bufnr)
     if vim.g.coc_service_initialized == 1 and not vim.tbl_contains(anyfold_prefer_ft, vim.bo.ft) then
@@ -42,7 +42,7 @@ function M.do_fold()
             if e == vim.NIL and r then
                 fn.CocActionAsync('fold', '', function(e1, r1)
                     if e1 ~= vim.NIL or not r1 then
-                        use_anyfold(filename)
+                        use_anyfold(filename, force)
                     else
                         pcall(api.nvim_buf_set_var, bufnr, 'loaded_fold', 'coc')
                         cmd(('au FoldLoad BufWritePost <buffer=%d> %s'):format(bufnr,
@@ -50,16 +50,16 @@ function M.do_fold()
                     end
                 end)
             else
-                use_anyfold(filename)
+                use_anyfold(filename, force)
             end
         end)
     else
-        use_anyfold(filename)
+        use_anyfold(filename, force)
     end
     cmd(('au! FoldLoad * <buffer=%d>'):format(bufnr))
     vim.wo.foldenable = true
     vim.wo.foldlevel = 99
-    vim.wo.foldtext = 'v:lua.foldtext()'
+    vim.wo.foldtext = [[v:lua.require'plugs.fold'.foldtext()]]
     vim.b.loaded_fold = 'anyfold'
 end
 
@@ -125,7 +125,7 @@ function M.foldtext()
         end
     end
     local pad = ' '
-    fs_line = utils.expandtab(fs_line)
+    fs_line = utils.expandtab(fs_line, vim.bo.ts)
     local gutter_size = fn.screenpos(0, api.nvim_win_get_cursor(0)[1], 1).curscol -
                             fn.win_screenpos(0)[2]
     local width = api.nvim_win_get_width(0) - gutter_size
@@ -193,9 +193,8 @@ local function init()
         aug END
     ]])
 
-    cmd([[com! -nargs=0 Fold lua require('plugs.fold').do_fold()]])
-    _G.foldtext = M.foldtext
-    for _, bufnr in pairs(api.nvim_list_bufs()) do
+    cmd([[com! -nargs=0 Fold lua require('plugs.fold').do_fold(true)]])
+    for _, bufnr in ipairs(api.nvim_list_bufs()) do
         if fn.buflisted(bufnr) == 1 then
             M.defer_load(bufnr)
         end

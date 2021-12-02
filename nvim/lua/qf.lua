@@ -3,6 +3,100 @@ local api = vim.api
 local cmd = vim.cmd
 local fn = vim.fn
 
+-- WIP
+function M.batch_sub(is_loc, pat_rep)
+    local matches = fn.matchlist(pat_rep, [[\v(([^|"\\a-zA-Z0-9]).*\2.*\2=)([cgeiI]*)\s*$]])
+    if vim.tbl_isempty(matches) then
+        return
+    end
+
+    local pr_str = matches[2]
+    local delm = matches[3]
+    local flag = matches[4]
+    local pr_tbl = vim.split(pr_str, delm)
+    local pat, rep = pr_tbl[2], pr_tbl[3]
+    if pat == '' then
+        pat = fn.getreg('/')
+    end
+    if vim.o.gdefault then
+        flag:gsub('g', '')
+        flag = flag .. 'g'
+    end
+
+    local old = is_loc and fn.getloclist(0) or fn.getqflist()
+    if #old == 0 then
+        return
+    end
+
+    local function gt(e1, e2)
+        local ret = false
+        if e1[1] > e2[1] then
+            ret = true
+        elseif e1[1] == e2[1] then
+            if e1[2] < e2[2] then
+                ret = true
+            end
+        end
+
+        return ret
+    end
+
+    -- Bucket sort + Insertion sort
+    local buf_list = {}
+    local bp_list = {}
+    for i = 1, #old do
+        local e = old[i]
+        local bufnr = e.bufnr
+        if not bp_list[bufnr] then
+            buf_list[#buf_list + 1] = bufnr
+            bp_list[bufnr] = {}
+        end
+        local plist = bp_list[bufnr]
+        local j = #plist
+        plist[j + 1] = {e.lnum, e.col}
+        while j > 0 and gt(plist[j], plist[j + 1]) do
+            plist[j], plist[j + 1] = plist[j + 1], plist[j]
+            j = j - 1
+        end
+    end
+
+    local new = {}
+    for _, bufnr in ipairs(buf_list) do
+        local plist = bp_list[bufnr]
+        for _, pos in ipairs(plist) do
+            new[#new + 1] = {bufnr = bufnr, lnum = pos[1], col = pos[2]}
+        end
+    end
+
+    local set_cmd = is_loc and function(...)
+        return fn.setloclist(0, ...)
+    end or fn.setqflist
+
+    local function silent_setqf(items)
+        local ei = vim.go.ei
+        vim.go.ei = 'all'
+        pcall(set_cmd, {}, 'r', {items = items, quickfixtextfunc = ''})
+        vim.go.ei = ei
+    end
+
+    silent_setqf(new)
+
+    local ok, msg = pcall(function()
+        local concat = ([[%s\%%#%s%s%s%s%s]]):format(delm, pat, delm, rep, delm, flag)
+        local do_cmd = is_loc and 'ldo' or 'cdo'
+        cmd(([[%s s%s]]):format(do_cmd, concat))
+    end)
+    fn.histdel('/', -1)
+    fn.histadd('/', pat)
+    fn.setreg('/', pat)
+
+    silent_setqf(old)
+
+    if not ok then
+        api.nvim_err_writeln(msg)
+    end
+end
+
 function _G.qftf(info)
     local items
     local ret = {}
@@ -91,6 +185,13 @@ end
 local function init()
     vim.g.qf_disable_statusline = true
     vim.o.qftf = '{info -> v:lua._G.qftf(info)}'
+    cmd([[
+        com! -nargs=1 Cdos lua require('qf').batch_sub(false, <q-args>)
+        com! -nargs=1 Ldos lua require('qf').batch_sub(true, <q-args>)
+
+        cabbrev cdos <C-r>=(getcmdtype() == ':' && getcmdpos() == 1 ? 'Cdos' : 'cdos')<CR>
+        cabbrev ldos <C-r>=(getcmdtype() == ':' && getcmdpos() == 1 ? 'Ldos' : 'ldos')<CR>
+    ]])
 end
 
 init()

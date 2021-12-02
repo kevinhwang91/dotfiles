@@ -28,10 +28,9 @@ end
 local function init()
     local conf = {
         ensure_installed = {
-            'bash', 'c', 'cpp', 'cmake', 'css', 'cuda', 'dart', 'dockerfile', 'go', 'gomod', 'html',
-            'java', 'javascript', 'json', 'jsonc', 'kotlin', 'lua', 'php', 'python',
-            'query', 'ruby', 'rust', 'scss', 'teal', 'toml', 'tsx', 'typescript', 'vim', 'vue',
-            'yaml', 'zig'
+            'bash', 'c', 'cpp', 'cmake', 'css', 'dart', 'dockerfile', 'go', 'gomod', 'html', 'java',
+            'javascript', 'json', 'jsonc', 'kotlin', 'lua', 'python', 'query', 'ruby', 'rust',
+            'scss', 'teal', 'toml', 'tsx', 'typescript', 'vim', 'vue', 'yaml'
         },
 
         highlight = {enable = true, disable = {'bash', 'html'}},

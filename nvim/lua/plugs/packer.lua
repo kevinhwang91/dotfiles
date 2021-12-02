@@ -24,7 +24,8 @@ packer.on_compile_done = function()
             local _, e1 = line:find('vim%.cmd')
             if line:find('vim%.cmd') then
                 local s2, e2 = line:find('%S+%s', e1 + 1)
-                line = ('pcall(vim.cmd, %s<unique>%s)'):format(line:sub(s2, e2), line:sub(e2 + 1))
+                local map_mode = line:sub(s2, e2)
+                line = ('pcall(vim.cmd, %s<unique>%s)'):format(map_mode, line:sub(e2 + 1))
             end
             table.insert(wbuf, line)
         else
@@ -73,7 +74,11 @@ return packer.startup({
         use {
             'kevinhwang91/nvim-hlslens',
             branch = 'dev',
-            keys = {'n', 'N', '/', '?', '*', '#', 'g*', 'g#'},
+            keys = {
+                {'n', 'n'}, {'x', 'n'}, {'o', 'n'}, {'n', 'N'}, {'x', 'N'}, {'o', 'N'}, {'n', '/'},
+                {'n', '?'}, {'n', '*'}, {'x', '*'}, {'n', '#'}, {'x', '#'}, {'n', 'g*'},
+                {'x', 'g*'}, {'n', 'g#'}, {'x', 'g#'}
+            },
             config = conf('hlslens'),
             requires = {{'haya14busa/vim-asterisk'}}
         }
@@ -94,24 +99,31 @@ return packer.startup({
             'mg979/vim-visual-multi',
             setup = [[vim.g.VM_leader = '<Space>']],
             keys = {
-                {'', '<C-n>'}, {'n', [[<Leader>\]]}, {'', '<Leader>A'}, {'n', '<M-C-k>'},
-                {'n', '<M-C-j>'}, {'n', 'g/'}
+                {'n', '<C-n>'}, {'x', '<C-n>'}, {'n', [[<Leader>\]]}, {'n', '<Leader>A'},
+                {'x', '<Leader>A'}, {'n', '<M-C-k>'}, {'n', '<M-C-j>'}, {'n', 'g/'}
             },
             cmd = {'VMSearch'},
             config = conf('visualmulti'),
             wants = {'nvim-hlslens', 'delimitMate', 'vim-surround'}
         }
 
-        use {'rhysd/clever-f.vim', keys = {'f', 'F', 't', 'T'}, config = conf('cleverf')}
+        use {
+            'rhysd/clever-f.vim',
+            keys = {
+                {'n', 'f'}, {'x', 'f'}, {'o', 'f'}, {'n', 'F'}, {'x', 'F'}, {'o', 'F'}, {'n', 't'},
+                {'x', 't'}, {'o', 't'}, {'n', 'T'}, {'x', 'T'}, {'o', 'T'}
+            },
+            config = conf('cleverf')
+        }
 
         use {'antoinemadec/FixCursorHold.nvim', opt = false}
 
         use {'junegunn/fzf.vim', requires = {{'junegunn/fzf', run = './install --bin'}}}
 
-        use {'t9md/vim-choosewin', keys = '<M-0>', config = conf('choosewin')}
+        use {'t9md/vim-choosewin', keys = {{'n', '<M-0>'}}, config = conf('choosewin')}
 
         use {
-            'mhinz/vim-grepper',
+            'kevinhwang91/vim-grepper',
             cmd = 'Grepper',
             keys = {{'n', 'gs'}, {'x', 'gs'}, {'n', '<Leader>rg'}},
             config = conf('grepper')
@@ -123,10 +135,7 @@ return packer.startup({
 
         use {
             'michaeljsmith/vim-indent-object',
-            keys = {
-                {'o', 'ai'}, {'o', 'ii'}, {'v', 'ai'}, {'v', 'ii'}, {'o', 'aI'}, {'o', 'iI'},
-                {'v', 'aI'}, {'v', 'iI'}
-            }
+            keys = {{'o', 'ai'}, {'o', 'ii'}, {'x', 'ai'}, {'x', 'ii'}}
         }
 
         use {'wellle/targets.vim', fn = 'targets#e'}
@@ -140,7 +149,7 @@ return packer.startup({
 
         use {
             'bootleq/vim-cycle',
-            keys = {'<C-a>', '<C-x>'},
+            keys = {{'n', '<C-a>'}, {'x', '<C-a>'}, {'n', '<C-x>'}, {'x', '<C-x>'}},
             setup = [[vim.g.cycle_no_mappings = 1]],
             config = [[require('plugs.cycle')]]
         }
@@ -156,13 +165,18 @@ return packer.startup({
 
         use {'tpope/vim-rhubarb'}
 
-        use {'rbong/vim-flog', cmd = {'Flog', 'Flogsplit'}, requires = {{'tpope/vim-fugitive'}}}
+        use {
+            'rbong/vim-flog',
+            cmd = {'Flog', 'Flogsplit'},
+            requires = {{'tpope/vim-fugitive'}},
+            config = [[require('plugs.flog')]]
+        }
 
         use {'airblade/vim-gitgutter'}
 
         use {
             'ruanyl/vim-gh-line',
-            keys = {'<Leader>gO', '<Leader>gL'},
+            keys = {{'n', '<Leader>gO'}, {'n', '<Leader>gL'}, {'x', '<Leader>gL'}},
             setup = [[vim.g.gh_line_blame_map_default = 0]],
             config = conf('ghline')
         }
@@ -179,7 +193,7 @@ return packer.startup({
 
         use {
             'jpalardy/vim-slime',
-            keys = {{'', '<C-c><C-c>'}, {'n', '<C-c>v'}, {'n', '<C-c>l'}},
+            keys = {{'n', '<C-c><C-c>'}, {'x', '<C-c><C-c>'}, {'n', '<C-c>v'}, {'n', '<C-c>l'}},
             setup = [[vim.g.slime_no_mappings = 1]],
             config = conf('slime')
         }
@@ -245,9 +259,10 @@ return packer.startup({
 
         use {'mizlan/iswap.nvim'}
 
+        use {'rcarriga/nvim-notify'}
+
         -- keep learning :)
         use {'nvim-lua/plenary.nvim'}
-
         use_rocks {'lrexlib-PCRE2'}
         use_rocks {'luautf8'}
     end

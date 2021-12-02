@@ -29,3 +29,5 @@ setlocal signcolumn=no
 
 nnoremap <silent><buffer> gO <Cmd>call <SID>show_toc()<CR>
 nnoremap <silent><buffer> gd <C-]>
+
+call timer_start(0, {-> execute('sil! nunmap <buffer> q')})

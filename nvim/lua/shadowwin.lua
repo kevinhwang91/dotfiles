@@ -46,14 +46,13 @@ local function close()
     return ret
 end
 
-local function detect_other_wins(cur_winid)
-    local ret = false
+local function should_toggle(cur_winid)
+    local ret = true
     cur_winid = cur_winid or api.nvim_get_current_win()
     for _, winid in ipairs(api.nvim_tabpage_list_wins(0)) do
         local bt = vim.bo[api.nvim_win_get_buf(winid)].bt
-        if bt ~= 'nofile' and winid ~= cur_winid and fn.win_gettype(winid) == 'popup' or bt ==
-            'quickfix' then
-            ret = true
+        if bt == '' and winid ~= cur_winid and fn.win_gettype(winid) == 'popup' or bt == 'quickfix' then
+            ret = false
             break
         end
     end
@@ -80,7 +79,7 @@ function M.toggle()
                     aug END
                 ]])
             end
-        elseif not detect_other_wins(cur_winid) then
+        elseif should_toggle(cur_winid) then
             if create() then
                 cmd([[
                     aug ShadowWindow

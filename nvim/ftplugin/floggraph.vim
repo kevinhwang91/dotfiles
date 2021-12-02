@@ -1,3 +1,11 @@
+setl lcs-=trail:•
+set ve=all
+augroup Flog
+    au! * <buffer>
+    au BufEnter <buffer> set ve=all
+    au BufLeave <buffer> set ve=
+augroup END
+
 nmap <buffer> ss <Plug>(FlogVDiffSplitRight)
 vmap <buffer> ss <Plug>(FlogVDiffSplitRight)
 nmap <buffer> sp <Plug>(FlogVDiffSplitPathsRight)

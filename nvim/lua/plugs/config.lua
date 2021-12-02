@@ -36,10 +36,15 @@ function M.hlslens()
         [[<Cmd>execute('norm! ' . v:count1 . 'nzv')<CR><Cmd>lua require('hlslens').start()<CR>]])
     map('n', 'N',
         [[<Cmd>execute('norm! ' . v:count1 . 'Nzv')<CR><Cmd>lua require('hlslens').start()<CR>]])
-    map('', '*', [[<Plug>(asterisk-z*)<Cmd>lua require('hlslens').start()<CR>]], {})
-    map('', '#', [[<Plug>(asterisk-z#)<Cmd>lua require('hlslens').start()<CR>]], {})
-    map('', 'g*', [[<Plug>(asterisk-gz*)<Cmd>lua require('hlslens').start()<CR>]], {})
-    map('', 'g#', [[<Plug>(asterisk-gz#)<Cmd>lua require('hlslens').start()<CR>]], {})
+    map('n', '*', [[<Plug>(asterisk-z*)<Cmd>lua require('hlslens').start()<CR>]], {})
+    map('n', '#', [[<Plug>(asterisk-z#)<Cmd>lua require('hlslens').start()<CR>]], {})
+    map('n', 'g*', [[<Plug>(asterisk-gz*)<Cmd>lua require('hlslens').start()<CR>]], {})
+    map('n', 'g#', [[<Plug>(asterisk-gz#)<Cmd>lua require('hlslens').start()<CR>]], {})
+
+    map('x', '*', [[<Plug>(asterisk-z*)<Cmd>lua require('hlslens').start()<CR>]], {})
+    map('x', '#', [[<Plug>(asterisk-z#)<Cmd>lua require('hlslens').start()<CR>]], {})
+    map('x', 'g*', [[<Plug>(asterisk-gz*)<Cmd>lua require('hlslens').start()<CR>]], {})
+    map('x', 'g#', [[<Plug>(asterisk-gz#)<Cmd>lua require('hlslens').start()<CR>]], {})
 end
 
 function M.surround()
@@ -108,16 +113,10 @@ end
 
 function M.grepper()
     g.grepper = {
-        tools = {'rg', 'grep'},
         dir = 'repo,file',
-        open = 0,
-        switch = 1,
-        jump = 0,
         simple_prompt = 1,
-        quickfix = 1,
         searchreg = 1,
-        highlight = 0,
-        stop = 10000,
+        stop = 50000,
         rg = {
             grepprg = 'rg -H --no-heading --vimgrep --smart-case',
             grepformat = '%f:%l:%c:%m,%f:%l:%m'
@@ -125,15 +124,14 @@ function M.grepper()
     }
     map('n', 'gs', [[<Cmd>lua require('yank').set_wv()<CR><Plug>(GrepperOperator)]], {})
     map('x', 'gs', '<Plug>(GrepperOperator)', {})
-    map('n', '<Leader>rg', [[<Cmd>Grepper -tool rg<CR>]])
+    map('n', '<Leader>rg', [[<Cmd>Grepper<CR>]])
     cmd(([[
         aug Grepper
             au!
-            au User Grepper ++nested %s | %s
+            au User Grepper ++nested %s
         aug END
     ]]):format(
-        [[call setqflist([], 'r', {'context': {'bqf': {'pattern_hl': '\%#' . getreg('/')}}})]],
-        'bo cope'))
+        [[call setqflist([], 'r', {'context': {'bqf': {'pattern_hl': '\%#' . getreg('/')}}})]]))
 
     -- if fn.executable('rg') then
     --     vim.o.grepprg = [[rg --vimgrep --no-heading --smart-case]]
@@ -224,6 +222,9 @@ function M.neoformat()
     g.neoformat_basic_format_align = 1
     g.neoformat_basic_format_retab = 1
     g.neoformat_basic_format_trim = 1
+
+    -- c
+    g.neoformat_enabled_python = {'clang-format'}
 
     -- python
     g.neoformat_enabled_python = {'autopep8'}

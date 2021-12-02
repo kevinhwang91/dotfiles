@@ -54,6 +54,11 @@
 		"body": ["$1func($2) {", "\t$TM_SELECTED_TEXT", "}($3)"],
 		"description": "Snippet for anonymous function surround"
 	},
+	"multiple variable declaration": {
+		"prefix": "vars",
+		"body": ["var (", "\t${1:name} = ${0:type}", ")"],
+		"description": "Snippet for a variable block"
+	},
 	"variable declaration": {
 		"prefix": "var",
 		"body": ["var ${1:name} ${2:type}"],
@@ -70,8 +75,8 @@
 		"description": "Snippet for select statement"
 	},
 	"case clause": {
-		"prefix": "case",
-		"body": "case ${0:condition}:",
+		"prefix": "cas",
+		"body": "case ${0:condition}",
 		"description": "Snippet for case clause"
 	},
 	"for statement": {
@@ -143,16 +148,6 @@
 		"prefix": "make",
 		"body": ["make(${1:type}, ${2:0})"],
 		"description": "Snippet for make statement"
-	},
-	"new(...)": {
-		"prefix": "new",
-		"body": ["new(${1:type})"],
-		"description": "Snippet for new statement"
-	},
-	"panic(...)": {
-		"prefix": "pn",
-		"body": ["panic(\"$0\")"],
-		"description": "Snippet for panic"
 	},
 	"http ResponseWriter *Request": {
 		"prefix": "wr",

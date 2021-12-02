@@ -86,6 +86,8 @@ end
 local function init()
     vim.g.fzf_action = {['ctrl-t'] = 'tabedit', ['ctrl-s'] = 'split', ['ctrl-v'] = 'vsplit'}
     vim.g.fzf_layout = {window = {width = 0.7, height = 0.7}}
+    -- TODO there's a bug for neovim's floating window for cursorline when split window, keep
+    -- cursorline option of fzf's window on as a workaround
     cmd([[
         function! FzfWrapper(opts) abort
             call fzf#run(fzf#wrap(a:opts))
@@ -93,6 +95,7 @@ local function init()
 
         aug Fzf
             au!
+            au FileType fzf setl cul
             au VimResized * lua require('plugs.fzf').resize_preview_layout()
         aug END
     ]])

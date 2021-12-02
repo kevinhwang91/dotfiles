@@ -17,7 +17,7 @@ function M.go2def()
     else
         local err = M.a2sync('definitions')
         if not err then
-            fn.CocAction('jumpDefinition')
+            fn.CocAction('jumpDefinition', 'drop')
             by = 'coc'
         else
             local cword = fn.expand('<cword>')
@@ -76,18 +76,19 @@ end
 function M.diagnostic(winid, nr, keep)
     fn.CocActionAsync('diagnosticList', '', function(err, res)
         if err == vim.NIL then
-            local items, loc_ranges = {}, {}
+            local items = {}
             for _, d in ipairs(res) do
                 local text = ('[%s%s] %s'):format((d.source == '' and 'coc.nvim' or d.source),
                     (d.code == vim.NIL and '' or ' ' .. d.code), d.message:match('([^\n]+)\n*'))
                 local item = {
                     filename = d.file,
                     lnum = d.lnum,
+                    end_lnum = d.end_lnum,
                     col = d.col,
+                    end_col = d.end_col,
                     text = text,
                     type = d.severity
                 }
-                table.insert(loc_ranges, d.location.range)
                 table.insert(items, item)
             end
             local id
@@ -98,12 +99,8 @@ function M.diagnostic(winid, nr, keep)
                 id, winid, nr = info.id, info.winid, info.nr
             end
             local action = id == 0 and ' ' or 'r'
-            fn.setqflist({}, action, {
-                id = id ~= 0 and id or nil,
-                title = 'CocDiagnosticList',
-                items = items,
-                context = {bqf = {lsp_ranges_hl = loc_ranges}}
-            })
+            fn.setqflist({}, action,
+                {id = id ~= 0 and id or nil, title = 'CocDiagnosticList', items = items})
 
             if id == 0 then
                 local info = fn.getqflist({id = id, nr = 0})
@@ -116,6 +113,7 @@ function M.diagnostic(winid, nr, keep)
                 else
                     api.nvim_set_current_win(winid)
                 end
+            else
                 cmd(('sil %dchi'):format(nr))
             end
         end
@@ -124,14 +122,12 @@ end
 
 function M.jump2loc(locs, skip)
     locs = locs or vim.g.coc_jump_locations
+    local ctx
     local loc_ranges = vim.tbl_map(function(val)
         return val.range
     end, locs)
-    fn.setloclist(0, {}, ' ', {
-        title = 'CocLocationList',
-        items = locs,
-        context = {bqf = {lsp_ranges_hl = loc_ranges}}
-    })
+    ctx = {bqf = {lsp_ranges_hl = loc_ranges}}
+    fn.setloclist(0, {}, ' ', {title = 'CocLocationList', items = locs, context = ctx})
     if not skip then
         local winid = fn.getloclist(0, {winid = 0}).winid
         if winid == 0 then
@@ -259,6 +255,15 @@ function M.skip_snippet()
     return api.nvim_replace_termcodes([[\<BS>]], true, false, true)
 end
 
+function M.switch_file()
+    local ft = vim.bo.ft
+    if ft == 'go' then
+        cmd('CocCommand go.test.toggle')
+    elseif ft == 'c' or ft == 'cpp' then
+        cmd('CocCommand clangd.switchSourceHeader')
+    end
+end
+
 function M.sign_icons(level)
     return sign_icons[level]
 end
@@ -292,6 +297,7 @@ local function init()
             au CursorHold * sil! call CocActionAsync('highlight', '', v:lua.require('plugs.coc').hl_fallback)
             au User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
             au VimLeavePre * if get(g:, 'coc_process_pid', 0) | call system('kill -9 -- -' . g:coc_process_pid) | endif
+            au FileType list lua vim.cmd('pa nvim-bqf') require('bqf.magicwin.handler').attach()
         aug END
     ]])
 
@@ -303,22 +309,27 @@ local function init()
     end
 
     map('i', '<C-space>', 'coc#refresh()', {noremap = true, expr = true, silent = true})
-    map('n', '<C-f>', [[coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"]],
+    map('n', '<C-f>', [[!empty(coc#float#get_float_win_list()) ? coc#float#scroll(1) : "\<C-f>"]],
         {noremap = true, expr = true, silent = true})
-    map('n', '<C-b>', [[coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"]],
+    map('n', '<C-b>', [[!empty(coc#float#get_float_win_list()) ? coc#float#scroll(0) : "\<C-b>"]],
         {noremap = true, expr = true, silent = true})
-    map('v', '<C-f>', [[coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"]],
+    map('v', '<C-f>', [[!empty(coc#float#get_float_win_list()) ? coc#float#scroll(1) : "\<C-f>"]],
         {noremap = true, expr = true, silent = true})
-    map('v', '<C-b>', [[coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"]],
+    map('v', '<C-b>', [[!empty(coc#float#get_float_win_list()) ? coc#float#scroll(0) : "\<C-b>"]],
         {noremap = true, expr = true, silent = true})
-    map('i', '<C-f>', [[coc#float#has_scroll() ? "\<C-r>=coc#float#scroll(1)\<cr>" : "\<Right>"]],
+    map('i', '<C-f>',
+        [[!empty(coc#float#get_float_win_list()) && pumvisible() == 0 ? "\<C-r>=coc#float#scroll(1)\<cr>" : "\<Right>"]],
         {noremap = true, expr = true, silent = true})
-    map('i', '<C-b>', [[coc#float#has_scroll() ? "\<C-r>=coc#float#scroll(0)\<cr>" : "\<Left>"]],
+    map('i', '<C-b>',
+        [[!empty(coc#float#get_float_win_list()) && pumvisible() == 0 ? "\<C-r>=coc#float#scroll(0)\<cr>" : "\<Left>"]],
         {noremap = true, expr = true, silent = true})
 
-    _G.coc_skip_snippet = M.skip_snippet
-    map('s', '<C-]>', [[!get(b:, 'coc_snippet_active') ? "\<C-]>" : v:lua._G.coc_skip_snippet()]],
-        {noremap = true, expr = true})
+    map('i', '<C-]>', [[!get(b:, 'coc_snippet_active') ? "\<C-]>" : "\<C-j>"]], {expr = true})
+    map('s', '<C-]>', [[v:lua.require'plugs.coc'.skip_snippet()]], {noremap = true, expr = true})
+    map('s', '<Bs>', '<C-g>"_c')
+    map('s', '<Del>', '<C-g>"_c')
+    map('s', '<C-r>', '<C-g>"_c<C-r>', {noremap = false})
+    map('s', '<C-h>', '<C-g>"_c')
     map('s', '<C-w>', '<Esc>a')
 
     map('n', '[d', '<Plug>(coc-diagnostic-prev)', {})
@@ -348,7 +359,10 @@ local function init()
 
     cmd([[com! -nargs=0 DiagnosticToggleBuffer call CocAction('diagnosticToggleBuffer')]])
     cmd([[com! -nargs=0 CocOutput CocCommand workspace.showOutput]])
-    map('n', '<Leader>sh', '<Cmd>CocCommand clangd.switchSourceHeader<CR>')
+    map('n', '<Leader>sf', [[<Cmd>lua require('plugs.coc').switch_file()<CR>]])
+
+    map('n', '<Leader>tf', [[<Cmd>CocCommand go.test.generate.function<CR>]])
+    map('x', '<Leader>tf', [[:CocCommand go.test.generate.function<CR>]])
 end
 
 init()
