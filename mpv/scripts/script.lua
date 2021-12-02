@@ -26,11 +26,11 @@ function toggle_loop()
     local loop_file = mp.get_property('loop-file', 'no')
     local loop_playlist = mp.get_property('loop-playlist', 'no')
     if loop_file == 'no' and loop_playlist == 'no' then
-        mp.set_property('loop-file', 'yes')
+        mp.set_property('loop-file', 'inf')
         mp.osd_message('Loop: current')
-    elseif loop_file == 'yes' and loop_playlist == 'no' then
+    elseif loop_file == 'inf' and loop_playlist == 'no' then
         mp.set_property('loop-file', 'no')
-        mp.set_property('loop-playlist', 'yes')
+        mp.set_property('loop-playlist', 'inf')
         mp.osd_message('Loop: playlist')
     else
         mp.set_property('loop-file', 'no')
