@@ -9,6 +9,9 @@
     pager = delta -w $COLUMNS
     excludesfile = ~/.gitignore
 
+[log]
+    date = iso
+
 [blame]
     date = short
 
