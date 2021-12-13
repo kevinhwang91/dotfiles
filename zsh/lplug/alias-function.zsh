@@ -218,7 +218,7 @@ if (( $+commands[nvim] )); then
     _nrg() {
         if [[ $* ]]; then
             nvim +'pa nvim-treesitter' \
-                +"Grepper -noprompt -dir cwd -grepprg rg ${(qq)*} -H --no-heading --vimgrep -C0 --color=never ."
+                +"Grepper -noprompt -dir cwd -grepprg rg $* -H --no-heading --vimgrep -C0 --color=never"
         else
             rg
         fi
