@@ -24,4 +24,4 @@ local fzf_preview_cmd="
         printf(\"%s\n$reset\", \$0);
     } else printf(\"%s\n\", \$0);}' <<<\$hist_context"
 
-alias | $FZF_CMD -d '=' --height=60% --preview=$fzf_preview_cmd | sed -E -n 's/^([^=]*)=.*/\1/p'
+alias | $FZF_CMD -q "$*" -d '=' --height=60% --preview=$fzf_preview_cmd | sed -E -n 's/^([^=]*)=.*/\1/p'

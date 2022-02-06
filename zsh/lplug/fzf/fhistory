@@ -4,7 +4,7 @@ setopt pipefail
 
 local selected
 
-fc -rl 1 | $FZF_CMD --height=60% -n2..,.. --tiebreak=index --bind=ctrl-s:toggle-sort --query=$1 +m |
+fc -rl 1 | $FZF_CMD -q "$*" --height=60% -n2..,.. --tiebreak=index --bind=ctrl-s:toggle-sort +m |
     read selected
 
 local ret=$?

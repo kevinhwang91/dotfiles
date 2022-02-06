@@ -306,6 +306,9 @@ git_symbols=(
     stash           
 )
 
-ZLE_RPROMPT_INDENT=0
+if [[ $OSTYPE == linux* ]]; then
+    ZLE_RPROMPT_INDENT=0
+fi
+
 GIT_DIRTY_TIMEOUT=60
 _git_prompt_setup

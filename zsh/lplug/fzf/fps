@@ -10,7 +10,7 @@ _fps() {
         render='cat'
     fi
 
-    ps -eo user,pid,ppid,pgid,tname,stat,command | awk '
+    ps -eo user,pid,ppid,pgid,tty,stat,command | awk '
     BEGIN { "ps -p $$ -o pgid= | tr -d \"[:blank:]\"" | getline pgid } {
         if ($4 != pgid || $2 == pgid)
             print
@@ -29,5 +29,5 @@ fi
 
 local fzf_preview_cmd="ps -o pcpu,pmem,vsz,rss,$nlwp,start,time -p {2}"
 
-_fps | $FZF_CMD ${(z)fzf_opts} --preview=$fzf_preview_cmd |
+_fps | $FZF_CMD -q "$*" ${(z)fzf_opts} --preview=$fzf_preview_cmd |
     awk -v sep=${FZF_MUL_DELIM:- } '{ printf "%s%c", $2, sep }' | sed -E "s/${FZF_MUL_DELIM:- }$//"

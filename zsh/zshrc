@@ -5,10 +5,27 @@ export GOPATH=$HOME/WorkSpaces/go
 # [[ $PATH =~ $GOPATH/bin ]] || PATH=$(go env GOPATH)/bin:$PATH
 
 export JDK_HOME=/usr/lib/jvm/default
+export JAVA_HOME=$JDK_HOME
 
 # yarn
 if (( $+commands[yarn] )); then
     [[ $PATH =~ $HOME/.yarn/bin ]] || PATH=$(yarn global bin):$PATH
+fi
+
+export PYTHONUSERBASE=$HOME/.local
+
+if [[ $OSTYPE == darwin* ]]; then
+    export LC_ALL=en_US.UTF-8
+    export LANG=en_US.UTF-8
+    local gnu_tools=(coreutils findutils gnu-tar gnu-sed gawk gnutls gnu-indent gnu-getopt grep)
+    local libexec_arr=('/usr/local/opt/' ' ' '/libexec/gnubin')
+    for tool in $gnu_tools; do
+        libexec_arr[2]=$tool
+        local dir=${(j..)libexec_arr}
+        if [[ -d $dir ]]; then
+            PATH="$dir:$PATH"
+        fi
+    done
 fi
 
 # path

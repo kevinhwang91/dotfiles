@@ -24,6 +24,7 @@ alias gss='git status'
 alias ga='git add'
 alias grm='git rm'
 alias gd='git diff'
+alias gd1='git diff @{1}'
 alias gd2='git diff @'
 alias gdc='git diff --cached'
 alias gdt='git difftool'
@@ -69,9 +70,8 @@ alias gl='git pull --rebase'
 alias glm='git pull --merge'
 alias gm='git merge'
 alias gma='git merge --abort'
-alias gmf='git merge --ff-only --squash'
 alias gmF='git merge --no-ff'
-alias gms='git merge --squash'
+alias gms='git merge --ff-only --squash'
 alias gmt='git mergetool'
 
 alias gp='git push'
@@ -108,6 +108,7 @@ alias grbs='git rebase --skip'
 alias gr='git reset'
 alias gru='git reset --'
 alias grh='git reset --hard'
+alias grh1='git reset --hard @{1}'
 
 alias gst='git stash'
 alias gsta='git stash apply'
@@ -167,6 +168,7 @@ alias got='go test'
 alias gotv='go test -v'
 alias gomi='go mod init'
 alias gomt='go mod tidy'
+alias gopf='go tool pprof'
 
 alias cco='gcc -o'
 
@@ -212,13 +214,15 @@ alias lsfp='lsof -w -p'
 alias vmst='vmstat -SM 1'
 alias iost='iostat -y -d -h -t 1'
 
+alias sleepi='sleep infinity'
+
 if (( $+commands[nvim] )); then
     alias nrg='_nrg'
     compdef __nrg_compdef _nrg
     _nrg() {
         if [[ $* ]]; then
             nvim +'pa nvim-treesitter' \
-                +"Grepper -noprompt -dir cwd -grepprg rg $* -H --no-heading --vimgrep -C0 --color=never"
+                +"Grepper -noprompt -dir cwd -grepprg rg $* --max-columns=200 -H --no-heading --vimgrep -C0 --color=never"
         else
             rg
         fi

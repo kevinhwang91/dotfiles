@@ -2,4 +2,4 @@ emulate -L zsh
 
 setopt pipefail
 
-print -l ${(k)functions} | $FZF_CMD  --height=60%
+print -l ${(k)functions} | $FZF_CMD -q "$*" --height=60%

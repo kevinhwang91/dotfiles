@@ -70,3 +70,11 @@ fi
 # esc cancel completion menu
 KEYTIMEOUT=1
 bindkey -M menuselect '^[' send-break
+
+# calibrate the SHLVL
+if (( SHLVL > 1 )); then
+    local ttys=("${(@f)$(ps -o tty= -p $$ -p $PPID)}")
+    if [[ $ttys[1] != $ttys[2] ]]; then
+        SHLVL=1
+    fi
+fi
