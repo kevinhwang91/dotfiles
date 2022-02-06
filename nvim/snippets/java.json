@@ -1,52 +1,88 @@
 {
 	"main": {
 		"prefix": "main",
-		"body": ["public static void main(String[] args) {", "\t$0", "}"],
+		"body": [
+			"public static void main(String[] args) {",
+			"\t$0",
+			"}"
+		],
 		"description": "Public static main method"
 	},
 	"cl": {
 		"prefix": "cl",
-		"body": ["public class ${TM_FILENAME_BASE} {", "\t$0", "}"],
+		"body": [
+			"public class ${TM_FILENAME_BASE} {",
+			"\t$0",
+			"}"
+		],
 		"description": "Public class"
 	},
 	"sysout": {
 		"prefix": "sysout",
-		"body": ["System.out.println($0);"],
+		"body": [
+			"System.out.println($0);"
+		],
 		"description": "Print to standard out"
 	},
 	"syserr": {
 		"prefix": "syserr",
-		"body": ["System.err.println($0);"],
+		"body": [
+			"System.err.println($0);"
+		],
 		"description": "Print to standard err"
 	},
 	"fori": {
 		"prefix": "fori",
-		"body": ["for (${1:int} ${2:i} = ${3:0}; $2 < ${4:max}; $2++) {", "\t$0", "}"],
+		"body": [
+			"for (${1:int} ${2:i} = ${3:0}; $2 < ${4:max}; $2++) {",
+			"\t$0",
+			"}"
+		],
 		"description": "Indexed for loop"
 	},
 	"foreach": {
 		"prefix": "foreach",
-		"body": ["for (${1:type} ${2:var} : ${3:iterable}) {", "\t$0", "}"],
+		"body": [
+			"for (${1:type} ${2:var} : ${3:iterable}) {",
+			"\t$0",
+			"}"
+		],
 		"description": "Enhanced for loop"
 	},
 	"Public constructor": {
 		"prefix": "ctor",
-		"body": ["public ${1:${TM_FILENAME_BASE}}($2) {", "\t${0:super();}", "}"],
+		"body": [
+			"public ${1:${TM_FILENAME_BASE}}($2) {",
+			"\t${0:super();}",
+			"}"
+		],
 		"description": "Public constructor"
 	},
 	"if": {
 		"prefix": "if",
-		"body": ["if (${1:condition}) {", "\t$0", "}"],
+		"body": [
+			"if (${1:condition}) {",
+			"\t$0",
+			"}"
+		],
 		"description": "if statement"
 	},
 	"ifnull": {
 		"prefix": "ifnull",
-		"body": ["if (${1:condition} == null) {", "\t$0", "}"],
+		"body": [
+			"if (${1:condition} == null) {",
+			"\t$0",
+			"}"
+		],
 		"description": "if statement checking for null"
 	},
 	"ifnotnull": {
 		"prefix": "ifnotnull",
-		"body": ["if (${1:condition} != null) {", "\t$0", "}"],
+		"body": [
+			"if (${1:condition} != null) {",
+			"\t$0",
+			"}"
+		],
 		"description": "if statement checking for not null"
 	},
 	"trycatch": {
@@ -72,27 +108,47 @@
 	},
 	"private_method": {
 		"prefix": "private_method",
-		"body": ["private ${1:void} ${2:name}($3) {", "\t$0", "}"],
+		"body": [
+			"private ${1:void} ${2:name}($3) {",
+			"\t$0",
+			"}"
+		],
 		"description": "private method"
 	},
 	"Public method": {
 		"prefix": "public_method",
-		"body": ["public ${1:void} ${2:name}(${3}) {", "\t$0", "}"],
+		"body": [
+			"public ${1:void} ${2:name}(${3}) {",
+			"\t$0",
+			"}"
+		],
 		"description": "public method"
 	},
 	"Private static method": {
 		"prefix": "private_static_method",
-		"body": ["private static ${1:Type} ${2:name}(${3}) {", "\t$0", "}"],
+		"body": [
+			"private static ${1:Type} ${2:name}(${3}) {",
+			"\t$0",
+			"}"
+		],
 		"description": "private static method"
 	},
 	"Public static method": {
 		"prefix": "public_static_method",
-		"body": ["public static ${1:void} ${2:name}(${3}) {", "\t$0", "}"],
+		"body": [
+			"public static ${1:void} ${2:name}(${3}) {",
+			"\t$0",
+			"}"
+		],
 		"description": "public static method"
 	},
 	"Protected Method": {
 		"prefix": "protected_method",
-		"body": ["protected ${1:void} ${2:name}(${3}) {", "\t$0", "}"],
+		"body": [
+			"protected ${1:void} ${2:name}(${3}) {",
+			"\t$0",
+			"}"
+		],
 		"description": "Protected method"
 	},
 	"Switch Statement": {
@@ -111,22 +167,34 @@
 	},
 	"While Statement": {
 		"prefix": "whi",
-		"body": ["while (${1:condition}) {", "\t$0", "}"],
+		"body": [
+			"while (${1:condition}) {",
+			"\t$0",
+			"}"
+		],
 		"description": "While Statement"
 	},
 	"Do-While Statement": {
 		"prefix": "do",
-		"body": ["do {", "\t$0", "} while (${1:condition});"],
+		"body": [
+			"do {",
+			"\t$0",
+			"} while (${1:condition});"
+		],
 		"description": "Do-While Statement"
 	},
 	"newObject": {
 		"prefix": "new",
-		"body": ["${0:Object} ${1:foo} = new ${0:Object}();"],
+		"body": [
+			"${0:Object} ${1:foo} = new ${0:Object}();"
+		],
 		"description": "Create new Object"
 	},
 	"Private field": {
 		"prefix": "prf",
-		"body": ["private ${1:String} ${2:name};"],
+		"body": [
+			"private ${1:String} ${2:name};"
+		],
 		"description": "Private field"
 	}
 }

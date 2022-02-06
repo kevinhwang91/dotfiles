@@ -1,128 +1,207 @@
 {
 	"await sleep": {
 		"prefix": "asleep",
-		"body": ["await new Promise((r) => setTimeout(r, ${0}))"]
+		"body": [
+			"await new Promise((r) => setTimeout(r, ${0}))"
+		]
 	},
 	"Promise": {
-		"prefix": ["pm"],
-		"body": "Promise"
+		"prefix": [
+			"pm"
+		],
+		"body": ["Promise"]
 	},
-	"new Promise": {
+	"New Promise": {
 		"prefix": "npm",
-		"body": ["new Promise((resolve, reject) => {", "\t${0}", "})"]
+		"body": [
+			"new Promise((resolve, reject) => {",
+			"\t${0}",
+			"})"
+		]
 	},
 	"export": {
 		"prefix": "exp",
-		"body": ["export $0"]
+		"body": [
+			"export $0"
+		]
 	},
 	"describe": {
 		"prefix": "desc",
-		"body": ["describe('${1:description}', () => {", "\t${0}", "})"]
+		"body": [
+			"describe('${1:description}', () => {",
+			"\t${0}",
+			"})"
+		]
 	},
 	"it": {
 		"prefix": "it",
-		"body": ["it('${1:description}', ${2:async }() => {", "\t${0}", "})"]
+		"body": [
+			"it('${1:description}', ${2:async }() => {",
+			"\t${0}",
+			"})"
+		]
 	},
 	"var assignment": {
 		"prefix": "var",
-		"body": ["var ${1:name} = ${2:value}"]
+		"body": [
+			"var ${1:name} = ${2:value}"
+		]
 	},
 	"let statement": {
 		"prefix": "let",
-		"body": ["let ${1:name} = ${2:value}"]
+		"body": [
+			"let ${1:name} = ${2:value}"
+		]
 	},
 	"const statement": {
 		"prefix": "co",
-		"body": ["const ${1:name} = ${2:value}"]
+		"body": [
+			"const ${1:name} = ${2:value}"
+		]
 	},
 	"Class Definition": {
 		"prefix": "class",
-		"body": ["class ${1:name} {", "\tconstructor(${2:parameters}) {", "\t\t$0", "\t}", "}"],
+		"body": [
+			"class ${1:name} {",
+			"\tconstructor($2) {",
+			"\t\t$0",
+			"\t}",
+			"}"
+		],
 		"description": "Class Definition"
 	},
 	"Import external module.": {
 		"prefix": "im",
-		"body": ["import { $0 } from '${1:module}'"],
+		"body": [
+			"import { $0 } from '${1:module}'"
+		],
 		"description": "Import external module."
 	},
 	"typeof": {
 		"prefix": "tyo",
-		"body": ["typeof ${1:source} === '$0'"]
+		"body": [
+			"typeof ${1:source} === '$0'"
+		]
 	},
 	"Array.isArray()": {
 		"prefix": "isarr",
-		"body": ["Array.isArray(${1:source})"]
+		"body": [
+			"Array.isArray(${1:source})"
+		]
 	},
 	"throw exception": {
 		"prefix": "throw",
-		"body": ["throw new Error(\"$1\")", "$0"],
+		"body": [
+			"throw new Error(\"$1\")",
+			"$0"
+		],
 		"description": "Throw Exception"
 	},
 	"try": {
 		"prefix": "tryc",
-		"body": ["try {", "\t$0", "} catch (${1:error}) {", "\t", "}"],
+		"body": [
+			"try {",
+			"\t$0",
+			"} catch (${1:error}) {",
+			"\t",
+			"}"
+		],
 		"description": "Try-Catch Statement"
 	},
 	"try/finally": {
 		"prefix": "tryf",
-		"body": "try {\n\t${0}\n} finally {\n\t\n}",
+		"body": ["try {", "\t${0}", "} finally {", "\t", "}"],
 		"description": "Try-Finally Statement"
 	},
 	"try/catch/finally": {
 		"prefix": "trycf",
-		"body": "try {\n\t${0}\n} catch (${1:err}) {\n\t\n} finally {\n\t\n}"
+		"body": ["try {", "\t${0}", "} catch (${1:err}) {", "\t", "} finally {", "\t", "}"]
 	},
 	"constructor": {
 		"prefix": "ctor",
-		"body": ["constructor () {", "\t${0}", "}"],
+		"body": [
+			"constructor ($1) {",
+			"\t${0}",
+			"}"
+		],
 		"description": "Constructor"
 	},
 	"use strict": {
 		"prefix": "uses",
-		"body": ["'use strict'"],
+		"body": [
+			"'use strict'"
+		],
 		"description": "Use strict"
 	},
 	"JSON.stringify()": {
 		"prefix": "jss",
-		"body": ["JSON.stringify($0)"]
+		"body": [
+			"JSON.stringify($0)"
+		]
 	},
 	"JSON.parse()": {
 		"prefix": "jsp",
-		"body": ["JSON.parse($0)"]
+		"body": [
+			"JSON.parse($0)"
+		]
 	},
 	"getter": {
 		"prefix": "getp",
-		"body": ["get ${1:property}() {", "\t${0}", "}"],
+		"body": [
+			"get ${1:property}() {",
+			"\t${0}",
+			"}"
+		],
 		"description": "Property getter"
 	},
 	"setter": {
 		"prefix": "setp",
-		"body": ["public set ${1:property}(${2:value}) {", "\t${0}", "}"],
+		"body": [
+			"public set ${1:property}(${2:value}) {",
+			"\t${0}",
+			"}"
+		],
 		"description": "Property setter"
 	},
 	"ternary": {
 		"prefix": "t:",
-		"body": ["${1:cond} ? ${2:true} : ${3:false}"]
+		"body": [
+			"${1:cond} ? ${2:true} : ${3:false}"
+		]
 	},
 	"Object.defineProperty": {
 		"prefix": "obd",
-		"body": ["Object.defineProperty(${1:dest}, '${2:prop}', {", "\t${0}", "})"]
+		"body": [
+			"Object.defineProperty(${1:dest}, '${2:prop}', {",
+			"\t${0}",
+			"})"
+		]
 	},
 	"Object.keys": {
 		"prefix": "obk",
-		"body": ["Object.keys(${1:obj})"]
+		"body": [
+			"Object.keys(${1:obj})"
+		]
 	},
 	"Object.values": {
 		"prefix": "obv",
-		"body": ["Object.values(${1:obj})"]
+		"body": [
+			"Object.values(${1:obj})"
+		]
 	},
 	"Object.entries": {
 		"prefix": "obe",
-		"body": ["Object.entries(${1:obj})"]
+		"body": [
+			"Object.entries(${1:obj})"
+		]
 	},
 	"surround selection in arrow function": {
 		"prefix": "sfun",
-		"body": ["${1:async }() => {", "\t{$TM_SELECTED_TEXT}", "}"],
+		"body": [
+			"${1:async }() => {",
+			"\t{$TM_SELECTED_TEXT}",
+			"}"
+		],
 		"description": "wraps text in arrow function"
 	},
 	"For Loop": {
@@ -137,7 +216,11 @@
 	},
 	"For-Each Loop": {
 		"prefix": "foreach",
-		"body": ["${1:array}.forEach(${2:e} => {", "\t$0", "})"],
+		"body": [
+			"${1:array}.forEach((${2:e}) => {",
+			"\t$0",
+			"})"
+		],
 		"description": "For-Each Loop"
 	},
 	"For-In Loop": {
@@ -154,45 +237,84 @@
 	},
 	"For-Of Loop": {
 		"prefix": "forof",
-		"body": ["for (const ${1:iterator} of ${2:object}) {", "\t$0", "}"],
+		"body": [
+			"for (const ${1:iterator} of ${2:object}) {",
+			"\t$0",
+			"}"
+		],
 		"description": "For-Of Loop"
 	},
 	"For-Await-Of Loop": {
 		"prefix": "foraof",
-		"body": ["for await (const ${1:e} of ${2:object}) {", "\t$0", "}"],
+		"body": [
+			"for await (const ${1:e} of ${2:object}) {",
+			"\t$0",
+			"}"
+		],
 		"description": "For-Await-Of Loop"
 	},
 	"Function Statement": {
 		"prefix": "fun",
-		"body": ["function ${1:name}(${2:params}) {", "\t$0", "}"],
+		"body": [
+			"function ${1:name}(${2:params}) {",
+			"\t$0",
+			"}"
+		],
 		"description": "Function Statement"
+	},
+	"Method Statement": {
+		"prefix": "fum",
+		"body": [
+			"${1:name}(${2:params}) {",
+			"\t$0",
+			"}"
+		],
+		"description": "Method Statement"
 	},
 	"arrow function": {
 		"prefix": "fui",
-		"body": "(${1:params}) => ${2:statement}"
+		"body": ["($1) => ${0:statement}"]
 	},
 	"arrow function with body": {
 		"prefix": "fua",
-		"body": ["$1 => {", "\t${0}", "}"]
+		"body": [
+			"($1) => {",
+			"\t${0}",
+			"}"
+		]
 	},
 	"If Statement": {
 		"prefix": "if",
-		"body": ["if (${1:condition}) {", "\t$0", "}"],
+		"body": [
+			"if (${1:condition}) {",
+			"\t$0",
+			"}"
+		],
 		"description": "If Statement"
 	},
 	"Else Statement": {
 		"prefix": "else",
-		"body": ["else {", "\t", "}"],
+		"body": [
+			"else {",
+			"\t$0",
+			"}"
+		],
 		"description": "Else Statement"
 	},
 	"Else If Statement": {
 		"prefix": "elseif",
-		"body": ["else if (${1:condition}) {", "\t$0", "}"],
+		"body": [
+			"else if (${1:condition}) {",
+			"\t$0",
+			"}"
+		],
 		"description": "Else If Statement"
 	},
 	"New Statement": {
 		"prefix": "new",
-		"body": ["const ${1:name} = new ${2:type}(${3:arguments})"],
+		"body": [
+			"const ${1:name} = new ${2:type}(${3:arguments})"
+		],
 		"description": "New Statement"
 	},
 	"Switch Statement": {
@@ -211,37 +333,59 @@
 	},
 	"While Statement": {
 		"prefix": "whi",
-		"body": ["while (${1:condition}) {", "\t$0", "}"],
+		"body": [
+			"while (${1:condition}) {",
+			"\t$0",
+			"}"
+		],
 		"description": "While Statement"
 	},
 	"Do-While Statement": {
 		"prefix": "do",
-		"body": ["do {", "\t$0", "} while (${1:condition})"],
+		"body": [
+			"do {",
+			"\t$0",
+			"} while (${1:condition})"
+		],
 		"description": "Do-While Statement"
 	},
 	"Set Timeout Function": {
 		"prefix": "settimeout",
-		"body": ["setTimeout(() => {", "\t$0", "}, ${1:timeout})"],
+		"body": [
+			"setTimeout(() => {",
+			"\t$0",
+			"}, ${1:timeout})"
+		],
 		"description": "Set Timeout Function"
 	},
 	"Set Interval Function": {
 		"prefix": "setinterval",
-		"body": ["setInterval(() => {", "\t$0", "}, ${1:interval})"],
+		"body": [
+			"setInterval(() => {",
+			"\t$0",
+			"}, ${1:interval})"
+		],
 		"description": "Set Interval Function"
 	},
 	"Log to console": {
 		"prefix": "clog",
-		"body": ["console.log($0)"],
+		"body": [
+			"console.log($0)"
+		],
 		"description": "Log to the console"
 	},
 	"Log warning to console": {
 		"prefix": "cwarn",
-		"body": ["console.warn($0)"],
+		"body": [
+			"console.warn($0)"
+		],
 		"description": "Log warning to the console"
 	},
 	"Log error to console": {
 		"prefix": "cerror",
-		"body": ["console.error($0)"],
+		"body": [
+			"console.error($0)"
+		],
 		"description": "Log error to the console"
 	}
 }

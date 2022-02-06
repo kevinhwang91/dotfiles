@@ -1,212 +1,367 @@
 {
 	"single import": {
 		"prefix": "im",
-		"body": ["import \"${1:package}\""],
+		"body": [
+			"import \"${1:package}\""
+		],
 		"description": "Snippet for import statement"
 	},
 	"multiple imports": {
 		"prefix": "ims",
-		"body": ["import (", "\t\"${0:package}\"", ")"],
+		"body": [
+			"import (",
+			"\t\"${0:package}\"",
+			")"
+		],
 		"description": "Snippet for a import block"
 	},
 	"single constant": {
 		"prefix": "co",
-		"body": ["const ${1:name} = ${0:value}"],
+		"body": [
+			"const ${1:name} = ${0:value}"
+		],
 		"description": "Snippet for a constant"
 	},
 	"multiple constants": {
 		"prefix": "cos",
-		"body": ["const (", "\t${1:name} = ${2:value}", ")"],
+		"body": [
+			"const (",
+			"\t${1:name} = ${2:value}",
+			")"
+		],
 		"description": "Snippet for a constant block"
+	},
+	"struct": {
+		"prefix": "st",
+		"body": [
+			"struct "
+		],
+		"description": "Snippet for a struct"
 	},
 	"type function declaration": {
 		"prefix": "tyf",
-		"body": ["type ${1:name} func($2)"],
+		"body": [
+			"type ${1:name} func($2)"
+		],
 		"description": "Snippet for a type function declaration"
 	},
 	"type interface declaration": {
 		"prefix": "tyi",
-		"body": ["type ${1:name} interface {", "\t$0", "}"],
+		"body": [
+			"type ${1:name} interface {",
+			"\t$0",
+			"}"
+		],
 		"description": "Snippet for a type interface"
 	},
 	"type struct declaration": {
 		"prefix": "tys",
-		"body": ["type ${1:name} struct {", "\t$0", "}"],
+		"body": [
+			"type ${1:name} struct {",
+			"\t$0",
+			"}"
+		],
 		"description": "Snippet for a struct declaration"
 	},
 	"package main and main function": {
 		"prefix": "pkgm",
-		"body": ["package main", "", "func main() {", "\t$0", "}"],
+		"body": [
+			"package main",
+			"",
+			"func main() {",
+			"\t$0",
+			"}"
+		],
 		"description": "Snippet for main package & function"
 	},
 	"function declaration": {
 		"prefix": "fun",
-		"body": ["func ${1:function}($2) $3 {", "\t$0", "}"],
+		"body": [
+			"func ${1:function}($2) $3 {",
+			"\t$0",
+			"}"
+		],
 		"description": "Snippet for function declaration"
 	},
 	"method declaration": {
 		"prefix": "fum",
-		"body": ["func (${1:receiver} ${2:type}) ${3:method}($4) $5 {", "\t$0", "}"],
+		"body": [
+			"func (${1:receiver} ${2:type}) ${3:method}($4) $5 {",
+			"\t$0",
+			"}"
+		],
 		"description": "Snippet for method declaration"
 	},
 	"anonymous function surround": {
 		"prefix": "sfun",
-		"body": ["$1func($2) {", "\t$TM_SELECTED_TEXT", "}($3)"],
+		"body": [
+			"$1func($2) {",
+			"\t$TM_SELECTED_TEXT",
+			"}($3)"
+		],
 		"description": "Snippet for anonymous function surround"
 	},
 	"multiple variable declaration": {
 		"prefix": "vars",
-		"body": ["var (", "\t${1:name} = ${0:type}", ")"],
+		"body": [
+			"var (",
+			"\t${1:name} = ${0:type}",
+			")"
+		],
 		"description": "Snippet for a variable block"
 	},
 	"variable declaration": {
 		"prefix": "var",
-		"body": ["var ${1:name} ${2:type}"],
+		"body": [
+			"var ${1:name} ${2:type}"
+		],
 		"description": "Snippet for a variable"
 	},
 	"switch statement": {
 		"prefix": "swi",
-		"body": ["switch ${1:expression} {", "case ${2:condition}:", "\t$0", "}"],
+		"body": [
+			"switch ${1:expression} {",
+			"case ${2:condition}:",
+			"\t$0",
+			"}"
+		],
 		"description": "Snippet for switch statement"
 	},
 	"select statement": {
 		"prefix": "sel",
-		"body": ["select {", "case ${1:condition}:", "\t$0", "}"],
+		"body": [
+			"select {",
+			"case ${1:condition}:",
+			"\t$0",
+			"}"
+		],
 		"description": "Snippet for select statement"
 	},
 	"case clause": {
 		"prefix": "cas",
-		"body": "case ${0:condition}",
+		"body": [
+			"case ${0:condition}"
+		],
 		"description": "Snippet for case clause"
 	},
 	"for statement": {
 		"prefix": "for",
-		"body": ["for ${1:i} := ${2:0}; $1 < ${3:count}; $1++ {", "\t$0", "}"],
+		"body": [
+			"for ${1:i} := ${2:0}; $1 < ${3:count}; $1++ {",
+			"\t$0",
+			"}"
+		],
 		"description": "Snippet for a for loop"
 	},
 	"for range statement": {
 		"prefix": "forr",
-		"body": ["for ${1:_, }${2:v} := range ${3:vs} {", "\t$0", "}"],
+		"body": [
+			"for ${1:_, }${2:v} := range ${3:vs} {",
+			"\t$0",
+			"}"
+		],
 		"description": "Snippet for a for range loop"
 	},
 	"channel declaration": {
 		"prefix": "ch",
-		"body": ["chan ${0:type}"],
+		"body": [
+			"chan ${0:type}"
+		],
 		"description": "Snippet for a channel"
 	},
 	"map declaration": {
 		"prefix": "map",
-		"body": ["map[${1:type}]${2:type}"],
+		"body": [
+			"map[${1:type}]${2:type}"
+		],
 		"description": "Snippet for a map"
 	},
 	"empty interface": {
 		"prefix": "in",
-		"body": ["interface{}"],
+		"body": [
+			"interface{}"
+		],
 		"description": "Snippet for empty interface"
 	},
 	"if statement": {
 		"prefix": "if",
-		"body": ["if ${1:condition} {", "\t$0", "}"],
+		"body": [
+			"if ${1:condition} {",
+			"\t$0",
+			"}"
+		],
 		"description": "Snippet for if statement"
 	},
 	"else branch": {
 		"prefix": "else",
-		"body": ["else {", "\t$0", "}"],
+		"body": [
+			"else {",
+			"\t$0",
+			"}"
+		],
 		"description": "Snippet for else branch"
+	},
+	"else if branch": {
+		"prefix": "elseif",
+		"body": [
+			"else if ${1:condition} {",
+			"\t$0",
+			"}"
+		]
 	},
 	"if err != nil": {
 		"prefix": "iferr",
-		"body": ["if ${1:err := ${2:expr}; }err != nil {", "\t${3:panic(err)}", "}"],
+		"body": [
+			"if ${1:err := ${2:expr}; }err != nil {",
+			"\t${3:panic(err)}",
+			"}"
+		],
 		"description": "Snippet for if err != nil"
+	},
+	"if ok": {
+		"prefix": "ifok",
+		"body": [
+			"if ${1:v}, ${2:ok} := ${3:expr}; $2 {",
+			"\t$0",
+			"}"
+		],
+		"description": "Snippet for if key exists"
 	},
 	"fmt.Println": {
 		"prefix": "fp",
-		"body": ["fmt.Println($1)"],
+		"body": [
+			"fmt.Println($1)"
+		],
 		"description": "Snippet for fmt.Println()"
 	},
 	"fmt.Printf": {
 		"prefix": "ff",
-		"body": ["fmt.Printf(\"$1\", ${2:var})"],
+		"body": [
+			"fmt.Printf(\"$1\", ${2:var})"
+		],
 		"description": "Snippet for fmt.Printf()"
 	},
 	"log.Println": {
 		"prefix": "lp",
-		"body": ["log.Println($1)"],
+		"body": [
+			"log.Println($1)"
+		],
 		"description": "Snippet for log.Println()"
 	},
 	"log.Printf": {
 		"prefix": "lf",
-		"body": ["log.Printf(\"$1\", ${2:var})"],
+		"body": [
+			"log.Printf(\"$1\", ${2:var})"
+		],
 		"description": "Snippet for log.Printf()"
 	},
 	"log variable content": {
 		"prefix": "lv",
-		"body": ["log.Printf(\"${1:var}: %#+v\\\\n\", ${1:var})"],
+		"body": [
+			"log.Printf(\"${1:var}: %#+v\\\\n\", ${1:var})"
+		],
 		"description": "Snippet for log.Printf() with variable content"
 	},
 	"make(...)": {
 		"prefix": "make",
-		"body": ["make(${1:type}, ${2:0})"],
+		"body": [
+			"make(${1:type}, ${2:0})$0"
+		],
 		"description": "Snippet for make statement"
 	},
 	"http ResponseWriter *Request": {
 		"prefix": "wr",
-		"body": ["${1:w} http.ResponseWriter, ${2:r} *http.Request"],
+		"body": [
+			"${1:w} http.ResponseWriter, ${2:r} *http.Request"
+		],
 		"description": "Snippet for http Response"
 	},
 	"http.HandleFunc": {
 		"prefix": "hf",
-		"body": ["${1:http}.HandleFunc(\"${2:/}\", ${3:handler})"],
+		"body": [
+			"${1:http}.HandleFunc(\"${2:/}\", ${3:handler})"
+		],
 		"description": "Snippet for http.HandleFunc()"
 	},
 	"http handler declaration": {
 		"prefix": "hand",
-		"body": ["func $1(${2:w} http.ResponseWriter, ${3:r} *http.Request) {", "\t$0", "}"],
+		"body": [
+			"func $1(${2:w} http.ResponseWriter, ${3:r} *http.Request) {",
+			"\t$0",
+			"}"
+		],
 		"description": "Snippet for http handler declaration"
 	},
 	"http.Redirect": {
 		"prefix": "rd",
-		"body": ["http.Redirect(${1:w}, ${2:r}, \"${3:/}\", ${4:http.StatusFound})"],
+		"body": [
+			"http.Redirect(${1:w}, ${2:r}, \"${3:/}\", ${4:http.StatusFound})"
+		],
 		"description": "Snippet for http.Redirect()"
 	},
 	"http.Error": {
 		"prefix": "herr",
-		"body": ["http.Error(${1:w}, ${2:err}.Error(), ${3:http.StatusInternalServerError})"],
+		"body": [
+			"http.Error(${1:w}, ${2:err}.Error(), ${3:http.StatusInternalServerError})"
+		],
 		"description": "Snippet for http.Error()"
 	},
 	"http.ListenAndServe": {
 		"prefix": "las",
-		"body": ["http.ListenAndServe(\"${1::8080}\", ${2:nil})"],
+		"body": [
+			"http.ListenAndServe(\"${1::8080}\", ${2:nil})"
+		],
 		"description": "Snippet for http.ListenAndServe"
 	},
 	"http.Serve": {
 		"prefix": "sv",
-		"body": ["http.Serve(\"${1::8080}\", ${2:nil})"],
+		"body": [
+			"http.Serve(\"${1::8080}\", ${2:nil})"
+		],
 		"description": "Snippet for http.Serve"
 	},
 	"goroutine anonymous function": {
 		"prefix": "go",
-		"body": ["go func($1) {", "\t$0", "}($2)"],
+		"body": [
+			"go func($1) {",
+			"\t$0",
+			"}($2)"
+		],
 		"description": "Snippet for anonymous goroutine declaration"
 	},
 	"goroutine function": {
 		"prefix": "gf",
-		"body": ["go ${1:func}($2)"],
+		"body": [
+			"go ${1:func}($2)"
+		],
 		"description": "Snippet for goroutine declaration"
 	},
 	"defer statement": {
 		"prefix": "df",
-		"body": ["defer func() {", "\t$0", "}()"],
+		"body": [
+			"defer func() {",
+			"\t$0",
+			"}()"
+		],
 		"description": "Snippet for anonymous defer statement"
 	},
 	"test function": {
 		"prefix": "tf",
-		"body": ["func Test$1(t *testing.T) {", "\t$0", "}"],
+		"body": [
+			"func Test$1(t *testing.T) {",
+			"\t$0",
+			"}"
+		],
 		"description": "Snippet for Test function"
 	},
 	"test main": {
 		"prefix": "tm",
-		"body": ["func TestMain(m *testing.M) {", "\t$0", "\tos.Exit(m.Run())", "}"],
+		"body": [
+			"func TestMain(m *testing.M) {",
+			"\t$0",
+			"\tos.Exit(m.Run())",
+			"}"
+		],
 		"description": "Snippet for TestMain function"
 	},
 	"benchmark function": {
@@ -222,12 +377,20 @@
 	},
 	"init function": {
 		"prefix": "init",
-		"body": ["func init() {", "\t$1", "}"],
+		"body": [
+			"func init() {",
+			"\t$1",
+			"}"
+		],
 		"description": "Snippet for init function"
 	},
 	"main function": {
 		"prefix": "main",
-		"body": ["func main() {", "\t$1", "}"],
+		"body": [
+			"func main() {",
+			"\t$1",
+			"}"
+		],
 		"description": "Snippet for main function"
 	},
 	"hello world web app": {
@@ -248,8 +411,7 @@
 			"func main() {",
 			"\thttp.HandleFunc(\"/\", greet)",
 			"\thttp.ListenAndServe(\":8080\", nil)",
-			"}",
-			"\n"
+			"}"
 		],
 		"description": "Snippet for sample hello world webapp"
 	},

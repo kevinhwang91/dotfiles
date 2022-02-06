@@ -1,85 +1,134 @@
 {
 	"require": {
 		"prefix": "req",
-		"body": ["require('${1:module}')"],
+		"body": [
+			"require('${1:module}')"
+		],
 		"description": "Require module"
 	},
 	"return": {
 		"prefix": "ret",
-		"body": ["return $0"],
+		"body": [
+			"return $0"
+		],
 		"description": "return value"
+	},
+	"local": {
+		"prefix": "lo",
+		"body": [
+			"local $0"
+		],
+		"description": "declare local variable"
 	},
 	"assigment": {
 		"prefix": "ll",
-		"body": ["local ${1:varName} = ${2:value}"],
+		"body": [
+			"local ${1:varName} = ${2:value}"
+		],
 		"description": "create a variable"
 	},
+	"locfun": {
+		"prefix": "lof",
+		"body": [
+			"local function ${1:name}($2)",
+			"\t$0",
+			"end"
+		],
+		"description": "local function"
+	},
 	"locreq": {
-		"prefix": "lreq",
-		"body": ["local ${1:var} = require('${2:module}')$0"],
+		"prefix": "lor",
+		"body": [
+			"local ${1:var} = require('${2:module}')$0"
+		],
 		"description": "Require module as a variable"
 	},
 	"if": {
 		"prefix": "if",
-		"body": ["if ${1:true} then", "\t$0", "end"]
+		"body": [
+			"if ${1:true} then",
+			"\t$0",
+			"end"
+		]
 	},
 	"elseif": {
 		"prefix": "elseif",
-		"body": ["elseif ${1:true} then", "\t$0"]
+		"body": [
+			"elseif ${1:true} then",
+			"\t$0"
+		]
 	},
 	"for": {
 		"prefix": "for",
-		"body": ["for ${1:i} = ${2:1}, ${3:10} do", "\t$0", "end"],
+		"body": [
+			"for ${1:i} = ${2:1}, ${3:10} do",
+			"\t$0",
+			"end"
+		],
 		"description": "for loop range"
 	},
 	"fori": {
 		"prefix": "fori",
-		"body": ["for ${1:i}, ${2:v} in ipairs(${3:t}) do", "\t$0", "end"],
+		"body": [
+			"for ${1:i}, ${2:v} in ipairs(${3:t}) do",
+			"\t$0",
+			"end"
+		],
 		"description": "for loop list"
 	},
 	"forp": {
 		"prefix": "forp",
-		"body": ["for ${1:k}, ${2:v} in pairs(${3:t}) do", "\t$0", "end"],
-		"description": "for loop table"
-	},
-	"forline": {
-		"prefix": "forline",
 		"body": [
-			"f = io.open(${1:'${2:filename}'}, '${3:r}')\n",
-			"while true do",
-			"\tline = f:read()",
-			"\tif line == nil then break end\n",
-			"\t${0:-- code}",
+			"for ${1:k}, ${2:v} in pairs(${3:t}) do",
+			"\t$0",
 			"end"
 		],
-		"description": "read file line by line"
+		"description": "for loop table"
 	},
 	"function": {
 		"prefix": "fun",
-		"body": ["function $1($2)", "\t$0", "end"]
-	},
-	"inline-function": {
-		"prefix": "ful",
-		"body": ["local ${1:name} = function($2)", "\t${0:-- code}", "end"]
+		"body": [
+			"function $1($2)",
+			"\t$0",
+			"end"
+		]
 	},
 	"print": {
 		"prefix": "p",
-		"body": ["print(${0})"]
+		"body": [
+			"print(${0})"
+		]
 	},
 	"self": {
 		"prefix": "self:",
-		"body": ["function self:${1:methodName}($2)", "\t$0", "end"]
+		"body": [
+			"function self:${1:methodName}($2)",
+			"\t$0",
+			"end"
+		]
 	},
 	"while": {
 		"prefix": "whi",
-		"body": ["while ${1:true} do", "\t$0", "end"]
+		"body": [
+			"while ${1:true} do",
+			"\t$0",
+			"end"
+		]
 	},
 	"surround-function": {
 		"prefix": "sfun",
-		"body": ["$1function($2)", "\t$TM_SELECTED_TEXT", "end"]
+		"body": [
+			"$1function($2)",
+			"\t$TM_SELECTED_TEXT",
+			"end"
+		]
 	},
 	"surround-ktime": {
 		"prefix": "skt",
-		"body": ["local ${1:rt} = ktime()", "$TM_SELECTED_TEXT", "${0:info}(ktime() - $1)"]
+		"body": [
+			"local ${1:rt} = ktime()",
+			"$TM_SELECTED_TEXT",
+			"${0:info}(ktime() - $1)"
+		]
 	}
 }
