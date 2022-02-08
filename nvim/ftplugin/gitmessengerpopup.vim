@@ -12,12 +12,13 @@ function s:get_commit() abort
     for l in nvim_buf_get_lines(0, 0, -1, v:false)
         let match_group = matchlist(l, '\m^\s\+Commit:\s\+\(\w\+\)')
         if !empty(match_group)
-            let commit =match_group[1]
+            let commit = match_group[1]
             break
         endif
     endfor
-    return commit
+    return commit[:6]
 endfunction
 
+nnoremap <buffer><silent> y<C-g> <Cmd>call setreg(v:register, <SID>get_commit())<CR>
 nnoremap <buffer> <Leader>gb :GBrowse <C-r>=<SID>get_commit()<CR><CR>
 nnoremap <buffer> <Leader>gl :Flog -- <C-r>=<SID>get_commit()<CR><CR>

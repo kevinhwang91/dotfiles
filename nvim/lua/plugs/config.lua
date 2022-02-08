@@ -13,9 +13,19 @@ function M.bqf()
     require('bqf').setup({
         auto_enable = true,
         auto_resize_height = true,
-        preview = {auto_preview = true},
-        func_map = {split = '<C-s>'},
-        filter = {fzf = {action_for = {['ctrl-s'] = 'split'}}}
+        preview = {auto_preview = true, delay_syntax = 50},
+        func_map = {split = '<C-s>', drop = 'o', openc = 'O', tabdrop = '<C-t>'},
+        filter = {
+            fzf = {
+                action_for = {
+                    ['enter'] = 'drop',
+                    ['ctrl-s'] = 'split',
+                    ['ctrl-t'] = 'tab drop',
+                    ['ctrl-x'] = ''
+                },
+                extra_opts = {'-d', '│'}
+            }
+        }
     })
 end
 
@@ -29,7 +39,6 @@ function M.hlslens()
         float_shadow_blend = 50,
         virt_priority = 100
     })
-
     cmd([[com! HlSearchLensToggle lua require('hlslens').toggle()]])
 
     map('n', 'n',
@@ -45,6 +54,8 @@ function M.hlslens()
     map('x', '#', [[<Plug>(asterisk-z#)<Cmd>lua require('hlslens').start()<CR>]], {})
     map('x', 'g*', [[<Plug>(asterisk-gz*)<Cmd>lua require('hlslens').start()<CR>]], {})
     map('x', 'g#', [[<Plug>(asterisk-gz#)<Cmd>lua require('hlslens').start()<CR>]], {})
+
+    g['asterisk#keeppos'] = 1
 end
 
 function M.surround()
@@ -118,11 +129,11 @@ function M.grepper()
         searchreg = 1,
         stop = 50000,
         rg = {
-            grepprg = 'rg -H --no-heading --vimgrep --smart-case',
+            grepprg = 'rg -H --no-heading --max-columns=200 --vimgrep --smart-case',
             grepformat = '%f:%l:%c:%m,%f:%l:%m'
         }
     }
-    map('n', 'gs', [[<Cmd>lua require('yank').set_wv()<CR><Plug>(GrepperOperator)]], {})
+    map('n', 'gs', '<Plug>(GrepperOperator)', {})
     map('x', 'gs', '<Plug>(GrepperOperator)', {})
     map('n', '<Leader>rg', [[<Cmd>Grepper<CR>]])
     cmd(([[
@@ -217,43 +228,30 @@ function M.ghline()
     map('', '<Leader>gL', '<Plug>(gh-line)', {})
 end
 
-function M.neoformat()
-    g.neoformat_only_msg_on_error = 1
-    g.neoformat_basic_format_align = 1
-    g.neoformat_basic_format_retab = 1
-    g.neoformat_basic_format_trim = 1
+function M.indentline()
+    g.indentLine_enabled = 0
+    g.indentLine_char = '▏'
+    g.indentLine_setColors = 1
+    g.indentLine_defaultGroup = 'Whitespace'
+    g.indentLine_faster = 1
+end
 
-    -- c
-    g.neoformat_enabled_python = {'clang-format'}
+function M.notify()
+    require('notify').setup({
+        stages = 'slide',
+        timeout = 2000,
+        minimum_width = 30,
+        render = 'minimal',
+        icons = {ERROR = ' ', WARN = ' ', INFO = ' ', DEBUG = ' ', TRACE = ' '}
+    })
+end
 
-    -- python
-    g.neoformat_enabled_python = {'autopep8'}
-    g.neoformat_python_autopep8 = {exe = 'autopep8', args = {'--max-line-length=100'}}
-
-    -- lua
-    g.neoformat_enabled_lua = {'luaformat'}
-    g.neoformat_lua_luaformat = {exe = 'lua-format'}
-
-    -- javascript
-    g.neoformat_enabled_javascript = {'prettier'}
-
-    -- typescript
-    g.neoformat_enabled_typescript = {'prettier'}
-
-    -- json
-    g.neoformat_enabled_json = {'prettier'}
-
-    -- yaml
-    g.neoformat_enabled_yaml = {'prettier'}
-    g.neoformat_yaml_prettier = {
-        exe = 'prettier',
-        args = {'--stdin-filepath', '"%:p"', '--tab-width=2'},
-        stdin = 1
-    }
-
-    -- sql
-    g.neoformat_enabled_sql = {'sqlformatter'}
-    g.neoformat_sql_sqlformatter = {exe = 'sql-formatter', args = {'--indent', '4'}, stdin = 1}
+function M.neogen()
+    local neogen = require('neogen')
+    neogen.setup({enabled = true, input_after_comment = true})
+    map('i', '<C-j>', [[<Cmd>lua require('neogen').jump_next()<CR>]])
+    map('i', '<C-k>', [[<Cmd>lua require('neogen').jump_prev()<CR>]])
+    map('n', '<Leader>dg', [[:Neogen<Space>]], {noremap = true, silent = false})
 end
 
 function M.slime()

@@ -6,7 +6,11 @@ local cmd = vim.cmd
 local bmap, bunmap = function(...)
     require('remap').bmap(0, ...)
 end, function(mode, lhs)
-    pcall(api.nvim_buf_del_keymap, 0, mode, lhs)
+    local ok, res = pcall(api.nvim_buf_del_keymap, 0, mode, lhs)
+    if not ok then
+        vim.notify(res, vim.log.levels.ERROR)
+    end
+
 end
 
 local function app()
@@ -29,19 +33,23 @@ function M.switch_win()
     jump_win(jump_winid)
 end
 
+function M.notify_locals()
+    local locals = fn.GdbCustomCommand('info locals')
+    vim.notify(locals:gsub('\r\n', '\n'))
+end
+
 -- alacritty has remaped Control-([1-9]|[0]) to Control-[F1-F10] (F25-F34)
 function M.set_keymaps()
     bmap('n', '<F25>', '<Cmd>GdbRun<CR>')
     bmap('n', '<F26>', '<Cmd>GdbContinue<CR>')
-    bmap('n', '<F27>',
-        [[<Cmd>echo substitute(GdbCustomCommand('info locals'), '\r\n', ' \| ', 'g')<CR>]])
+    bmap('n', '<F27>', [[<Cmd>lua require('plugs.nvimgdb').notify_locals()<CR>]])
     bmap('n', '<F28>', '<Cmd>GdbDebugStop<CR>')
     bmap('n', '<F29>', '<Cmd>GdbEvalWord<CR>')
     bmap('x', '<F29>', ':GdbEvalRange<CR>')
-    bmap('n', '<F30>', '<Cmd>GdbFinish<CR>')
-    bmap('n', '<F31>', '<Cmd>GdbStep<CR>')
-    bmap('n', '<F32>', '<Cmd>GdbNext<CR>')
-    bmap('n', '<F33>', '<Cmd>GdbUntil<CR>')
+    bmap('n', '<F30>', '<Cmd>norm! md<CR><Cmd>GdbFinish<CR>')
+    bmap('n', '<F31>', '<Cmd>norm! md<CR><Cmd>GdbStep<CR>')
+    bmap('n', '<F32>', '<Cmd>norm! md<CR><Cmd>GdbNext<CR>')
+    bmap('n', '<F33>', '<Cmd>norm! md<CR><Cmd>GdbUntil<CR>')
     bmap('n', '<F34>', '<Cmd>GdbBreakpointToggle<CR>')
     bmap('n', '<C-p>', '<Cmd>GdbFrameUp<CR>')
     bmap('n', '<C-n>', '<Cmd>GdbFrameDown<CR>')
@@ -73,6 +81,8 @@ end
 function M.set_tkeymaps()
     bmap('t', '<F25>', '<Cmd>GdbRun<CR>')
     bmap('t', '<C-t>', [[<Cmd>lua require('plugs.nvimgdb').switch_win()<CR>]])
+    bmap('n', '<C-n>', '<Cmd>GdbFrameDown<CR>')
+    bmap('n', '<C-t>', [[<Cmd>lua require('plugs.nvimgdb').switch_win()<CR>]])
 end
 
 function M.start()

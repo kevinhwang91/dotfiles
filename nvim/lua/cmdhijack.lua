@@ -1,19 +1,11 @@
 local M = {}
 local fn = vim.fn
 local cmd = vim.cmd
-local api = vim.api
 
 local mods_action
-local hijacked
 
 function M.do_action()
     if vim.v.event.abort then
-        return
-    end
-
-    if hijacked then
-        hijacked = false
-        api.nvim_echo({{'', ''}}, false, {})
         return
     end
 
@@ -22,17 +14,20 @@ function M.do_action()
     for c, mod in pairs(mods_action) do
         if c:match(com_pat) then
             cmd('let v:event.abort = v:true')
-            local wrapped_cmd = (':%s %s<CR>'):format(mod, raw_cmd)
-            local w_cmd = api.nvim_replace_termcodes(wrapped_cmd, true, false, true)
-            api.nvim_feedkeys(w_cmd, 't', true)
-            hijacked = true
+            vim.schedule(function()
+                local ok, res = pcall(cmd, ('%s %s'):format(mod, raw_cmd))
+                if not ok then
+                    local _
+                    _, _, res = res:find([[Vim%(.*%):(.*)$]])
+                    vim.notify(res, vim.log.levels.ERROR)
+                end
+            end)
             break
         end
     end
 end
 
 local function init()
-    hijacked = false
     mods_action = {
         ['Man'] = 'tab',
         ['cwindow'] = 'bo',
@@ -44,6 +39,8 @@ local function init()
         aug CmdHijack
             au!
             au CmdlineLeave : lua require('cmdhijack').do_action()
+            au CmdlineEnter : set nosmartcase
+            au CmdlineLeave : set smartcase
         aug END
     ]])
 end

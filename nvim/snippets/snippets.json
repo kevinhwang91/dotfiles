@@ -1,0 +1,38 @@
+{
+	"id": "vscode://schemas/snippets",
+	"type": "object",
+	"description": "User snippet configuration",
+	"allowTrailingComma": true,
+	"additionalProperties": {
+		"allowTrailingComma": true,
+		"type": "object",
+		"required": [
+			"body"
+		],
+		"properties": {
+			"prefix": {
+				"description": "The prefix to use when selecting the snippet in intellisense",
+				"type": [
+					"string",
+					"array"
+				]
+			},
+			"body": {
+				"type": [
+					"array"
+				],
+				"items": {
+					"type": "string"
+				}
+			},
+			"description": {
+				"description": "The snippet description.",
+				"type": [
+					"string",
+					"array"
+				]
+			}
+		},
+		"additionalProperties": false
+	}
+}

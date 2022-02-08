@@ -25,14 +25,14 @@ function M.start()
         config = require('hlslens.config')
         lens_backup = config.override_lens
         config.override_lens = override_lens
-        hlslens.start()
+        hlslens.start(true)
     end
 end
 
 function M.exit()
     if hlslens then
         config.override_lens = lens_backup
-        hlslens.start()
+        hlslens.start(true)
     end
 end
 
@@ -43,9 +43,9 @@ function M.mappings()
 end
 
 local function init()
-    local ok, msg = pcall(require, 'hlslens')
+    local ok, res = pcall(require, 'hlslens')
     if ok then
-        hlslens = msg
+        hlslens = res
     end
 end
 

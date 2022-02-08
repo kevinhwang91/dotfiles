@@ -9,7 +9,7 @@ local rex = require('rex_pcre2')
 function M.search_all(pattern, bufnr)
     bufnr = bufnr and bufnr or api.nvim_get_current_buf()
     local pos = {}
-    local start = vim.loop.hrtime()
+    -- local start = vim.loop.hrtime()
     local re = rex.new(pattern)
     -- local lines = api.nvim_buf_get_lines(bufnr, 0, -1, false)
     local len = api.nvim_buf_line_count(bufnr)
@@ -29,14 +29,14 @@ function M.search_all(pattern, bufnr)
         j = j + 1
     end
 
-    info('find')
+    -- info('find')
     -- local text = table.concat(lines, '\n')
     -- rex.gsub(text, pattern, '', function(s, e, _)
     --     table.insert(pos, {s, e})
     --     return false, false
     -- end)
     -- info('gsub')
-    info(vim.loop.hrtime() - start)
+    -- info(vim.loop.hrtime() - start)
     return pos
 end
 

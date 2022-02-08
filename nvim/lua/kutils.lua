@@ -4,6 +4,29 @@ local fn = vim.fn
 local cmd = vim.cmd
 local uv = vim.loop
 
+local debounce = require('debounce')
+
+M.termcodes = setmetatable({}, {
+    __index = function(tbl, k)
+        local k_upper = k:upper()
+        local v_upper = rawget(tbl, k_upper)
+        local c = v_upper or api.nvim_replace_termcodes(k, true, false, true)
+        rawset(tbl, k, c)
+        if not v_upper then
+            rawset(tbl, k_upper, c)
+        end
+        return c
+    end
+})
+
+M.ansi = setmetatable({}, {
+    __index = function(t, k)
+        local v = M.render_str('%s', k)
+        rawset(t, k, v)
+        return v
+    end
+})
+
 function M.write_file(path, data, sync)
     local path_ = path .. '_'
     if sync then
@@ -28,6 +51,72 @@ function M.write_file(path, data, sync)
         end)
     end
 end
+
+M.render_str = (function()
+    local ansi = {
+        black = 30,
+        red = 31,
+        green = 32,
+        yellow = 33,
+        blue = 34,
+        magenta = 35,
+        cyan = 36,
+        white = 37
+    }
+    local gui = vim.o.termguicolors
+
+    local function color2csi24b(color_num, fg)
+        local r = math.floor(color_num / 2 ^ 16)
+        local g = math.floor(math.floor(color_num / 2 ^ 8) % 2 ^ 8)
+        local b = math.floor(color_num % 2 ^ 8)
+        return ('%d;2;%d;%d;%d'):format(fg and 38 or 48, r, g, b)
+    end
+
+    local function color2csi8b(color_num, fg)
+        return ('%d;5;%d'):format(fg and 38 or 48, color_num)
+    end
+
+    local color2csi = gui and color2csi24b or color2csi8b
+
+    return function(str, group_name, def_fg, def_bg)
+        vim.validate({
+            str = {str, 'string'},
+            group_name = {group_name, 'string'},
+            def_fg = {def_fg, 'string', true},
+            def_bg = {def_bg, 'string', true}
+        })
+        local ok, hl = pcall(api.nvim_get_hl_by_name, group_name, gui)
+        if not ok or
+            not (hl.foreground or hl.background or hl.reverse or hl.bold or hl.italic or
+                hl.underline) then
+            return str
+        end
+        local fg, bg
+        if hl.reverse then
+            fg = hl.background ~= nil and hl.background or nil
+            bg = hl.foreground ~= nil and hl.foreground or nil
+        else
+            fg = hl.foreground
+            bg = hl.background
+        end
+        local escape_prefix = ('\x1b[%s%s%s'):format(hl.bold and ';1' or '',
+            hl.italic and ';3' or '', hl.underline and ';4' or '')
+
+        local escape_fg, escape_bg = '', ''
+        if fg and type(fg) == 'number' then
+            escape_fg = ';' .. color2csi(fg, true)
+        elseif def_fg and ansi[def_fg] then
+            escape_fg = ansi[def_fg]
+        end
+        if bg and type(bg) == 'number' then
+            escape_fg = ';' .. color2csi(bg, false)
+        elseif def_bg and ansi[def_bg] then
+            escape_fg = ansi[def_bg]
+        end
+
+        return ('%s%s%sm%s\x1b[m'):format(escape_prefix, escape_fg, escape_bg, str)
+    end
+end)()
 
 function M.follow_symlink(fname)
     fname = fname and fn.fnamemodify(fname, ':p') or api.nvim_buf_get_name(0)
@@ -66,58 +155,23 @@ function M.close_diff()
     end
 end
 
--- My eyes can't get along with 2 spaces indent!
-function M.kill2spaces()
-    cmd('sil! GitGutterBufferDisable')
-    vim.bo.ts = 4
-    vim.bo.sw = 4
-    local pos = api.nvim_win_get_cursor(0)
-    cmd('%!unexpand -t2 --first-only')
-    vim.bo.modified = false
-    api.nvim_win_set_cursor(0, pos)
-end
-
-function M.killable_defer(timer, func, delay)
-    vim.validate({
-        timer = {timer, 'userdata', true},
-        func = {func, 'function'},
-        delay = {delay, 'number'}
-    })
-    local stop = function()
-        timer:stop()
-        if not timer:is_closing() then
-            timer:close()
-        end
-    end
-    if timer and timer:has_ref() then
-        stop()
-    end
-    timer = uv.new_timer()
-    timer:start(delay, 0, function()
-        vim.schedule(function()
-            if timer:has_ref() then
-                stop()
-                func()
-            end
-        end)
-    end)
-    return timer
-end
-
 M.cool_echo = (function()
-    local timer
-    return function(msg, hl, history, delay)
+    local lastmsg
+    local debounced
+    return function(msg, hl, history, wait)
         -- TODO without schedule wrapper may echo prefix spaces
-        local lastmsg
         vim.schedule(function()
             api.nvim_echo({{msg, hl}}, history, {})
             lastmsg = api.nvim_exec('5message', true)
         end)
-        timer = M.killable_defer(timer, function()
-            if lastmsg == api.nvim_exec('5message', true) then
-                api.nvim_echo({{'', ''}}, false, {})
-            end
-        end, delay or 2500)
+        if not debounced then
+            debounced = debounce(function()
+                if lastmsg == api.nvim_exec('5message', true) then
+                    api.nvim_echo({{'', ''}}, false, {})
+                end
+            end, wait or 2500)
+        end
+        debounced()
     end
 end)()
 
@@ -154,11 +208,38 @@ end
 
 M.highlight = (function()
     local ns = api.nvim_create_namespace('k-highlight')
-    return function(bufnr, higroup, start, finish, delay)
-        vim.highlight.range(bufnr, ns, higroup, start, finish)
+
+    local function do_unpack(pos)
+        vim.validate({
+            pos = {
+                pos, function(p)
+                    local t = type(p)
+                    return t == 'table' or t == 'number'
+                end, 'must be table or number type'
+            }
+        })
+        local row, col
+        if type(pos) == 'table' then
+            row, col = unpack(pos)
+        else
+            row = pos
+        end
+        col = col or 0
+        return row, col
+    end
+
+    return function(bufnr, hl_goup, start, finish, opt, delay)
+        local row, col = do_unpack(start)
+        local end_row, end_col = do_unpack(finish)
+        if end_col then
+            end_col = math.min(math.max(fn.col({end_row + 1, '$'}) - 1, 0), end_col)
+        end
+        local o = {hl_group = hl_goup, end_row = end_row, end_col = end_col}
+        o = opt and vim.tbl_deep_extend('keep', o, opt) or o
+        local id = api.nvim_buf_set_extmark(bufnr, ns, row, col, o)
         vim.defer_fn(function()
-            pcall(api.nvim_buf_clear_namespace, bufnr, ns, 0, -1)
-        end, delay or 200)
+            pcall(api.nvim_buf_del_extmark, bufnr, ns, id)
+        end, delay or 300)
     end
 end)()
 

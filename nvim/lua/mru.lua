@@ -5,6 +5,7 @@ local cmd = vim.cmd
 local uv = vim.loop
 
 local utils = require('kutils')
+local debounce = require('debounce')
 
 local db
 local max
@@ -59,16 +60,21 @@ function M.list()
     return mru_list
 end
 
-M.flush = function()
-    return function(sync)
-        local timer
-        return function()
-            utils.killable_defer(timer, function()
-                utils.write_file(db, table.concat(list(db), '\n'), sync)
-            end, 50)
+M.flush = (function()
+    local debounced
+    return function(force)
+        if force then
+            utils.write_file(db, table.concat(list(db), '\n'), force)
+        else
+            if not debounced then
+                debounced = debounce(function()
+                    utils.write_file(db, table.concat(list(db), '\n'))
+                end, 50)
+            end
+            debounced()
         end
     end
-end
+end)()
 
 M.store_buf = (function()
     local count = 0

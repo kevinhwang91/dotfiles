@@ -12,13 +12,14 @@ function M.go2def()
     local cur_bufnr = api.nvim_get_current_buf()
     local by
     if vim.bo.ft == 'help' then
-        api.nvim_feedkeys(api.nvim_replace_termcodes('<C-]>', true, false, true), 'n', false)
+        api.nvim_feedkeys(utils.termcodes['<C-]>'], 'n', false)
         by = 'tag'
     else
-        local err = M.a2sync('definitions')
+        local err, res = M.a2sync('jumpDefinition', {'drop'})
         if not err then
-            fn.CocAction('jumpDefinition', 'drop')
             by = 'coc'
+        elseif res == 'timeout' then
+            vim.notify('Go to reference Timeout', vim.log.levels.WARN)
         else
             local cword = fn.expand('<cword>')
             if not pcall(function()
@@ -51,23 +52,23 @@ end
 
 function M.show_documentation()
     local ft = vim.bo.ft
-    if ft == 'vim' or ft == 'help' then
+    if ft == 'help' then
         cmd(('sil! h %s'):format(fn.expand('<cword>')))
-    elseif api.nvim_eval([[CocAction('hasProvider', 'hover')]]) then
-        fn.CocActionAsync('definitionHover')
     else
-        cmd('norm! K')
+        local err, res = M.a2sync('definitionHover')
+        if err then
+            if res == 'timeout' then
+                vim.notify('Show documentation Timeout', vim.log.levels.WARN)
+            end
+            cmd('norm! K')
+        end
     end
 end
-
--- function M.outline()
---     local o = fn.CocAction('listLoadItems', 'outline')
--- end
 
 function M.diagnostic_change()
     if vim.v.exiting == vim.NIL then
         local info = fn.getqflist({id = diag_qfid, winid = 0, nr = 0})
-        if info.winid ~= 0 then
+        if info.id == diag_qfid and info.winid ~= 0 then
             M.diagnostic(info.winid, info.nr, true)
         end
     end
@@ -113,7 +114,6 @@ function M.diagnostic(winid, nr, keep)
                 else
                     api.nvim_set_current_win(winid)
                 end
-            else
                 cmd(('sil %dchi'):format(nr))
             end
         end
@@ -122,12 +122,7 @@ end
 
 function M.jump2loc(locs, skip)
     locs = locs or vim.g.coc_jump_locations
-    local ctx
-    local loc_ranges = vim.tbl_map(function(val)
-        return val.range
-    end, locs)
-    ctx = {bqf = {lsp_ranges_hl = loc_ranges}}
-    fn.setloclist(0, {}, ' ', {title = 'CocLocationList', items = locs, context = ctx})
+    fn.setloclist(0, {}, ' ', {title = 'CocLocationList', items = locs})
     if not skip then
         local winid = fn.getloclist(0, {winid = 0}).winid
         if winid == 0 then
@@ -138,42 +133,46 @@ function M.jump2loc(locs, skip)
     end
 end
 
-local function get_cur_word()
-    local lnum, col = unpack(api.nvim_win_get_cursor(0))
-    local line = api.nvim_buf_get_lines(0, lnum - 1, lnum, true)[1]:match('%C*')
-    local word = fn.matchstr(line:sub(1, col + 1), [[\k*$]]) ..
-                     fn.matchstr(line:sub(col + 1, -1), [[^\k*]]):sub(2, -1)
-    return ([[\<%s\>]]):format(word:gsub('[\\/~]', [[\%1]]))
-end
-
--- CocHasProvider('documentHighlight') has probability of RPC failure
--- Write the hardcode of filetype for fallback highlight
-local fb_bl_ft = {
-    'qf', 'fzf', 'vim', 'sh', 'python', 'go', 'c', 'cpp', 'rust', 'java', 'lua', 'typescript',
-    'javascript', 'css', 'html', 'xml'
-}
-
-local hl_fb_tbl = {}
-
-function M.hl_fallback()
-    if vim.tbl_contains(fb_bl_ft, vim.bo.ft) or api.nvim_get_mode().mode == 't' and vim.bo.bt ==
-        'terminal' then
-        return
+M.hl_fallback = (function()
+    local fb_bl_ft = {
+        'qf', 'fzf', 'vim', 'sh', 'python', 'go', 'c', 'cpp', 'rust', 'java', 'lua', 'typescript',
+        'javascript', 'css', 'html', 'xml'
+    }
+    local hl_fb_tbl = {}
+    local re_s, re_e = vim.regex([[\k*$]]), vim.regex([[^\k*]])
+    local function cur_word_pat()
+        local lnum, col = unpack(api.nvim_win_get_cursor(0))
+        local line = api.nvim_buf_get_lines(0, lnum - 1, lnum, true)[1]:match('%C*')
+        local _, e_off = re_e:match_str(line:sub(col + 1, -1))
+        local pat = ''
+        if e_off ~= 0 then
+            local s, e = re_s:match_str(line:sub(1, col + 1))
+            local word = line:sub(s + 1, e + e_off - 1)
+            pat = ([[\<%s\>]]):format(word:gsub('[\\/~]', [[\%1]]))
+        end
+        return pat
     end
 
-    local m_id, winid = unpack(hl_fb_tbl)
-    pcall(fn.matchdelete, m_id, winid)
+    return function()
+        local ft = vim.bo.ft
+        if vim.tbl_contains(fb_bl_ft, ft) or api.nvim_get_mode().mode == 't' then
+            return
+        end
 
-    winid = api.nvim_get_current_win()
-    m_id = fn.matchadd('CocHighlightText', get_cur_word(), -1, -1, {window = winid})
-    hl_fb_tbl = {m_id, winid}
-end
+        local m_id, winid = unpack(hl_fb_tbl)
+        pcall(fn.matchdelete, m_id, winid)
+
+        winid = api.nvim_get_current_win()
+        m_id = fn.matchadd('CocHighlightText', cur_word_pat(), -1, -1, {window = winid})
+        hl_fb_tbl = {m_id, winid}
+    end
+end)()
 
 function M.a2sync(action, args, time)
     local done = false
     local err = false
     local res = ''
-    args = args or {''}
+    args = args or {}
     table.insert(args, function(e, r)
         if e ~= vim.NIL then
             err = true
@@ -191,24 +190,50 @@ function M.a2sync(action, args, time)
     return err, res
 end
 
-function M.code_action(...)
-    local argv = {...}
-    fn.CocActionAsync('codeActions', unpack(argv), function(err, res)
-        if err == vim.NIL and type(res) == 'table' and #res > 0 then
-            fn.CocActionAsync('codeAction', unpack(argv))
+function M.run_command(name, args, cb)
+    local action_fn
+    args = args or {}
+    if type(cb) == 'function' then
+        action_fn = fn.CocActionAsync
+        table.insert(args, cb)
+    else
+        action_fn = fn.CocAction
+    end
+    return action_fn('runCommand', name, unpack(args))
+end
+
+function M.code_action(mode, only)
+    if type(mode) == 'string' then
+        mode = {mode}
+    end
+    local no_actions = true
+    for _, m in ipairs(mode) do
+        local err, ret = M.a2sync('codeActions', {m, only}, 1000)
+        if err then
+            if ret == 'timeout' then
+                vim.notify('codeAction timeout', vim.log.levels.WARN)
+                break
+            end
         else
-            utils.cool_echo('No codeAction', 'WarningMsg')
+            if type(ret) == 'table' and #ret > 0 then
+                fn.CocActionAsync('codeAction', m, only)
+                no_actions = false
+                break
+            end
         end
-    end)
+    end
+    if no_actions then
+        vim.notify('No code Action available', vim.log.levels.WARN)
+    end
 end
 
 function M.organize_import()
     local err, ret = M.a2sync('organizeImport', {}, 1000)
     if err then
         if ret == 'timeout' then
-            utils.cool_echo('organizeImport timeout', 'ErrorMsg')
+            vim.notify('organizeImport timeout', vim.log.levels.WARN)
         else
-            utils.cool_echo('No action for organizeImport', 'WarningMsg')
+            vim.notify('No action for organizeImport', vim.log.levels.WARN)
         end
     end
 end
@@ -216,17 +241,17 @@ end
 function M.accept_complete()
     local mode = api.nvim_get_mode().mode
     if mode == 'i' then
-        api.nvim_feedkeys(api.nvim_replace_termcodes('<C-l>', true, false, true), 'n', false)
-    elseif mode == 'ic' and fn.pumvisible() == 1 then
+        return utils.termcodes['<C-l>']
+    elseif mode == 'ic' then
         local ei_bak = vim.o.ei
         vim.o.ei = 'CompleteDone'
         vim.schedule(function()
             vim.o.ei = ei_bak
-        end)
-        api.nvim_feedkeys(api.nvim_replace_termcodes('<C-y>', true, false, true), 'n', false)
-        if fn.pumvisible() == 1 then
             fn.CocActionAsync('stopCompletion')
-        end
+        end)
+        return utils.termcodes['<C-y>']
+    else
+        return utils.termcodes['<Ignore>']
     end
 end
 
@@ -236,7 +261,7 @@ function M.rename()
         if err == vim.NIL and res then
             local loc = vim.g.coc_jump_locations
             if loc then
-                local uri = vim.uri_from_bufnr()
+                local uri = vim.uri_from_bufnr(0)
                 local dont_open = true
                 for _, lo in ipairs(loc) do
                     if lo.uri ~= uri then
@@ -250,30 +275,43 @@ function M.rename()
     end)
 end
 
-function M.skip_snippet()
-    fn.CocActionAsync('snippetNext')
-    return api.nvim_replace_termcodes([[\<BS>]], true, false, true)
-end
-
-function M.switch_file()
-    local ft = vim.bo.ft
-    if ft == 'go' then
-        cmd('CocCommand go.test.toggle')
-    elseif ft == 'c' or ft == 'cpp' then
-        cmd('CocCommand clangd.switchSourceHeader')
+function M.post_open_float()
+    local winid = vim.g.coc_last_float_win
+    if winid and api.nvim_win_is_valid(winid) then
+        local bufnr = api.nvim_win_get_buf(winid)
+        api.nvim_buf_call(bufnr, function()
+            vim.wo[winid].showbreak = 'NONE'
+        end)
     end
 end
 
-function M.sign_icons(level)
+function M.skip_snippet()
+    fn.CocActionAsync('snippetNext')
+    return utils.termcodes['<BS>']
+end
+
+function M.scroll(down)
+    if #fn['coc#float#get_float_win_list']() > 0 then
+        return fn['coc#float#scroll'](down)
+    else
+        return down and utils.termcodes['<C-f>'] or utils.termcodes['<C-b>']
+    end
+end
+
+function M.scroll_insert(right)
+    if #fn['coc#float#get_float_win_list']() > 0 and fn.pumvisible() == 0 then
+        return fn['coc#float#scroll'](right)
+    else
+        return right and utils.termcodes['<Right>'] or utils.termcodes['<Left>']
+    end
+end
+
+function M.sign_icon(level)
     return sign_icons[level]
 end
 
-local function init()
+function M.initialize()
     diag_qfid = -1
-
-    cmd('hi link CocSem_parameter Parameter')
-    cmd('hi link CocSem_variable NONE')
-    cmd('hi link CocSem_namespace Namespace')
 
     fn['coc#config']('languageserver.lua.settings.Lua.workspace',
         {library = {[vim.env.VIMRUNTIME .. '/lua'] = true}})
@@ -298,7 +336,14 @@ local function init()
             au User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
             au VimLeavePre * if get(g:, 'coc_process_pid', 0) | call system('kill -9 -- -' . g:coc_process_pid) | endif
             au FileType list lua vim.cmd('pa nvim-bqf') require('bqf.magicwin.handler').attach()
+            au User CocOpenFloat lua require('plugs.coc').post_open_float()
         aug END
+
+        hi link CocSemVariable TSVariable
+        hi link CocSemNamespace Namespace
+        hi link CocSemClass Type
+        hi link CocSemEnum Number
+        hi link CocSemEnumMember Enum
     ]])
 
     cmd('hi! link CocHighlightText CurrentWord')
@@ -306,65 +351,68 @@ local function init()
         cmd('hi! CocFadeOut guifg=#928374')
         cmd('hi! CocErrorSign guifg=#be5046')
         cmd('hi! CocWarningSign guifg=#e5c07b')
+        cmd('hi! CocWarningHighlight gui=undercurl guisp=#e5c07b')
+        cmd('hi! CocErrorHighlight gui=undercurl guisp=#be5046')
+        cmd('hi! CocCodeLens gui=italic guifg=#5e5e5e')
     end
 
     map('i', '<C-space>', 'coc#refresh()', {noremap = true, expr = true, silent = true})
-    map('n', '<C-f>', [[!empty(coc#float#get_float_win_list()) ? coc#float#scroll(1) : "\<C-f>"]],
+    map('n', '<C-f>', [[v:lua.require'plugs.coc'.scroll(v:true)]],
         {noremap = true, expr = true, silent = true})
-    map('n', '<C-b>', [[!empty(coc#float#get_float_win_list()) ? coc#float#scroll(0) : "\<C-b>"]],
+    map('n', '<C-b>', [[v:lua.require'plugs.coc'.scroll(v:false)]],
         {noremap = true, expr = true, silent = true})
-    map('v', '<C-f>', [[!empty(coc#float#get_float_win_list()) ? coc#float#scroll(1) : "\<C-f>"]],
+    map('s', '<C-f>', [[v:lua.require'plugs.coc'.scroll(v:true)]],
         {noremap = true, expr = true, silent = true})
-    map('v', '<C-b>', [[!empty(coc#float#get_float_win_list()) ? coc#float#scroll(0) : "\<C-b>"]],
+    map('s', '<C-b>', [[v:lua.require'plugs.coc'.scroll(v:false)]],
         {noremap = true, expr = true, silent = true})
-    map('i', '<C-f>',
-        [[!empty(coc#float#get_float_win_list()) && pumvisible() == 0 ? "\<C-r>=coc#float#scroll(1)\<cr>" : "\<Right>"]],
+    map('i', '<C-f>', [[v:lua.require'plugs.coc'.scroll_insert(v:true)]],
         {noremap = true, expr = true, silent = true})
-    map('i', '<C-b>',
-        [[!empty(coc#float#get_float_win_list()) && pumvisible() == 0 ? "\<C-r>=coc#float#scroll(0)\<cr>" : "\<Left>"]],
+    map('i', '<C-b>', [[v:lua.require'plugs.coc'.scroll_insert(v:false)]],
         {noremap = true, expr = true, silent = true})
 
     map('i', '<C-]>', [[!get(b:, 'coc_snippet_active') ? "\<C-]>" : "\<C-j>"]], {expr = true})
     map('s', '<C-]>', [[v:lua.require'plugs.coc'.skip_snippet()]], {noremap = true, expr = true})
     map('s', '<Bs>', '<C-g>"_c')
     map('s', '<Del>', '<C-g>"_c')
-    map('s', '<C-r>', '<C-g>"_c<C-r>', {noremap = false})
     map('s', '<C-h>', '<C-g>"_c')
     map('s', '<C-w>', '<Esc>a')
+    map('s', '<C-o>', '<Nop>')
+    map('s', '<C-o>o', '<Esc>a<C-o>o')
 
     map('n', '[d', '<Plug>(coc-diagnostic-prev)', {})
     map('n', ']d', '<Plug>(coc-diagnostic-next)', {})
 
     map('n', 'gd', [[<Cmd>lua require('plugs.coc').go2def()<CR>]])
-    map('n', 'gy', '<Plug>(coc-type-definition)', {})
-    map('n', 'gi', '<Plug>(coc-implementation)', {})
-    map('n', 'gr', '<Plug>(coc-references-used)', {})
+    map('n', 'gy', [[<Cmd>call CocActionAsync('jumpTypeDefinition', 'drop')<CR>]])
+    map('n', 'gi', [[<Cmd>call CocActionAsync('jumpImplementation', 'drop')<CR>]])
+    map('n', 'gr', [[<Cmd>call CocActionAsync('jumpUsed', 'drop')<CR>]])
 
     map('n', 'K', [[<Cmd>lua require('plugs.coc').show_documentation()<CR>]])
 
     map('n', '<Leader>rn', [[<Cmd>lua require('plugs.coc').rename()<CR>]])
 
     map('n', '<Leader>ac', [[<Cmd>lua require('plugs.coc').code_action('')<CR>]])
-    map('n', '<M-CR>', [[<Cmd>lua require('plugs.coc').code_action('line')<CR>]])
+    map('n', '<M-CR>', [[<Cmd>lua require('plugs.coc').code_action({'cursor', 'line'})<CR>]])
     map('x', '<M-CR>', [[:<C-u>lua require('plugs.coc').code_action(vim.fn.visualmode())<CR>]])
+
+    map('n', '<Leader>al', '<Plug>(coc-codelens-action)', {silent = true})
 
     map('x', '<Leader>s', '<Plug>(coc-snippets-select)', {})
     map('n', '<Leader>so', '<Cmd>CocCommand snippets.openSnippetFiles<CR>')
 
     map('n', '<Leader>qi', [[<Cmd>lua require('plugs.coc').organize_import()<CR>]])
-    map('n', '<M-q>', [[<Cmd>echo CocAction('getCurrentFunctionSymbol')<CR>]])
+    map('n', '<M-q>', [[<Cmd>lua vim.notify(vim.fn.CocAction('getCurrentFunctionSymbol'))<CR>]])
     map('n', '<Leader>qd', [[<Cmd>lua require('plugs.coc').diagnostic()<CR>]])
 
-    map('i', '<C-l>', [[<Cmd>lua require('plugs.coc').accept_complete()<CR>]])
+    map('i', '<C-l>', [[v:lua.require'plugs.coc'.accept_complete()]], {noremap = true, expr = true})
 
     cmd([[com! -nargs=0 DiagnosticToggleBuffer call CocAction('diagnosticToggleBuffer')]])
     cmd([[com! -nargs=0 CocOutput CocCommand workspace.showOutput]])
-    map('n', '<Leader>sf', [[<Cmd>lua require('plugs.coc').switch_file()<CR>]])
+    map('n', '<Leader>sf', [[<Cmd>CocCommand clangd.switchSourceHeader<CR>]])
 
+    map('n', '<Leader>st', [[<Cmd>CocCommand go.test.toggle<CR>]])
     map('n', '<Leader>tf', [[<Cmd>CocCommand go.test.generate.function<CR>]])
     map('x', '<Leader>tf', [[:CocCommand go.test.generate.function<CR>]])
 end
-
-init()
 
 return M

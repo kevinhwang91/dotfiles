@@ -81,7 +81,7 @@ function M.batch_sub(is_loc, pat_rep)
 
     silent_setqf(new)
 
-    local ok, msg = pcall(function()
+    local ok, res = pcall(function()
         local concat = ([[%s\%%#%s%s%s%s%s]]):format(delm, pat, delm, rep, delm, flag)
         local do_cmd = is_loc and 'ldo' or 'cdo'
         cmd(([[%s s%s]]):format(do_cmd, concat))
@@ -93,23 +93,23 @@ function M.batch_sub(is_loc, pat_rep)
     silent_setqf(old)
 
     if not ok then
-        api.nvim_err_writeln(msg)
+        vim.notify(res, vim.log.levels.ERROR)
     end
 end
 
-function _G.qftf(info)
+function _G.qftf(qinfo)
     local items
     local ret = {}
     require('gittool').cd_root(fn.bufname('#'), true)
-    if info.quickfix == 1 then
-        items = fn.getqflist({id = info.id, items = 0}).items
+    if qinfo.quickfix == 1 then
+        items = fn.getqflist({id = qinfo.id, items = 0}).items
     else
-        items = fn.getloclist(info.winid, {id = info.id, items = 0}).items
+        items = fn.getloclist(qinfo.winid, {id = qinfo.id, items = 0}).items
     end
     local limit = 31
     local fname_fmt1, fname_fmt2 = '%-' .. limit .. 's', '…%.' .. (limit - 1) .. 's'
     local valid_fmt = '%s │%5d:%-3d│%s %s'
-    for i = info.start_idx, info.end_idx do
+    for i = qinfo.start_idx, qinfo.end_idx do
         local e = items[i]
         local fname = ''
         local str
@@ -159,9 +159,11 @@ function M.close()
                 row = 1,
                 col = 1,
                 style = 'minimal',
-                border = 'single',
+                border = 'rounded',
                 noautocmd = true
             })
+            vim.wo[winid].winhl = 'Normal:Normal'
+            vim.wo[winid].winbl = 8
             api.nvim_buf_set_lines(bufnr, 0, 1, false, {prompt})
             -- (?<=\[)[^\[\]](?=\]) to \%(\[\)\@<=[^[\]]\%(\]\)\@=]== with E2v
             -- I know \zs and \ze also work, but I prefer PCRE than vim regex

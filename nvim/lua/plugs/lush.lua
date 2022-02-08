@@ -1,6 +1,5 @@
 local M = {}
 local fn = vim.fn
-local api = vim.api
 local cmd = vim.cmd
 
 local lush
@@ -20,12 +19,12 @@ function M.dump(name)
     local theme_path = ('%s/%s.vim'):format(colors_path, name)
 
     dev.reload_module('lush_theme')
-    local ok, msg = pcall(require, 'lush_theme.' .. name)
+    local ok, res = pcall(require, 'lush_theme.' .. name)
     if ok then
-        local module = msg
-        ok, msg = pcall(lush.compile, module)
+        local module = res
+        ok, res = pcall(lush.compile, module)
         if ok then
-            local lines = msg
+            local lines = res
             local fp = assert(io.open(theme_path, 'w+'))
             fp:write(header)
             fp:write(([[let g:colors_name = '%s'%s]]):format(name, '\n'))
@@ -35,11 +34,11 @@ function M.dump(name)
             fp:close()
             cmd('so ' .. theme_path)
         else
-            api.nvim_err_writeln(msg)
+            vim.notify(res, vim.log.levels.ERROR)
         end
     else
-        msg = type(msg) == 'table' and msg.msg or msg:match('[^\n]+')
-        api.nvim_err_writeln(msg)
+        res = type(res) == 'table' and res.res or res:match('[^\n]+')
+        vim.notify(res, vim.log.levels.ERROR)
     end
 end
 

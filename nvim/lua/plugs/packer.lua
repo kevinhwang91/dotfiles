@@ -14,12 +14,12 @@ packer.on_compile_done = function()
             table.insert(wbuf, line)
             if line:find('Keymap lazy%-loads') then
                 key_state = 1
-                table.insert(wbuf, [[vim.schedule(function() vim.defer_fn(function()]])
+                table.insert(wbuf, [[vim.defer_fn(function()]])
             end
         elseif key_state == 1 then
             if line == '' then
                 key_state = 2
-                table.insert(wbuf, ('end, %d) end)'):format(100))
+                table.insert(wbuf, ('end, %d)'):format(15))
             end
             local _, e1 = line:find('vim%.cmd')
             if line:find('vim%.cmd') then
@@ -46,9 +46,14 @@ return packer.startup({
         opt_default = true,
         display = {open_cmd = 'tabedit', keybindings = {prompt_revert = 'R', diff = 'D'}}
     },
+    ---@diagnostic disable-next-line: unused-local
     function(use, use_rocks)
         local function conf(name)
-            return ([[require('plugs.config').%s()]]):format(name)
+            if name:match('^plugs%.') then
+                return ([[require('%s')]]):format(name)
+            else
+                return ([[require('plugs.config').%s()]]):format(name)
+            end
         end
 
         use {
@@ -80,7 +85,7 @@ return packer.startup({
                 {'x', 'g*'}, {'n', 'g#'}, {'x', 'g#'}
             },
             config = conf('hlslens'),
-            requires = {{'haya14busa/vim-asterisk'}}
+            requires = 'haya14busa/vim-asterisk'
         }
 
         use {'Raimondi/delimitMate', event = 'InsertEnter'}
@@ -129,10 +134,9 @@ return packer.startup({
             config = conf('grepper')
         }
 
-        use {'andymass/vim-matchup'}
+        use {'Yggdroot/indentLine', cmd = 'IndentLinesEnable', config = conf('indentline')}
 
         use {'tpope/vim-repeat', opt = false}
-
         use {
             'michaeljsmith/vim-indent-object',
             keys = {{'o', 'ai'}, {'o', 'ii'}, {'x', 'ai'}, {'x', 'ii'}}
@@ -149,9 +153,9 @@ return packer.startup({
 
         use {
             'bootleq/vim-cycle',
-            keys = {{'n', '<C-a>'}, {'x', '<C-a>'}, {'n', '<C-x>'}, {'x', '<C-x>'}},
+            keys = {{'n', '<C-a>'}, {'v', '<C-a>'}, {'n', '<C-x>'}, {'v', '<C-x>'}},
             setup = [[vim.g.cycle_no_mappings = 1]],
-            config = [[require('plugs.cycle')]]
+            config = conf('plugs.cycle')
         }
 
         use {'mbbill/undotree'}
@@ -160,7 +164,8 @@ return packer.startup({
             'tpope/vim-fugitive',
             fn = 'fugitive#*',
             cmd = {'Git', 'Gedit', 'Gread', 'Gwrite', 'Gdiffsplit', 'Gvdiffsplit'},
-            config = [[require('plugs.fugitive')]]
+            event = 'BufReadPre */.git/index',
+            config = conf('plugs.fugitive')
         }
 
         use {'tpope/vim-rhubarb'}
@@ -169,10 +174,14 @@ return packer.startup({
             'rbong/vim-flog',
             cmd = {'Flog', 'Flogsplit'},
             requires = {{'tpope/vim-fugitive'}},
-            config = [[require('plugs.flog')]]
+            config = conf('plugs.flog')
         }
 
-        use {'airblade/vim-gitgutter'}
+        use {
+            'lewis6991/gitsigns.nvim',
+            requires = {'nvim-lua/plenary.nvim'},
+            config = conf('plugs.gitsigns')
+        }
 
         use {
             'ruanyl/vim-gh-line',
@@ -185,9 +194,9 @@ return packer.startup({
 
         use {'rrethy/vim-hexokinase', run = 'make hexokinase'}
 
-        use {'sbdchd/neoformat', cmd = 'Neoformat', config = conf('neoformat')}
+        use {'sbdchd/neoformat', cmd = 'Neoformat', config = conf('plugs.format')}
 
-        use {'editorconfig/editorconfig-vim'}
+        use {'editorconfig/editorconfig-vim', config = conf('plugs.editorconf')}
 
         use {'pseewald/vim-anyfold', cmd = 'AnyFoldActivate'}
 
@@ -207,11 +216,7 @@ return packer.startup({
             setup = [[vim.g.mkdp_auto_close = 0]]
         }
 
-        use {
-            'sakhnik/nvim-gdb',
-            cmd = {'GdbStart', 'GdbStartPDB'},
-            config = [[require('plugs.nvimgdb')]]
-        }
+        use {'sakhnik/nvim-gdb', cmd = {'GdbStart', 'GdbStartPDB'}, config = conf('plugs.nvimgdb')}
 
         use {'kevinhwang91/vim-ibus-sw', event = 'InsertEnter'}
 
@@ -231,11 +236,10 @@ return packer.startup({
         use {'kevinhwang91/coc-kvs', run = 'yarn install --frozen-lockfile'}
 
         use {
-            'kkoomen/vim-doge',
-            run = function()
-                vim.fn['doge#install']()
-            end,
-            cmd = {'DogeGenerate', 'DogeCreateDocStandard'}
+            'danymat/neogen',
+            config = conf('neogen'),
+            keys = {{'n', '<Leader>dg'}},
+            requires = 'nvim-treesitter/nvim-treesitter'
         }
 
         use {'preservim/nerdcommenter', keys = '<Plug>NERDCommenterToggle'}
@@ -257,13 +261,13 @@ return packer.startup({
 
         use {'nanotee/luv-vimdocs', opt = false}
 
-        use {'mizlan/iswap.nvim'}
+        use {'mizlan/iswap.nvim', requires = 'nvim-treesitter/nvim-treesitter'}
 
-        use {'rcarriga/nvim-notify'}
+        use {'rcarriga/nvim-notify', config = conf('notify')}
 
-        -- keep learning :)
-        use {'nvim-lua/plenary.nvim'}
-        use_rocks {'lrexlib-PCRE2'}
-        use_rocks {'luautf8'}
+        -- use_rocks {'lrexlib-PCRE2'}
+        -- use_rocks {'base64'}
+        -- use_rocks {'luautf8'}
+
     end
 })

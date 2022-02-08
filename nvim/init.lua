@@ -34,7 +34,6 @@ o.cedit = '<C-x>'
 o.listchars = 'tab:▏ ,trail:•,precedes:<,extends:>'
 o.sidescrolloff = 5
 o.showbreak = '╰─➤ '
-o.cpo = o.cpo .. 'n'
 o.foldlevelstart = 99
 o.title = true
 o.titlestring = '%(%m%)%(%{expand(\"%:~\")}%)'
@@ -46,7 +45,9 @@ o.diffopt = o.diffopt .. ',vertical,internal,algorithm:patience'
 o.shada = [['20,<50,s10,/20,@20,:0,h]]
 o.termguicolors = true
 o.fillchars = 'eob: '
-o.pumblend = 8
+o.wildoptions = 'pum'
+o.winminwidth = 10
+o.nrformats = 'octal,hex,bin,unsigned'
 
 -- undo
 o.undofile = true
@@ -56,12 +57,9 @@ o.undolevels = 1000
 o.backup = false
 o.swapfile = false
 
--- source filetype.vim later
-g.did_load_filetypes = 1
-
 g.loaded_netrwPlugin = 1
-g.loaded_matchparen = 1
-g.loaded_matchit = 1
+-- g.loaded_matchparen = 1
+-- g.loaded_matchit = 1
 g.loaded_2html_plugin = 1
 
 -- I haven't any remote plugins
@@ -142,9 +140,10 @@ map('n', 'V', 'm`V')
 map('n', '<C-v>', 'm`<C-v>')
 map('x', 'p', [[p<Cmd>let @+ = @0<CR><Cmd>let @" = @0<CR>]])
 map('x', 'P', [[P<Cmd>let @+ = @0<CR><Cmd>let @" = @0<CR>]])
+map('n', '<Leader>v', [['`[' . strpart(getregtype(), 0, 1) . '`]']], {noremap = true, expr = true})
 map('n', '<Leader>2;', '@:')
 map('x', '<Leader>2;', '@:')
-map('n', '<Leader>3', '<Cmd>b #<CR>')
+map('n', '<Leader>3', [[<Cmd>lua require('builtin').switch_lastbuf()<CR>]])
 map('n', '<Leader>w', '<Cmd>up<CR>')
 map('n', '<Leader>;w', '<Cmd>wq<CR>')
 map('n', '<C-g>', '2<C-g>')
@@ -164,6 +163,7 @@ map('n', '<C-w><C-t>', '<Cmd>tab sp<CR>')
 map('n', '<C-w>s', [[<Cmd>lua require('builtin').split_lastbuf()<CR>]])
 map('n', '<C-w>v', [[<Cmd>lua require('builtin').split_lastbuf(true)<CR>]])
 map('n', '<C-w>O', '<Cmd>tabo<CR>')
+map('n', '<C-w>;', [[<Cmd>lua require('win').go2recent()<CR>]])
 
 map('n', '<M-a>', 'VggoG')
 map('i', '<M-;>', '<END>')
@@ -181,18 +181,7 @@ map('n', [[`]], [[']])
 map('x', [[`]], [[']])
 map('o', [[`]], [[']])
 
-map('i', [[<C-r>']], [[<C-r>"]])
-map('c', [[<C-r>']], [[<C-r>"]])
-
-map('n', [['0]], [[<Cmd>norm! `0<CR>]])
 map('n', '<Leader>i', '<Cmd>sil! norm! `^<CR>')
-
-map('n', '0', [[getline('.')[:col('.') - 2] =~ '^\s\+$' ? '0' : 'm`^']],
-    {noremap = true, expr = true})
-map('x', '0', [[getline('.')[:col('.') - 2] =~ '^\s\+$' ? '0' : 'm`^']],
-    {noremap = true, expr = true})
-map('o', '0', [[getline('.')[:col('.') - 2] =~ '^\s\+$' ? '0' : 'm`^']],
-    {noremap = true, expr = true})
 
 map('n', '<M-j>', '<Cmd>m +1<CR>')
 map('n', '<M-k>', '<Cmd>m -2<CR>')
@@ -200,9 +189,15 @@ map('i', '<M-j>', '<C-o><Cmd>m +1<CR>')
 map('i', '<M-k>', '<C-o><Cmd>m -2<CR>')
 map('x', '<M-j>', [[:m '>+1<CR>gv=gv]])
 map('x', '<M-k>', [[:m '<-2<CR>gv=gv]])
-map('n', 'yd', [[<Cmd>call setreg(v:register, expand('%:p:h'))<CR>:echo expand('%:p:h')<CR>]])
-map('n', 'yn', [[<Cmd>call setreg(v:register, expand('%:t'))<CR>:echo expand('%:t')<CR>]])
-map('n', 'yp', [[<Cmd>call setreg(v:register, expand('%:p'))<CR>:echo expand('%:p')<CR>]])
+
+map('n', 'cc', [[getline('.') =~ '^\s*$' ? '"_cc' : 'cc']], {noremap = true, expr = true})
+map('n', '0', [[v:lua.require'builtin'.jump0()]], {noremap = true, expr = true})
+map('x', '0', [[v:lua.require'builtin'.jump0()]], {noremap = true, expr = true})
+map('o', '0', [[v:lua.require'builtin'.jump0()]], {noremap = true, expr = true})
+
+map('n', 'yd', [[<Cmd>lua require('yank').yank_reg(vim.v.register, vim.fn.expand('%:p:h'))<CR>]])
+map('n', 'yn', [[<Cmd>lua require('yank').yank_reg(vim.v.register, vim.fn.expand('%:t'))<CR>]])
+map('n', 'yp', [[<Cmd>lua require('yank').yank_reg(vim.v.register, vim.fn.expand('%:p'))<CR>]])
 
 map('n', '[', [[v:lua.require'builtin'.prefix_timeout('[')]], {noremap = true, expr = true})
 map('x', '[', [[v:lua.require'builtin'.prefix_timeout('[')]], {noremap = true, expr = true})
@@ -229,11 +224,11 @@ map('x', 'zk', 'zk_')
 map('n', 'z', [[v:lua.require'builtin'.prefix_timeout('z')]], {noremap = true, expr = true})
 map('x', 'z', [[v:lua.require'builtin'.prefix_timeout('z')]], {noremap = true, expr = true})
 
-map('n', 'za', [[<Cmd>lua require('plugs.fold').toggle_fold('a')<CR>]])
-map('n', 'zA', [[<Cmd>lua require('plugs.fold').toggle_fold('A')<CR>]])
-map('n', 'zo', [[<Cmd>lua require('plugs.fold').toggle_fold('o')<CR>]])
-map('n', 'zO', [[<Cmd>lua require('plugs.fold').toggle_fold('O')<CR>]])
-map('n', 'zv', [[<Cmd>lua require('plugs.fold').toggle_fold('v')<CR>]])
+map('n', 'za', [[<Cmd>lua require('plugs.fold').with_highlight('a')<CR>]])
+map('n', 'zA', [[<Cmd>lua require('plugs.fold').with_highlight('A')<CR>]])
+map('n', 'zo', [[<Cmd>lua require('plugs.fold').with_highlight('o')<CR>]])
+map('n', 'zO', [[<Cmd>lua require('plugs.fold').with_highlight('O')<CR>]])
+map('n', 'zv', [[<Cmd>lua require('plugs.fold').with_highlight('v')<CR>]])
 
 map('n', 'z[', [[<Cmd>lua require('plugs.fold').nav_fold(false)<CR>]])
 map('n', 'z]', [[<Cmd>lua require('plugs.fold').nav_fold(true)<CR>]])
@@ -241,32 +236,37 @@ map('n', 'z]', [[<Cmd>lua require('plugs.fold').nav_fold(true)<CR>]])
 map('x', 'iz', [[:<C-u>keepj norm [zv]zg_<CR>]])
 map('o', 'iz', [[:norm viz<CR>]])
 
-map('x', 'if', [[:<C-u>lua require('plugs.textobj').action('func', true, true)<CR>]])
-map('x', 'af', [[:<C-u>lua require('plugs.textobj').action('func', false, true)<CR>]])
-map('o', 'if', [[:<C-u>lua require('plugs.textobj').action('func', true)<CR>]])
-map('o', 'af', [[:<C-u>lua require('plugs.textobj').action('func', false)<CR>]])
+map('x', 'if', [[:<C-u>lua require('plugs.textobj').select('func', true, true)<CR>]])
+map('x', 'af', [[:<C-u>lua require('plugs.textobj').select('func', false, true)<CR>]])
+map('o', 'if', [[<Cmd>lua require('plugs.textobj').select('func', true)<CR>]])
+map('o', 'af', [[<Cmd>lua require('plugs.textobj').select('func', false)<CR>]])
 
-map('x', 'ik', [[:<C-u>lua require('plugs.textobj').action('class', true, true)<CR>]])
-map('x', 'ak', [[:<C-u>lua require('plugs.textobj').action('class', false, true)<CR>]])
-map('o', 'ik', [[:<C-u>lua require('plugs.textobj').action('class', true)<CR>]])
-map('o', 'ak', [[:<C-u>lua require('plugs.textobj').action('class', false)<CR>]])
+map('x', 'ik', [[:<C-u>lua require('plugs.textobj').select('class', true, true)<CR>]])
+map('x', 'ak', [[:<C-u>lua require('plugs.textobj').select('class', false, true)<CR>]])
+map('o', 'ik', [[<Cmd>lua require('plugs.textobj').select('class', true)<CR>]])
+map('o', 'ak', [[<Cmd>lua require('plugs.textobj').select('class', false)<CR>]])
+
+map('n', '<M-C-l>', [[<Cmd>lua require('plugs.format').format_doc()<CR>]])
+map('x', '<M-C-l>', [[:lua require('plugs.format').format_selected(vim.fn.visualmode())<CR>]])
 
 require('dev')
+require('reg')
 require('mru')
 require('stl')
 require('qf')
 
 local conf_dir = fn.stdpath('config')
 if uv.fs_stat(conf_dir .. '/plugin/packer_compiled.lua') then
-    cmd([[
+    local packer_loader_complete = [[customlist,v:lua.require'packer'.loader_complete]]
+    cmd(([[
         com! PackerInstall lua require('plugs.packer').install()
         com! PackerUpdate lua require('plugs.packer').update()
         com! PackerSync lua require('plugs.packer').sync()
         com! PackerClean lua require('plugs.packer').clean()
         com! PackerStatus lua require('plugs.packer').status()
         com! -nargs=? PackerCompile lua require('plugs.packer').compile(<q-args>)
-        com! -nargs=+ PackerLoad lua require('plugs.packer').loader(<q-args>)
-    ]])
+        com! -nargs=+ -complete=%s PackerLoad lua require('plugs.packer').loader(<f-args>)
+    ]]):format(packer_loader_complete))
 else
     require('plugs.packer').compile()
 end
@@ -285,28 +285,29 @@ if fzf_opts then
 end
 env.BAT_STYLE = 'numbers'
 map('n', '<Leader>f', '')
-map('n', '<Leader>ff', '<Cmd>FZF<CR>')
+map('n', '<Leader>fz', '<Cmd>FZF<CR>')
 map('n', '<Leader>fm', '<Cmd>Marks<CR>')
-map('n', '<Leader>ft', '<Cmd>BTags<CR>')
 map('n', '<Leader>fo', '<Cmd>Tags<CR>')
 map('n', '<Leader>f/', '<Cmd>History/<CR>')
 map('n', '<Leader>fc', [[<Cmd>lua require('gittool').root_exe('BCommits')<CR>]])
 map('n', '<Leader>fg', [[<Cmd>lua require('gittool').root_exe('GFiles')<CR>]])
-map('n', '<Leader>fb', [[<Cmd>lua require('gittool').root_exe('Buffers')<CR>]])
+map('n', '<Leader>ff', [[<Cmd>lua require('gittool').root_exe(require('plugs.fzf').files)<CR>]])
 map('n', '<Leader>f,', [[<Cmd>lua require('gittool').root_exe('Rg')<CR>]])
-map('n', '<Leader>fr', [[<Cmd>lua require('gittool').root_exe(require('plugs.fzf').mru)<CR>]])
 map('n', '<Leader>f;', [[<Cmd>lua require('plugs.fzf').cmdhist()<CR>]])
 
 cmd([[
     aug Fzf
         au!
         au FuncUndefined fzf#* lua require('plugs.fzf')
-        au CmdUndefined FZF,BTags,BCommits,History,GFiles,Marks,Buffers,Rg lua require('plugs.fzf')
+        au CmdUndefined FZF,BCommits,History,GFiles,Marks,Buffers,Rg lua require('plugs.fzf')
     aug END
 
     com! -nargs=* -bar -bang Maps call fzf#vim#maps(<q-args>, <bang>0)
     com! -bar -bang Helptags call fzf#vim#helptags(<bang>0)
 ]])
+
+-- qf extension
+map('n', '<Leader>ft', [[<Cmd>lua require('plugs.qfext').outline()<CR>]])
 
 -- Man
 g.no_man_maps = 1
@@ -314,14 +315,17 @@ cmd([[cabbrev man <C-r>=(getcmdtype() == ':' && getcmdpos() == 1 ? 'Man' : 'man'
 
 -- kevinhwang91/rnvimr
 g.rnvimr_enable_ex = 1
+-- g.rnvimr_enable_picker = 1
 g.rnvimr_enable_bw = 1
 g.rnvimr_hide_gitignore = 1
 g.rnvimr_border_attr = {fg = 3}
 g.rnvimr_ranger_cmd = 'ranger'
+g.rnvimr_shadow_winblend = 70
+g.rnvimr_edit_cmd = 'drop'
 g.rnvimr_action = {
-    ['<C-t>'] = 'NvimEdit tabedit',
-    ['<C-s>'] = 'NvimEdit split',
-    ['<C-v>'] = 'NvimEdit vsplit',
+    ['<C-t>'] = 'NvimEdit tab drop',
+    ['<C-s>'] = 'NvimEdit split true',
+    ['<C-v>'] = 'NvimEdit vsplit true',
     ['<C-o>'] = 'NvimEdit drop true',
     gw = 'JumpNvimCwd',
     yw = 'EmitRangerCwd'
@@ -374,7 +378,7 @@ map('n', '<Leader>gb', '<Cmd>Git blame -w<Bar>winc p<CR>')
 map('n', '<Leader>gw', [[<Cmd>lua require('kutils').follow_symlink()<CR><Cmd>Gwrite<CR>]])
 map('n', '<Leader>gr',
     [[<Cmd>lua require('kutils').follow_symlink()<CR><Cmd>keepalt Gread<Bar>up!<CR>]])
-map('n', '<Leader>gd', ':Gdiffsplit!<Space>', {silent = false})
+map('n', '<Leader>gd', ':tab Gdiffsplit<Space>', {silent = false})
 map('n', '<Leader>gt', ':Git difftool -y<Space>', {silent = false})
 
 -- rbong/vim-flog
@@ -387,9 +391,6 @@ g.git_messenger_always_into_popup = 1
 g.git_messenger_date_format = '%Y-%m-%d %H:%M:%S'
 map('n', '<Leader>gm', '<Cmd>GitMessenger<CR>')
 
--- sbdchd/neoformat
-map('n', '<M-C-l>', [[<Cmd>lua require('gittool').root_exe('Neoformat')<CR><Cmd>up<CR>]])
-
 -- plasticboy/vim-markdown
 g.vim_markdown_toc_autofit = 1
 g.vim_markdown_no_default_key_mappings = 1
@@ -401,12 +402,6 @@ g.vim_markdown_edit_url_in = 'current'
 g.nvimgdb_disable_start_keymaps = 1
 map('n', '<Leader>dd', ':GdbStart gdb -q<Space>', {silent = false})
 map('n', '<Leader>dp', ':GdbStartPDB python -m pdb<Space>', {silent = false})
-
--- kkoomen/vim-doge
-g.doge_enable_mappings = 0
-g.doge_mapping_comment_jump_forward = '<C-j>'
-g.doge_mapping_comment_jump_backward = '<C-k>'
-map('n', '<Leader>dg', '<Cmd>DogeGenerate<CR>')
 
 -- preservim/nerdcommenter
 g.NERDCreateDefaultMappings = 0
@@ -426,14 +421,19 @@ map('i', '<CR>', ('%s ? %s : %s . "<Plug>delimitMateCR"'):format('pumvisible()',
     [[(getline('.')[:col('.') - 2] =~ '^\s*$' ? col('.') == 1 ? '' : "\<Bs>" : "\<C-g>u")]]),
     {noremap = false, expr = true})
 
-map('n', '<Leader>2p', '<Cmd>Kill2Spaces<CR>')
 map('n', '<Leader>jj', '<Cmd>Jumps<CR>')
+
+-- notify
+vim.notify = function(...)
+    cmd('PackerLoad nvim-notify')
+    vim.notify = require('notify')
+    vim.notify(...)
+end
 
 cmd([[
     com! -range=% -nargs=0 RmAnsi <line1>,<line2>s/\%x1b\[[0-9;]*[Km]//g
     com! -nargs=? -complete=buffer FollowSymlink lua require('kutils').follow_symlink(<f-args>)
     com! -nargs=0 CleanEmptyBuf lua require('kutils').clean_empty_bufs()
-    com! -nargs=0 Kill2Spaces lua require('kutils').kill2spaces()
     com! -nargs=0 Jumps lua require('builtin').jumps2qf()
 
     aug RnuColumn
@@ -441,13 +441,8 @@ cmd([[
         au FocusLost * lua require('rnu').focus(false)
         au FocusGained * lua require('rnu').focus(true)
         au WinEnter * lua require('rnu').win_enter()
-        au CmdlineEnter [/\?] lua require('rnu').scmd_enter()
-        au CmdlineLeave [/\?] lua require('rnu').scmd_leave()
-    aug END
-
-    aug ShadowWindow
-        au!
-        au WinEnter * lua require('shadowwin').toggle()
+        au CmdlineEnter /,\? lua require('rnu').scmd_enter()
+        au CmdlineLeave /,\? lua require('rnu').scmd_leave()
     aug END
 
     aug TermFix
@@ -475,9 +470,19 @@ cmd([[
         au!
         au BufHidden <buffer> ++once lua require('builtin').wipe_empty_buf()
     aug END
+
+    aug MruWin
+        au!
+        au WinLeave * lua require('win').record()
+    aug END
 ]])
 
 require('plugs.manual')
+
+cmd([[
+    filetype off
+    let g:did_load_filetypes = 0
+]])
 
 -- defer loading
 g.loaded_clipboard_provider = 1
@@ -488,35 +493,37 @@ vim.schedule(function()
         for _, paras in ipairs(paras_tbl) do
             m(unpack(paras))
         end
-    end, 20)
+    end, 10)
 
     vim.defer_fn(function()
         require('plugs.treesitter')
 
         cmd([[
             unlet g:did_load_filetypes
+            runtime! filetype.vim
             au! syntaxset
             au syntaxset FileType * lua require('plugs.treesitter').hijack_synset()
             filetype on
             doautoall filetypedetect BufRead
         ]])
-    end, 30)
+    end, 20)
 
     vim.defer_fn(function()
         g.loaded_clipboard_provider = nil
         cmd('runtime autoload/provider/clipboard.vim')
-        cmd('pa nvim-hclipboard')
-        require('hclipboard').setup({
-            should_bypass_cb = function(regname, ev)
-                local ret = false
-                if ev.operator == 'c' then
-                    if ev.regname == '' or ev.regname == regname then
-                        ret = true
-                    end
-                end
-                return ret
-            end
-        }).start()
+
+        if fn.exists('##ModeChanged') == 1 then
+            cmd([[
+                aug SelectModeNoYank
+                    au!
+                    au ModeChanged *:s set clipboard=
+                    au ModeChanged s:* set clipboard=unnamedplus
+                aug END
+            ]])
+        else
+            cmd('pa nvim-hclipboard')
+            require('hclipboard').start()
+        end
 
         cmd([[
             aug Packer
@@ -541,17 +548,21 @@ vim.schedule(function()
         ]])
 
         -- highlight syntax
+        if fn.exists('##SearchWrapped') == 1 then
+            cmd([[
+                aug SearchWrappedHighlight
+                    au!
+                    au SearchWrapped * lua require('builtin').search_wrap()
+                aug END
+            ]])
+        end
+
         cmd(([[
             aug LuaHighlight
                 au!
                 au TextYankPost * lua if not vim.b.visual_multi then %s end
             aug END
-        ]]):format([[pcall(vim.highlight.on_yank, {higroup='IncSearch', timeout=500})]]))
-
-        require('plugs.config').matchup()
-        cmd('pa vim-matchup')
-        fn['matchup#loader#init_buffer']()
-        fn['matchup#loader#bufwinenter']()
+        ]]):format([[pcall(vim.highlight.on_yank, {higroup='IncSearch', timeout=400})]]))
 
         local all_hexokinase_pat = {
             'full_hex', 'triple_hex', 'rgb', 'rgba', 'hsl', 'hsla', 'colour_names'
@@ -566,20 +577,35 @@ vim.schedule(function()
 
     vim.defer_fn(function()
         g.coc_global_extensions = {
-            'coc-clangd', 'coc-go', 'coc-html', 'coc-json', 'coc-pyright', 'coc-java',
-            'coc-rust-analyzer', 'coc-tsserver', 'coc-eslint', 'coc-vimlsp', 'coc-xml', 'coc-yaml',
-            'coc-css', 'coc-dictionary', 'coc-markdownlint', 'coc-snippets', 'coc-word'
+            'coc-clangd', --
+            'coc-css', --
+            'coc-dictionary', --
+            'coc-eslint', --
+            'coc-go', --
+            'coc-html', --
+            'coc-java', --
+            'coc-json', --
+            'coc-markdownlint', --
+            'coc-pyright', --
+            'coc-rust-analyzer', --
+            'coc-snippets', --
+            'coc-sql', --
+            'coc-tsserver', --
+            'coc-vimlsp', --
+            'coc-word', --
+            'coc-xml', --
+            'coc-yaml' --
         }
         g.coc_enable_locationlist = 0
-        g.coc_default_semantic_highlight_groups = 0
         g.coc_selectmode_mapping = 0
-        cmd([[au User CocNvimInit ++once lua require('plugs.coc')]])
-
+        cmd([[
+            au User CocNvimInit ++once lua require('plugs.coc').initialize()
+        ]])
         cmd('pa coc-kvs')
         cmd('pa coc.nvim')
-    end, 1000)
+    end, 300)
 
     vim.defer_fn(function()
         require('plugs.fold')
-    end, 1500)
+    end, 800)
 end)

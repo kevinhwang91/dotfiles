@@ -1,14 +1,27 @@
 {
 	"coc.preferences.useQuickfixForLocations": false,
-	"coc.preferences.colorSupport": false,
 	"coc.preferences.extensionUpdateCheck": "weekly",
 	"coc.preferences.messageLevel": "error",
 	"coc.preferences.listOfWorkspaceEdit": "location",
-	"coc.preferences.semanticTokensHighlights": false,
-	"coc.source.file.triggerCharacters": ["/"],
-	"coc.source.buffer.disableSyntaxes": [],
+	"semanticTokens.filetypes": [
+		"c",
+		"go",
+		"html",
+		"java",
+		"javascript",
+		"lua",
+		"typescript"
+	],
+	"coc.source.file.triggerCharacters": [
+		"/"
+	],
+	"codeLens.enable": true,
+	"codeLens.separator": "",
+	"codeLens.subseparator": " │ ",
+	"codeLens.position": "eol",
 	"suggest.enablePreselect": true,
 	"suggest.noselect": false,
+	"suggest.selection": "none",
 	"suggest.defaultSortMethod": "none",
 	"suggest.snippetIndicator": "",
 	"suggest.languageSourcePriority": 99,
@@ -42,17 +55,15 @@
 		"operator": "Ψ",
 		"typeParameter": ""
 	},
-	"suggest.floatConfig": {
-		"winblend": 8
-	},
 	"diagnostic.errorSign": "",
 	"diagnostic.warningSign": "",
 	"diagnostic.infoSign": "",
 	"diagnostic.hintSign": "",
 	"diagnostic.floatConfig": {
 		"border": true,
+		"borderhighlight": "FloatBorder",
 		"highlight": "Normal",
-		"maxWidth": 100,
+		"maxWidth": 120,
 		"focusable": false
 	},
 	"diagnostic.signPriority": 20,
@@ -60,14 +71,16 @@
 	"diagnostic.locationlistUpdate": false,
 	"hover.floatConfig": {
 		"border": true,
+		"borderhighlight": "FloatBorder",
 		"highlight": "Normal",
-		"maxWidth": 100,
+		"maxWidth": 120,
 		"focusable": false
 	},
 	"signature.floatConfig": {
 		"border": true,
+		"borderhighlight": "FloatBorder",
 		"highlight": "Normal",
-		"maxWidth": 100,
+		"maxWidth": 120,
 		"focusable": false
 	},
 	"dialog.floatHighlight": "Normal",
@@ -75,8 +88,12 @@
 	"languageserver": {
 		"lua": {
 			"command": "lua-language-server",
-			"filetypes": ["lua"],
-			"rootPatterns": [".git/"],
+			"filetypes": [
+				"lua"
+			],
+			"rootPatterns": [
+				".git/"
+			],
 			"settings": {
 				"Lua": {
 					"workspace": {
@@ -87,14 +104,31 @@
 						"version": "LuaJIT"
 					},
 					"completion": {
-						"callSnippet": "Replace"
+						"callSnippet": "Replace",
+						"postfix": "."
 					},
 					"diagnostics": {
 						"enable": true,
-						"globals": ["vim", "jit", "it", "describe", "before_each", "after_each"],
+						"globals": [
+							"vim",
+							"jit",
+							"it",
+							"describe",
+							"before_each",
+							"after_each"
+						],
 						"neededFileStatus": {
 							"different-requires": "None"
 						}
+					},
+					"IntelliSense": {
+						"traceLocalSet": true,
+						"traceReturn": true,
+						"traceBeSetted": true,
+						"traceFieldInject": true
+					},
+					"semantic": {
+						"enable": true
 					},
 					"telemetry": {
 						"enable": false
@@ -108,20 +142,33 @@
 		},
 		"dockerfile": {
 			"command": "docker-langserver",
-			"filetypes": ["dockerfile"],
-			"args": ["--stdio"]
+			"filetypes": [
+				"dockerfile"
+			],
+			"args": [
+				"--stdio"
+			]
 		},
 		"bash": {
 			"command": "bash-language-server",
-			"args": ["start"],
-			"filetypes": ["sh"]
+			"args": [
+				"start"
+			],
+			"filetypes": [
+				"sh",
+				"zsh"
+			]
 		},
 		"efm": {
 			"command": "efm-langserver",
 			"args": [],
-			"filetypes": ["sh"],
+			"filetypes": [
+				"sh"
+			],
 			"settings": {
-				"rootMarkers": [".git/"],
+				"rootMarkers": [
+					".git/"
+				],
 				"languages": {
 					"sh": [
 						{
@@ -139,10 +186,8 @@
 		}
 	},
 	"clangd.enabled": true,
-	"rust-analyzer.trace.server": "off",
-	"tsserver.trace.server": "off",
+	"clangd.trace.server": "off",
 	"vimlsp.trace.server": "off",
-	"json.trace.server": "off",
 	"xml.trace.server": "off",
 	"html.trace.server": "off",
 	"css.trace.server": "off",
@@ -153,14 +198,39 @@
 	"java.maven.downloadSources": false,
 	"python.analysis.diagnosticMode": "openFilesOnly",
 	"python.linting.pylintEnabled": true,
-	"python.linting.pylintPath": "/usr/bin/pylint",
+	"python.linting.pylintPath": "pylint",
+	"python.formatting.provider": "autopep8",
+	"tsserver.trace.server": "off",
+	"javascript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": false,
+	"typescript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": false,
+	"javascript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": true,
+	"typescript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": true,
+	"javascript.format.semicolons": "remove",
+	"typescript.format.semicolons": "remove",
 	"go.trace.server": "off",
 	"go.goplsPath": "gopls",
 	"go.goplsUseDaemon": false,
-	"go.goplsOptions": { "usePlaceholders": true, "semanticTokens": false },
+	"go.goplsOptions": {
+		"usePlaceholders": true,
+		"semanticTokens": true
+	},
+	"rust-analyzer.trace.server": "off",
 	"rust-analyzer.server.path": "rust-analyzer",
 	"eslint.packageManager": "yarn",
 	"eslint.run": "onSave",
+	"sql.formatOptions": {
+		"indent": "    "
+	},
+	"json.trace.server": "off",
+	"json.schemas": [
+		{
+			"fileMatch": [
+				"*/nvim/snippets/*.json",
+				"!*/nvim/snippets/snippets.json"
+			],
+			"url": "https://raw.githubusercontent.com/kevinhwang91/dotfiles/main/nvim/snippets/snippets.json"
+		}
+	],
 	"yaml.trace.server": "off",
 	"yaml.validate": true,
 	"yaml.format.singleQuote": true,
@@ -171,7 +241,18 @@
 	"snippets.loadFromExtensions": false,
 	"snippets.shortcut": "SP",
 	"snippets.extends": {
-		"cpp": ["c"],
-		"typescript": ["javascript"]
-	}
+		"cpp": [
+			"c"
+		],
+		"typescript": [
+			"javascript"
+		]
+	},
+	"outline.keepWindow": true,
+	"outline.sortBy": "position",
+	"outline.splitCommand": "botright 40vs",
+	"outline.showLineNumber": true,
+	"tree.key.activeFilter": "zf",
+	"tree.key.close": "qq",
+	"tree.key.toggle": "t"
 }

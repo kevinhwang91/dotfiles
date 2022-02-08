@@ -29,6 +29,8 @@ nnoremap <buffer> <Leader>gp :Flogsetargs -raw-args=--first-parent --
 nnoremap <buffer> <Leader>gr :Flogsetargs -raw-args=
 nnoremap <buffer> <Leader>gj :Flogjump<Space>
 nnoremap <buffer> <Leader>gb :GBrowse <C-r>=flog#get_commit_at_line().short_commit_hash<CR><CR>
+nmap <buffer> qd <Plug>(FlogCloseTmpWin)
+nmap <buffer> sc <Plug>(FlogVDiffSplitLastCommitRight)
 
 function s:scroll(direction) abort
     let winnr = winnr('$')

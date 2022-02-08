@@ -30,7 +30,8 @@ local function init()
     g.cycle_default_groups_for_vim = {{{'elseif', 'if'}}}
     g.cycle_default_groups_for_lua = {{{'elseif', 'if'}}, {{'==', '~='}}, {{'pairs', 'ipairs'}}}
     g.cycle_default_groups_for_go = {
-        {{'interface', 'struct'}}, {{'int', 'int8', 'int16', 'int32', 'int64'}},
+        {{'==', '!='}}, {{':=', '='}}, {{'interface', 'struct'}},
+        {{'int', 'int8', 'int16', 'int32', 'int64'}},
         {{'uint', 'uint8', 'uint16', 'uint32', 'uint64'}}, {{'float32', 'float64'}},
         {{'complex64', 'complex128'}}
     }
@@ -41,9 +42,11 @@ local function init()
     map('n', '<Plug>CycleFallbackNext', '<C-a>')
     map('n', '<Plug>CycleFallbackPrev', '<C-x>')
     map('n', '<C-a>', '<Plug>CycleNext', {})
-    map('v', '<C-a>', '<Plug>CycleNext', {})
+    map('x', '<C-a>', '<Plug>CycleNext', {})
+    map('s', '<C-a>', '<C-g>o<Esc><Plug>CycleNext', {})
     map('n', '<C-x>', '<Plug>CyclePrev', {})
-    map('v', '<C-x>', '<Plug>CyclePrev', {})
+    map('x', '<C-x>', '<Plug>CyclePrev', {})
+    map('s', '<C-x>', '<C-g>o<Esc><Plug>CycleNext', {})
 
     fn['cycle#reset_ft_groups']()
 end

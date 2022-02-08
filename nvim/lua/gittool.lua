@@ -8,9 +8,9 @@ function M.root(path)
     if path then
         path = fn.fnamemodify(path, ':p')
     else
-        local ok, msg = pcall(api.nvim_buf_get_var, 0, 'git_dir')
-        if ok then
-            return fn.fnamemodify(msg, ':h')
+        local git_dir = vim.b.git_dir
+        if git_dir then
+            return fn.fnamemodify(git_dir, ':h')
         else
             path = api.nvim_buf_get_name(0)
         end
@@ -22,7 +22,7 @@ function M.root(path)
         path = fn.fnamemodify(path, ':h')
         local st = uv.fs_stat(path .. '/.git')
         local stt = st and st.type
-        if stt == 'directory' or stt == 'file' then
+        if stt and stt == 'directory' or stt == 'file' then
             ret = path
             break
         end
@@ -39,23 +39,29 @@ function M.cd_root(path, window)
     return r
 end
 
-function M.root_exe(exec)
+function M.root_exe(exec, path)
     local cur_winid
     local old_cwd = uv.cwd()
 
-    local r = M.cd_root(nil, true)
+    local r = M.cd_root(path, true)
     if r ~= '' then
         cur_winid = api.nvim_get_current_win()
     end
+    local ok, res
     if type(exec) == 'string' then
-        pcall(cmd, exec)
+        ok, res = pcall(cmd, exec)
     elseif type(exec) == 'function' then
-        pcall(exec)
+        ok, res = pcall(exec)
+    end
+    if not ok then
+        vim.notify(res, vim.log.levels.ERROR)
     end
 
     if r ~= '' then
         fn.win_execute(cur_winid, 'noa lcd ' .. old_cwd)
     end
+
+    return ok and res or nil
 end
 
 return M

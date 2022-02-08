@@ -4,6 +4,7 @@ local api = vim.api
 local cmd = vim.cmd
 
 local utils = require('kutils')
+local debounce = require('debounce')
 
 local db
 local last_hist
@@ -60,13 +61,19 @@ function M.reload()
     last_hist = hist_list[1]
 end
 
-function M.enable_reload()
-    if api.nvim_get_mode().mode == 'c' then
-        vim.defer_fn(M.reload, 50)
-    elseif fn.exists('#CmdHist#CmdlineEnter#:') == 0 then
-        cmd([[au CmdHist CmdlineEnter : ++once lua vim.schedule(require('cmdhist').reload)]])
+M.enable_reload = (function()
+    local debounced
+    return function()
+        if api.nvim_get_mode().mode == 'c' then
+            if not debounced then
+                debounced = debounce(M.reload, 50)
+            end
+            debounced()
+        elseif fn.exists('#CmdHist#CmdlineEnter#:') == 0 then
+            cmd([[au CmdHist CmdlineEnter : ++once lua vim.schedule(require('cmdhist').reload)]])
+        end
     end
-end
+end)()
 
 function M.list()
     local hist_list = list(db)
@@ -78,19 +85,23 @@ function M.list()
 end
 
 M.flush = (function()
-    local timer
+    local debounced
     return function(force)
-        if #hist_bufs > 0 then
-            if force then
-                utils.write_file(db, table.concat(list(db), '\n'), true)
-            else
-                utils.killable_defer(timer, function()
+        if #hist_bufs == 0 then
+            return
+        end
+        if force then
+            utils.write_file(db, table.concat(list(db), '\n'), true)
+        else
+            if not debounced then
+                debounced = debounce(function()
                     if #hist_bufs > 0 then
                         utils.write_file(db, table.concat(list(db), '\n'))
                         hist_bufs = {}
                     end
                 end, 50)
             end
+            debounced()
         end
     end
 end)()
@@ -111,9 +122,7 @@ M.store = (function()
 end)()
 
 function M.fire_leave()
-    if not vim.v.event.abort then
-        vim.schedule(M.store)
-    end
+    vim.schedule(M.store)
 end
 
 local function init()

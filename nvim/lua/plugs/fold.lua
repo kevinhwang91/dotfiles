@@ -7,6 +7,7 @@ local uv = vim.loop
 local utils = require('kutils')
 
 local bl_ft
+local coc_loaded_ft
 local anyfold_prefer_ft
 
 local function find_win_except_float(bufnr)
@@ -24,63 +25,103 @@ local function find_win_except_float(bufnr)
     return winid
 end
 
-local function use_anyfold(filename, force)
+function M.use_anyfold(bufnr, force)
+    local filename = api.nvim_buf_get_name(bufnr)
     local st = uv.fs_stat(filename)
     if st then
         local fsize = st.size
         if force or 0 < fsize and fsize < 131072 then
-            cmd('AnyFoldActivate')
+            if fn.bufwinid(bufnr) == -1 then
+                cmd(('au FoldLoad BufEnter <buffer=%d> ++once %s'):format(bufnr,
+                    ([[lua require('plugs.fold').use_anyfold(%d)]]):format(bufnr)))
+            else
+                api.nvim_buf_call(bufnr, function()
+                    utils.cool_echo(('bufnr: %d is using anyfold'):format(bufnr), 'WarningMsg')
+                    cmd('AnyFoldActivate')
+                end)
+            end
         end
     end
+    vim.b[bufnr].loaded_fold = 'anyfold'
 end
 
-function M.do_fold(force)
-    local bufnr = api.nvim_get_current_buf()
-    local filename = api.nvim_buf_get_name(bufnr)
+local function apply_fold(bufnr, ranges)
+    api.nvim_buf_call(bufnr, function()
+        vim.wo.foldmethod = 'manual'
+        cmd('norm! zE')
+        local fold_cmd = {}
+        for _, f in ipairs(ranges) do
+            table.insert(fold_cmd, ('%d,%d:fold'):format(f.startLine + 1, f.endLine + 1))
+        end
+        cmd(table.concat(fold_cmd, '|'))
+        vim.wo.foldenable = true
+        vim.wo.foldlevel = 99
+    end)
+end
+
+function M.update_fold(bufnr)
+    bufnr = bufnr or api.nvim_get_current_buf()
+    require('plugs.coc').run_command('kvs.fold.foldingRange', {bufnr}, function(e, r)
+        if e == vim.NIL and type(r) == 'table' then
+            apply_fold(bufnr, r)
+        end
+    end)
+end
+
+function M.attach(bufnr, force)
+    bufnr = bufnr or api.nvim_get_current_buf()
+    if not api.nvim_buf_is_valid(bufnr) or not force and vim.b[bufnr].loaded_fold then
+        return
+    end
+
     if vim.g.coc_service_initialized == 1 and not vim.tbl_contains(anyfold_prefer_ft, vim.bo.ft) then
-        fn.CocActionAsync('hasProvider', 'foldingRange', function(e, r)
-            if e == vim.NIL and r then
-                fn.CocActionAsync('fold', '', function(e1, r1)
-                    if e1 ~= vim.NIL or not r1 then
-                        use_anyfold(filename, force)
-                    else
-                        pcall(api.nvim_buf_set_var, bufnr, 'loaded_fold', 'coc')
-                        cmd(('au FoldLoad BufWritePost <buffer=%d> %s'):format(bufnr,
-                            [[call CocActionAsync('fold')]]))
+        require('plugs.coc').run_command('kvs.fold.foldingRange', {bufnr}, function(e, r)
+            if not force and vim.b[bufnr].loaded_fold then
+                return
+            end
+            if e == vim.NIL and type(r) == 'table' then
+                -- language servers may need time to parser buffer
+                if #r == 0 then
+                    local ft = vim.bo[bufnr].ft
+                    local loaded = coc_loaded_ft[ft]
+                    if not loaded then
+                        vim.defer_fn(function()
+                            coc_loaded_ft[ft] = true
+                            M.attach(bufnr)
+                        end, 2000)
+                        return
                     end
-                end)
+                end
+                local winid = fn.bufwinid(bufnr)
+                if winid == -1 then
+                    cmd(('au FoldLoad BufEnter <buffer=%d> ++once %s'):format(bufnr,
+                        [[lua require('plugs.fold').update_fold()]]))
+                else
+                    apply_fold(bufnr, r)
+                end
+                vim.b[bufnr].loaded_fold = 'coc'
+                cmd(('au FoldLoad BufWritePost <buffer=%d> %s'):format(bufnr,
+                    [[lua require('plugs.fold').update_fold()]]))
+                cmd(('au FoldLoad BufRead <buffer=%d> %s'):format(bufnr,
+                    [[lua vim.defer_fn(require('plugs.fold').update_fold, 100)]]))
+
             else
-                use_anyfold(filename, force)
+                M.use_anyfold(bufnr, force)
             end
         end)
     else
-        use_anyfold(filename, force)
+        M.use_anyfold(bufnr, force)
     end
     cmd(('au! FoldLoad * <buffer=%d>'):format(bufnr))
     vim.wo.foldenable = true
     vim.wo.foldlevel = 99
     vim.wo.foldtext = [[v:lua.require'plugs.fold'.foldtext()]]
-    vim.b.loaded_fold = 'anyfold'
 end
 
-function M.defer_load(bufnr)
+function M.defer_attach(bufnr)
     bufnr = bufnr or api.nvim_get_current_buf()
     local bo = vim.bo[bufnr]
-    if vim.tbl_contains(bl_ft, bo.ft) or bo.bt ~= '' then
-        return
-    end
-
-    local ok, loadby = pcall(function()
-        return api.nvim_buf_get_var(bufnr, 'loaded_fold')
-    end)
-    if ok then
-        if loadby == 'coc' then
-            vim.defer_fn(function()
-                if bufnr == api.nvim_get_current_buf() then
-                    fn.CocActionAsync('fold')
-                end
-            end, 100)
-        end
+    if vim.b[bufnr].loaded_fold or vim.tbl_contains(bl_ft, bo.ft) or bo.bt ~= '' then
         return
     end
 
@@ -95,23 +136,8 @@ function M.defer_load(bufnr)
 
     wo.foldmethod = 'manual'
     vim.defer_fn(function()
-        if fn.buflisted(bufnr) == 1 then
-            winid = fn.bufwinid(bufnr)
-            if api.nvim_win_is_valid(winid) and vim.wo[winid].foldmethod == 'manual' then
-                if not pcall(function()
-                    return api.nvim_buf_get_var(bufnr, 'loaded_fold')
-                end) then
-                    local cur_bufnr = api.nvim_get_current_buf()
-                    if cur_bufnr == bufnr then
-                        M.do_fold()
-                    else
-                        cmd(('au FoldLoad BufEnter <buffer=%d> ++once %s'):format(bufnr,
-                            [[lua require('plugs.fold').do_fold()]]))
-                    end
-                end
-            end
-        end
-    end, 1500)
+        M.attach(bufnr)
+    end, 1000)
 end
 
 function M.foldtext()
@@ -126,12 +152,12 @@ function M.foldtext()
     end
     local pad = ' '
     fs_line = utils.expandtab(fs_line, vim.bo.ts)
-    local gutter_size = fn.screenpos(0, api.nvim_win_get_cursor(0)[1], 1).curscol -
-                            fn.win_screenpos(0)[2]
-    local width = api.nvim_win_get_width(0) - gutter_size
+    local winid = api.nvim_get_current_win()
+    local textoff = fn.getwininfo(winid)[1].textoff
+    local width = api.nvim_win_get_width(0) - textoff
     local fold_info = (' %d lines %s +- '):format(1 + fe - fs, vim.v.foldlevel)
-    local spaces = pad:rep(width - #fold_info - api.nvim_strwidth(fs_line))
-    return fs_line .. spaces .. fold_info
+    local padding = pad:rep(width - #fold_info - api.nvim_strwidth(fs_line))
+    return fs_line .. padding .. fold_info
 end
 
 function M.nav_fold(forward)
@@ -162,20 +188,19 @@ function M.nav_fold(forward)
     end
 end
 
-function M.toggle_fold(c)
+function M.with_highlight(c)
     local cnt = vim.v.count1
-    local ok = pcall(cmd, ('norm! m`V%dz%s%c'):format(cnt, c, 0x1b))
-    if ok and fn.foldclosed('.') == -1 then
-        cmd(('norm! %c'):format(0x1b))
-        local t
-        t = api.nvim_buf_get_mark(0, '<')
-        local start = {t[1] - 1, t[2]}
-        t = api.nvim_buf_get_mark(0, '>')
-        local finish = {t[1] - 1, t[2]}
+    local fostart = fn.foldclosed('.')
+    local foend
+    if fostart > 0 then
+        foend = fn.foldclosedend('.')
+    end
 
-        utils.highlight(0, 'Visual', start, finish, 500)
-
-        cmd('norm! ``')
+    local ok = pcall(cmd, ('norm! %dz%s'):format(cnt, c))
+    if ok then
+        if fn.foldclosed('.') == -1 and fostart > 0 and foend > fostart then
+            utils.highlight(0, 'Visual', fostart - 1, foend, nil, 400)
+        end
     end
 end
 
@@ -185,19 +210,18 @@ local function init()
     vim.g.anyfold_motion = 0
 
     bl_ft = {'', 'man', 'markdown', 'git', 'floggraph'}
+    coc_loaded_ft = {}
     anyfold_prefer_ft = {'vim'}
     cmd([[
         aug FoldLoad
             au!
-            au FileType * lua require('plugs.fold').defer_load(tonumber(vim.fn.expand('<abuf>')))
+            au FileType * lua require('plugs.fold').defer_attach(tonumber(vim.fn.expand('<abuf>')))
         aug END
     ]])
 
-    cmd([[com! -nargs=0 Fold lua require('plugs.fold').do_fold(true)]])
+    cmd([[com! -nargs=0 Fold lua require('plugs.fold').attach(nil, true)]])
     for _, bufnr in ipairs(api.nvim_list_bufs()) do
-        if fn.buflisted(bufnr) == 1 then
-            M.defer_load(bufnr)
-        end
+        M.defer_attach(bufnr)
     end
 end
 

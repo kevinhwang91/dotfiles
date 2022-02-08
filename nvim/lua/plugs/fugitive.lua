@@ -39,6 +39,13 @@ function M.map()
 end
 
 local function init()
+    local bufname = api.nvim_buf_get_name(0)
+    if bufname:find('/.git/index$') then
+        vim.schedule(function()
+            cmd(('do fugitive BufReadCmd %s'):format(bufname))
+        end)
+    end
+
     vim.g.nremap = {
         ['d?'] = 's?',
         dv = 'sv',
