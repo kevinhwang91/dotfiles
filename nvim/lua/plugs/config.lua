@@ -122,6 +122,13 @@ function M.choosewin()
     map('n', '<M-0>', '<Cmd>ChooseWin<CR>')
 end
 
+function M.delimitmate()
+    g.delimitMate_jump_expansion = 1
+    g.delimitMate_expand_cr = 2
+    map('i', '<CR>', ('pumvisible() ? %s : %s . "<Plug>delimitMateCR"'):format([["\<C-y>"]],
+        [[(getline('.') =~ '^\s*$' ? '' : "\<C-g>u")]]), {noremap = false, expr = true})
+end
+
 function M.grepper()
     g.grepper = {
         dir = 'repo,file',
@@ -134,6 +141,7 @@ function M.grepper()
         }
     }
     map('n', 'gs', '<Plug>(GrepperOperator)', {})
+    map('n', 'gsw', '<Plug>(GrepperOperator)iw', {})
     map('x', 'gs', '<Plug>(GrepperOperator)', {})
     map('n', '<Leader>rg', [[<Cmd>Grepper<CR>]])
     cmd(([[
@@ -153,8 +161,8 @@ end
 function M.exchange()
     map('n', 'cx', '<Plug>(Exchange)', {})
     map('x', 'X', '<Plug>(Exchange)', {})
-    map('n', 'cx;', '<Plug>(ExchangeClear)', {})
     map('n', 'cxx', '<Plug>(ExchangeLine)', {})
+    map('n', 'cxc', '<Plug>(ExchangeClear)', {})
 end
 
 function M.matchup()

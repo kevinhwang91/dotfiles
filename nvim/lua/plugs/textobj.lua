@@ -2,14 +2,14 @@ local M = {}
 local fn = vim.fn
 
 local utils = require('kutils')
+local coc = require('plugs.coc')
 
 function M.select(obj, inner, visual)
-    if vim.g.coc_service_initialized == 1 then
-        local coc = require('plugs.coc')
+    if coc.did_init() then
         local symbols = {func = {'Method', 'Function'}, class = {'Interface', 'Struct', 'Class'}}
         if not inner then
-            local err = coc.a2sync('hasProvider', {'documentSymbol'})
-            if not err then
+            local err, res = coc.a2sync('hasProvider', {'documentSymbol'})
+            if not err and res == true then
                 err = require('plugs.coc').a2sync('selectSymbolRange', {
                     inner, visual and fn.visualmode() or '', symbols[obj]
                 })

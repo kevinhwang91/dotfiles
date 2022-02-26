@@ -71,6 +71,13 @@
 		],
 		"description": "Code snippet for struct"
 	},
+	"Array Length": {
+		"prefix": "arrlen",
+		"body": [
+			"${1:size_t} ${2:len} = sizeof(${3:arr}) / sizeof($3[0])$0"
+		],
+		"description": "Length for array"
+	},
 	"typedef struct": {
 		"prefix": "tys",
 		"body": [

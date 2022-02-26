@@ -14,39 +14,43 @@ local function save_doc(bufnr)
     end)
 end
 
+local function neoformat()
+    cmd('Neoformat')
+    cmd('sil! up')
+end
+
 function M.format_doc()
     gittool.root_exe(function()
-        if vim.g.coc_service_initialized == 1 then
+        if coc.did_init() then
             local bufnr = api.nvim_get_current_buf()
-            local err = coc.a2sync('hasProvider', {'format'}, 2000)
-            if not err then
+            local err, res = coc.a2sync('hasProvider', {'format'}, 2000)
+            if not err and res == true then
                 fn.CocActionAsync('format', '', function(e, _)
                     if e ~= vim.NIL then
                         api.nvim_buf_call(bufnr, function()
-                            cmd('Neoformat')
-                            cmd('sil! up')
+                            neoformat()
                         end)
                     else
                         save_doc(bufnr)
                     end
                 end)
+            else
+                neoformat()
             end
         else
-            cmd('Neoformat')
-            cmd('sil! up')
+            neoformat()
         end
     end)
 end
 
 function M.format_selected(mode)
-    if vim.g.coc_service_initialized == 0 then
-        vim.notify([[coc.nvim hasn't initialized]], vim.log.levels.WARN)
+    if not coc.did_init() then
         return
     end
 
     gittool.root_exe(function()
-        local err = coc.a2sync('hasProvider', {mode and 'formatRange' or 'format'}, 2000)
-        if not err then
+        local err, res = coc.a2sync('hasProvider', {mode and 'formatRange' or 'format'}, 2000)
+        if not err and res == true then
             local bufnr = api.nvim_get_current_buf()
             fn.CocActionAsync(mode and 'formatSelected' or 'format', mode, function(e, _)
                 if e ~= vim.NIL then

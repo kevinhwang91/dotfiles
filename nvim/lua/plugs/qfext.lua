@@ -6,6 +6,10 @@ local cmd = vim.cmd
 local coc = require('plugs.coc')
 
 function M.outline()
+    if not coc.did_init() then
+        return
+    end
+
     local kinds = {'Function', 'Method', 'Interface', 'Struct', 'Class'}
     local bufnr = api.nvim_get_current_buf()
     if vim.bo[bufnr].bt == 'quickfix' then
@@ -31,13 +35,11 @@ function M.outline()
                 text = text_fmt:format(s.kind, lnum, col, ' ', ('| '):rep(s.level), s.text)
             })
         end
-        local bufname = api.nvim_buf_get_name(bufnr)
         fn.setloclist(0, {}, ' ', {
             title = ('Outline Bufnr: %d'):format(bufnr),
             context = {bqf = {fzf_action_for = {esc = 'closeall', ['ctrl-c'] = ''}}},
             items = items,
             quickfixtextfunc = function(qinfo)
-                cmd(('noa lcd %s'):format(fn.fnamemodify(bufname, ':h')))
                 local ret = {}
                 local _items = fn.getloclist(qinfo.winid, {id = qinfo.id, items = 0}).items
                 for i = qinfo.start_idx, qinfo.end_idx do
@@ -54,11 +56,21 @@ function M.outline()
         else
             api.nvim_set_current_win(winid)
         end
-
         if vim.b.bqf_enabled then
             api.nvim_feedkeys('zf', 'm', false)
         end
     end)
+end
+
+function M.outline_syntax()
+    cmd([[
+        syn match Function /^\(Method\|Function\)\s*/ nextgroup=qfSeparator
+        syn match Structure /^\(Interface\|Struct\|Class\)\s*/ nextgroup=qfSeparator
+        syn match qfSeparator /│/ contained nextgroup=qfLineNr
+        syn match qfLineNr /[^│]*/ contained
+        hi def link qfSeparator Delimiter
+        hi def link qfLineNr LineNr
+    ]])
 end
 
 return M

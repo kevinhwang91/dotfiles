@@ -10,6 +10,7 @@
 		"java",
 		"javascript",
 		"lua",
+		"rust",
 		"typescript"
 	],
 	"coc.source.file.triggerCharacters": [
@@ -98,7 +99,8 @@
 				"Lua": {
 					"workspace": {
 						"maxPreload": 2000,
-						"preloadFileSize": 1000
+						"preloadFileSize": 1000,
+						"checkThirdParty": false
 					},
 					"runtime": {
 						"version": "LuaJIT"
@@ -138,7 +140,11 @@
 						"statusBar": false
 					}
 				}
-			}
+			},
+			"disabledFeatures": [
+				"documentFormatting",
+				"documentRangeFormatting"
+			]
 		},
 		"dockerfile": {
 			"command": "docker-langserver",
@@ -160,10 +166,14 @@
 			]
 		},
 		"efm": {
+			"initializationOptions": {
+				"documentFormatting": true
+			},
 			"command": "efm-langserver",
 			"args": [],
 			"filetypes": [
-				"sh"
+				"sh",
+				"lua"
 			],
 			"settings": {
 				"rootMarkers": [
@@ -179,6 +189,12 @@
 								"%f:%l:%c: %tarning: %m",
 								"%f:%l:%c: %tarning: %m"
 							]
+						}
+					],
+					"lua": [
+						{
+							"formatCommand": "lua-format -i",
+							"formatStdin": true
 						}
 					]
 				}

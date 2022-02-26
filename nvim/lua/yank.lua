@@ -8,13 +8,13 @@ local winid
 local bufnr
 local report
 
-function M.wrap()
+function M.wrap(suffix)
     if api.nvim_get_mode().mode == 'n' then
         M.set_wv()
     else
         M.clear_wv()
     end
-    return 'y'
+    return type(suffix) == 'string' and ('y' .. suffix) or 'y'
 end
 
 function M.set_wv()

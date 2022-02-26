@@ -134,6 +134,8 @@ map('x', 'u', '<C-u>')
 map('n', '<C-u>', 'u')
 
 map('n', 'y', [[v:lua.require'yank'.wrap()]], {noremap = true, expr = true})
+map('n', 'yw', [[v:lua.require'yank'.wrap('iw')]], {noremap = true, expr = true})
+map('n', 'yW', [[v:lua.require'yank'.wrap('iW')]], {noremap = true, expr = true})
 map('n', 'Y', 'y$')
 map('n', 'v', 'm`v')
 map('n', 'V', 'm`V')
@@ -416,11 +418,6 @@ g.NERDAltDelims_cpp = 1
 
 map('', '<C-_>', '<Plug>NERDCommenterToggle', {})
 
--- delimitMate
-map('i', '<CR>', ('%s ? %s : %s . "<Plug>delimitMateCR"'):format('pumvisible()', [["\<C-y>"]],
-    [[(getline('.')[:col('.') - 2] =~ '^\s*$' ? col('.') == 1 ? '' : "\<Bs>" : "\<C-g>u")]]),
-    {noremap = false, expr = true})
-
 map('n', '<Leader>jj', '<Cmd>Jumps<CR>')
 
 -- notify
@@ -600,6 +597,9 @@ vim.schedule(function()
         g.coc_selectmode_mapping = 0
         cmd([[
             au User CocNvimInit ++once lua require('plugs.coc').initialize()
+            hi! link CocSemDefaultLibrary Special
+            hi! link CocSemDocumentation Number
+            hi! CocSemStatic gui=bold
         ]])
         cmd('pa coc-kvs')
         cmd('pa coc.nvim')

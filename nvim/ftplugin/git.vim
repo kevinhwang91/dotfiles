@@ -1,7 +1,6 @@
 setlocal foldmethod=expr
 setlocal foldexpr=DiffFold()
 setlocal foldcolumn=2
-setlocal foldtext=v:lua.foldtext()
 setlocal signcolumn=no
 
 function! DiffFold()

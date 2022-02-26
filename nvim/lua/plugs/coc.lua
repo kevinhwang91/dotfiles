@@ -186,7 +186,10 @@ function M.a2sync(action, args, time)
     local wait_ret = vim.wait(time or 1000, function()
         return done
     end)
-    err, res = err or not wait_ret, wait_ret and res or 'timeout'
+    err = err or not wait_ret
+    if not wait_ret then
+        res = 'timeout'
+    end
     return err, res
 end
 
@@ -299,7 +302,8 @@ function M.scroll(down)
 end
 
 function M.scroll_insert(right)
-    if #fn['coc#float#get_float_win_list']() > 0 and fn.pumvisible() == 0 then
+    if #fn['coc#float#get_float_win_list']() > 0 and fn.pumvisible() == 0 and
+        api.nvim_get_current_win() ~= vim.g.coc_last_float_win then
         return fn['coc#float#scroll'](right)
     else
         return right and utils.termcodes['<Right>'] or utils.termcodes['<Left>']
@@ -308,6 +312,16 @@ end
 
 function M.sign_icon(level)
     return sign_icons[level]
+end
+
+function M.did_init(silent)
+    if vim.g.coc_service_initialized == 0 then
+        if silent then
+            vim.notify([[coc.nvim hasn't initialized]], vim.log.levels.WARN)
+        end
+        return false
+    end
+    return true
 end
 
 function M.initialize()

@@ -97,7 +97,7 @@ function M.batch_sub(is_loc, pat_rep)
     end
 end
 
-function _G.qftf(qinfo)
+function M.qftf(qinfo)
     local items
     local ret = {}
     require('gittool').cd_root(fn.bufname('#'), true)
@@ -184,9 +184,41 @@ function M.close()
     end
 end
 
+function M.syntax()
+    if vim.b.current_syntax then
+        return
+    end
+
+    local title = vim.w.quickfix_title
+    if title:match('^%**[Oo]utline') then
+        require('plugs.qfext').outline_syntax()
+    else
+        cmd([[
+            syn match qfFileName /^[^│]*/ nextgroup=qfSeparatorLeft
+            syn match qfSeparatorLeft /│/ contained nextgroup=qfLineNr
+            syn match qfLineNr /[^│]*/ contained nextgroup=qfSeparatorRight
+            syn match qfSeparatorRight '│' contained nextgroup=qfError,qfWarning,qfInfo,qfNote
+            syn match qfError / E .*$/ contained
+            syn match qfWarning / W .*$/ contained
+            syn match qfInfo / I .*$/ contained
+            syn match qfNote / [NH] .*$/ contained
+
+            hi def link qfFileName Directory
+            hi def link qfSeparatorLeft Delimiter
+            hi def link qfSeparatorRight Delimiter
+            hi def link qfLineNr LineNr
+            hi def link qfError CocErrorSign
+            hi def link qfWarning CocWarningSign
+            hi def link qfInfo CocInfoSign
+            hi def link qfNote CocHintSign
+        ]])
+        end
+    vim.b.current_syntax = 'qf'
+end
+
 local function init()
     vim.g.qf_disable_statusline = true
-    vim.o.qftf = '{info -> v:lua._G.qftf(info)}'
+    vim.o.qftf = [[{info -> v:lua.require('qf').qftf(info)}]]
     cmd([[
         com! -nargs=1 Cdos lua require('qf').batch_sub(false, <q-args>)
         com! -nargs=1 Ldos lua require('qf').batch_sub(true, <q-args>)

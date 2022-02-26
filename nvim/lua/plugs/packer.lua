@@ -88,7 +88,7 @@ return packer.startup({
             requires = 'haya14busa/vim-asterisk'
         }
 
-        use {'Raimondi/delimitMate', event = 'InsertEnter'}
+        use {'Raimondi/delimitMate', event = 'InsertEnter', config = conf('delimitmate')}
 
         use {
             'tpope/vim-surround',
@@ -146,7 +146,7 @@ return packer.startup({
 
         use {
             'tommcdo/vim-exchange',
-            keys = {{'x', 'X'}, {'n', 'cx'}, {'n', 'cx;'}, {'n', 'cxx'}},
+            keys = {{'x', 'X'}, {'n', 'cx'}, {'n', 'cxx'}},
             setup = [[vim.g.exchange_no_mappings = 1]],
             config = conf('exchange')
         }
