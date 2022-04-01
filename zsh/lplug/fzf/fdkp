@@ -58,5 +58,5 @@ local fzf_preview_cmd="docker inspect --format='\
 sed -E -e 's/ @/@/g' -e '1s/^/PID@IMAGE@IPADDRESS@PORTS\n/' |
 column -t -s'@'"
 
-_fdkp | $FZF_CMD -q "$*" ${(z)fzf_opts} --preview=$fzf_preview_cmd |
+_fdkp $@ | $FZF_CMD ${(z)fzf_opts} --preview=$fzf_preview_cmd |
     awk '{printf "%s ", $3}' | sed -E '$s/ $//'

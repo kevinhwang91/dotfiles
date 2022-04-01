@@ -39,5 +39,5 @@ local fzf_preview_cmd="docker inspect --format='\
 {{printf \"Cmd: %s\" (join .Config.Cmd \" \")}}' {1} |
 awk -v OFS=' ' '{ \$1=\$1;print \$0 }'"
 
-_fdki | $FZF_CMD -q "$*" ${(z)fzf_opts} --preview=$fzf_preview_cmd |
+_fdki $@ | $FZF_CMD ${(z)fzf_opts} --preview=$fzf_preview_cmd |
     awk '{printf "%s ", $2}' | sed -E '$s/ $//'
