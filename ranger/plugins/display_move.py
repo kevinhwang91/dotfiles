@@ -26,7 +26,7 @@ class DisplayMove(Command):
             return
 
         cwd = self.fm.thisdir
-        pos_orgin = cwd.pointer
+        pos_origin = cwd.pointer
         while True:
             old_thisfile = self.fm.thisfile
             cwd.pointer = direction.move(
@@ -37,11 +37,11 @@ class DisplayMove(Command):
             cwd.correct_pointer()
             if self.fm.thisfile.is_directory:
                 if old_thisfile == self.fm.thisfile:
-                    cwd.pointer = pos_orgin
+                    cwd.pointer = pos_origin
                     cwd.correct_pointer()
                     break
             else:
                 break
 
-        if pos_orgin != cwd.pointer:
+        if pos_origin != cwd.pointer:
             self.fm.display_file()
