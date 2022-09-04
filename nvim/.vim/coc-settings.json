@@ -1,8 +1,0 @@
-{
-	"workspace.bottomUpFiletypes": ["lua", "vim", "json"],
-	"languageserver": {
-		"lua": {
-			"rootPatterns": ["after", "ftplugin", "lua"]
-		}
-	}
-}
