@@ -75,7 +75,7 @@ local keys = {
     {key = '.', mods = 'CTRL', action = ac {SendString = '\x1b\x5b\x32\x34\x3b\x36\x7e'}},
     -- Map Control-[ and Control-m to Alt-Shift-[F1-F2] (F61-F62)
     {key = '[', mods = 'CTRL', action = ac {SendString = '\x1b\x5b\x31\x3b\x34\x50'}},
-    {key = 'M', mods = 'CTRL', action = ac {SendString = '\x1b\x5b\x31\x3b\x34\x51'}}
+    {key = 'm', mods = 'CTRL', action = ac {SendString = '\x1b\x5b\x31\x3b\x34\x51'}}
 }
 
 return {
