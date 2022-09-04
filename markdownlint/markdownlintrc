@@ -4,8 +4,6 @@
 		"line_length": 100
 	},
 	"MD024": false,
-	"MD033": false,
-	"_vim_": {
-		"modeline": "/* vim: set ft=json: */"
-	}
+	"MD033": false
 }
+// vim: ft=jsonc

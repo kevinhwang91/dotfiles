@@ -8,8 +8,6 @@ if (( $+commands[grc] )); then
     cmds=(
         ping
         traceroute
-        cc gcc g++ c++
-        make gmake bear
         stat
         ss
         mount

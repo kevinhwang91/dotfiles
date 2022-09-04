@@ -6,7 +6,7 @@ colours=default,yellow,bold yellow
 regexp=^NAME.*
 colours=default
 -
-# Oficial
+# Official
 regexp=\[OK\](?!$)
 colours=bold green
 -

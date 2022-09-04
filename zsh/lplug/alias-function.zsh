@@ -154,7 +154,7 @@ alias dke='docker exec -i -t'
 alias dkp='docker ps'
 alias dkpe='docker ps -f status=exited'
 alias dki='docker images'
-alias dklf='docker log -f'
+alias dklf='docker logs -f'
 alias dkbt='docker build -t'
 alias dkis='docker inspect'
 
