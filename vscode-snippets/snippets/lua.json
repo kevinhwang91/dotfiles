@@ -1,0 +1,182 @@
+{
+	"require": {
+		"prefix": "req",
+		"body": [
+			"require('${1:module}')$0"
+		],
+		"description": "Require module"
+	},
+	"return": {
+		"prefix": "ret",
+		"body": [
+			"return $0"
+		],
+		"description": "return value"
+	},
+	"local": {
+		"prefix": "lo",
+		"body": [
+			"local $0"
+		],
+		"description": "declare local variable"
+	},
+	"assignment": {
+		"prefix": "la",
+		"body": [
+			"local ${1:varName} = ${2:value}"
+		],
+		"description": "create a variable"
+	},
+	"local function": {
+		"prefix": "lof",
+		"body": [
+			"local function ${1:name}($2)",
+			"\t$0",
+			"end"
+		],
+		"description": "local function"
+	},
+	"locreq": {
+		"prefix": "lor",
+		"body": [
+			"local ${2:var} = require('${1:module}')$0"
+		],
+		"description": "Require module as a variable"
+	},
+	"if": {
+		"prefix": "if",
+		"body": [
+			"if ${1:true} then",
+			"\t$0",
+			"end"
+		]
+	},
+	"else": {
+		"prefix": "else",
+		"body": [
+			"else",
+			"\t$0"
+		]
+	},
+	"elseif": {
+		"prefix": "elseif",
+		"body": [
+			"elseif ${1:true} then",
+			"\t$0"
+		]
+	},
+	"for": {
+		"prefix": "for",
+		"body": [
+			"for ${1:i} = ${2:1}, ${3:10} do",
+			"\t$0",
+			"end"
+		],
+		"description": "for loop range"
+	},
+	"fori": {
+		"prefix": "fori",
+		"body": [
+			"for ${1:i}, ${2:v} in ipairs(${3:t}) do",
+			"\t$0",
+			"end"
+		],
+		"description": "for loop list"
+	},
+	"forp": {
+		"prefix": "forp",
+		"body": [
+			"for ${1:k}, ${2:v} in pairs(${3:t}) do",
+			"\t$0",
+			"end"
+		],
+		"description": "for loop table"
+	},
+	"function": {
+		"prefix": "fun",
+		"body": [
+			"function $1($2)",
+			"\t$0",
+			"end"
+		]
+	},
+	"print": {
+		"prefix": "p",
+		"body": [
+			"print(${0})"
+		]
+	},
+	"class": {
+		"prefix": "cl",
+		"body": [
+			"local ${1:Class} = {}",
+			"",
+			"function $1:new($2)",
+			"\tlocal ${3:o} = setmetatable({}, self)",
+			"\tself.__index = self",
+			"\t$0",
+			"\treturn $3",
+			"end"
+		],
+		"description": "Create a class"
+	},
+	"method": {
+		"prefix": "fum",
+		"body": [
+			"function ${1:Class}:${2:methodName}($3)",
+			"\t$0",
+			"end"
+		]
+	},
+	"while": {
+		"prefix": "whi",
+		"body": [
+			"while ${1:true} do",
+			"\t$0",
+			"end"
+		]
+	},
+	"surround-function": {
+		"prefix": "sfun",
+		"body": [
+			"$1function($2)",
+			"\t$TM_SELECTED_TEXT",
+			"end"
+		]
+	},
+	"surround-ktime": {
+		"prefix": "skt",
+		"body": [
+			"local ${1:rt} = ktime()",
+			"$TM_SELECTED_TEXT",
+			"${0:info}(ktime() - $1)"
+		]
+	},
+	"describe": {
+		"prefix": "desc",
+		"body": [
+			"describe('${1:tag}', function()",
+			"\t$0",
+			"end)"
+		],
+		"description": "busted describe"
+	},
+	"it": {
+		"prefix": "it",
+		"body": [
+			"it('${1:should}', function()",
+			"\t$0",
+			"end)"
+		],
+		"description": "busted test"
+	},
+	"new promise": {
+		"prefix": "npm",
+		"body": [
+			"promise(function(${1:resolve}, ${2:reject})",
+			"\t$3",
+			"end)$0"
+		],
+		"description": "create a promise"
+	}
+}

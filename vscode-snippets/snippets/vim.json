@@ -1,0 +1,76 @@
+{
+	"let": {
+		"prefix": "let",
+		"body": [
+			"let ${1:var} = ${0:val}"
+		],
+		"description": "set internal variable to value"
+	},
+	"unlet": {
+		"prefix": "unlet",
+		"body": [
+			"unlet ${0:var}"
+		],
+		"description": "set internal variable to value"
+	},
+	"for": {
+		"prefix": "for",
+		"body": [
+			"for ${1:l} in ${2:list}",
+			"\t$0",
+			"endfor"
+		],
+		"description": "for ... in loop"
+	},
+	"fork": {
+		"prefix": "fork",
+		"body": [
+			"for ${1:k} in keys(${2:dict})",
+			"\t$0",
+			"endfor"
+		],
+		"description": "for key in loop"
+	},
+	"forv": {
+		"prefix": "forv",
+		"body": [
+			"for ${1:v} in values(${2:dict})",
+			"\t$0",
+			"endfor"
+		],
+		"description": "for value in loop"
+	},
+	"fori": {
+		"prefix": "fori",
+		"body": [
+			"for [${1:k}, ${2:v}] in items(${3:dict})",
+			"\t$0",
+			"endfor"
+		],
+		"description": "for [k, v] in loop"
+	},
+	"while": {
+		"prefix": "whi",
+		"body": [
+			"while $1",
+			"\t$0",
+			"endwhile"
+		],
+		"description": "while loop"
+	},
+	"catch": {
+		"prefix": "catch",
+		"body": [
+			"catch /.*/"
+		],
+		"description": "catch exception"
+	},
+	"surround-reltimestr": {
+		"prefix": "skt",
+		"body": [
+			"let ${1:rt} = reltime()",
+			"$TM_SELECTED_TEXT",
+			"${0:echom} reltimestr(reltime($1))"
+		]
+	}
+}
